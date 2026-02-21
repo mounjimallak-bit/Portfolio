@@ -1,116 +1,84 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axiora — Détails du projet</title>
+<!-- =========================
+     AXIORA DATA - INTRODUCTION
+     ========================= -->
+<section id="introduction" class="project-section">
+  <div class="container">
+    <h2>Introduction</h2>
 
-  <!-- Chemin relatif vers ton CSS racine -->
-  <link rel="stylesheet" href="../../styles.css" />
-</head>
+    <h3>Contexte</h3>
+    <p>
+      Les indicateurs socio-économiques constituent un levier essentiel pour la compréhension du
+      développement territorial et la prise de décision stratégique. La région Souss-Massa présente
+      une diversité démographique, économique et sociale nécessitant une analyse approfondie et
+      structurée des données officielles.
+    </p>
+    <p>
+      Dans ce contexte, <strong>Axiora Data</strong> a été développé comme une plateforme intelligente
+      d’analyse, de visualisation et de prévision des indicateurs socio-économiques régionaux,
+      basée sur les données du Haut-Commissariat au Plan (HCP).
+    </p>
 
-<body>
-  <div class="bg-glow"></div>
+    <h3>Problématique</h3>
+    <p>
+      Les données publiques sont souvent disponibles sous forme statique (rapports PDF, tableaux bruts),
+      ce qui limite :
+    </p>
+    <ul>
+      <li>l’exploration interactive</li>
+      <li>la comparaison multi-années</li>
+      <li>l’analyse comparative entre provinces et communes</li>
+      <li>la génération automatique d’insights</li>
+      <li>la projection des tendances futures</li>
+    </ul>
+    <p>
+      Il existe donc un besoin d’un outil <strong>interactif</strong>, <strong>dynamique</strong>,
+      <strong>prédictif</strong> et orienté <strong>aide à la décision</strong>.
+    </p>
 
-  <header class="header">
-    <div class="container nav">
-      <a class="logo" href="../../index.html#portfolio">← Retour</a>
+    <h3>Objectif du Projet</h3>
+    <p>Axiora Data vise à :</p>
+    <ul>
+      <li>Centraliser et structurer les indicateurs socio-économiques régionaux</li>
+      <li>Offrir une visualisation interactive avancée</li>
+      <li>Permettre des comparaisons temporelles et spatiales</li>
+      <li>Intégrer des modèles de Machine Learning pour la prévision</li>
+      <li>Fournir un assistant IA capable d’interpréter les données</li>
+      <li>Générer automatiquement des rapports décisionnels en PDF</li>
+    </ul>
 
-      <nav class="nav-links">
-        <a href="../../index.html#home">Home</a>
-        <a href="../../index.html#about">About</a>
-        <a href="../../index.html#skills">Skills</a>
-        <a href="../../index.html#portfolio" class="active">Portfolio</a>
-        <a href="../../index.html#contact">Contact</a>
-      </nav>
+    <h3>Vision</h3>
+    <p>
+      Axiora Data ne se limite pas à un simple tableau de bord. Il s’agit d’une
+      <strong>plateforme d’intelligence socio-économique</strong>, combinant :
+    </p>
+    <ul>
+      <li>Data Analytics</li>
+      <li>Visualisation avancée</li>
+      <li>Intelligence artificielle</li>
+      <li>Géospatial</li>
+      <li>Automatisation de reporting</li>
+    </ul>
+    <p>
+      L’objectif final est de transformer les données statistiques en <strong>outil stratégique
+      d’aide à la décision</strong>.
+    </p>
 
-      <div class="nav-actions">
-        <a class="btn btn-primary" href="../../CV_Malak_Mounji.pdf" download>Download CV</a>
-      </div>
-    </div>
-  </header>
+    <p class="project-links">
+      <a href="https://github.com/mounjimallak-bit/Axiora-data-app" target="_blank" rel="noopener">
+        Voir le repository GitHub
+      </a>
+    </p>
+  </div>
+</section>
 
-  <main class="container">
-    <section class="section" style="border-top:none;">
-      <div class="section-head">
-        <h2>Axiora — Application d’analyse (Streamlit)</h2>
-        <p>Interface interactive pour explorer des données, visualiser et produire des insights.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>Contexte</h3>
-          <p>
-            Projet orienté valorisation des données : nettoyage, exploration, visualisation,
-            et restitution via une application web simple à utiliser.
-          </p>
-
-          <h3 style="margin-top:14px;">Objectifs</h3>
-          <ul>
-            <li>Permettre l’exploration rapide (EDA) via une interface.</li>
-            <li>Afficher des visualisations claires et des indicateurs clés.</li>
-            <li>Rendre le projet facilement partageable (démo web).</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>Stack & Outils</h3>
-          <ul>
-            <li>Python (Pandas, NumPy)</li>
-            <li>Visualisation (Plotly / Matplotlib)</li>
-            <li>Streamlit (UI + déploiement)</li>
-            <li>Git/GitHub</li>
-          </ul>
-
-          <h3 style="margin-top:14px;">Résultats</h3>
-          <ul>
-            <li>Navigation simple (filtres, vues, graphiques).</li>
-            <li>Indicateurs + visualisations lisibles.</li>
-            <li>Application présentable pour un recruteur.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
-        <h3>Captures</h3>
-        <p class="section-text" style="max-width:none;">
-          Remplace les images ci-dessous par tes propres captures (ou garde-les si tu veux).
-        </p>
-
-        <div class="projects" style="grid-template-columns:1fr 1fr 1fr; margin-top:12px;">
-          <div class="project-card" style="pointer-events:none;">
-            <img src="../../portfolio1.jpg" alt="Axiora capture 1" />
-            <div class="project-body">
-              <h3>Vue principale</h3>
-              <p>Présentation générale + filtres.</p>
-            </div>
-          </div>
-
-          <div class="project-card" style="pointer-events:none;">
-            <img src="../../portfolio2.jpg" alt="Axiora capture 2" />
-            <div class="project-body">
-              <h3>Analyse</h3>
-              <p>Graphiques et indicateurs.</p>
-            </div>
-          </div>
-
-          <div class="project-card" style="pointer-events:none;">
-            <img src="../../portfolio3.jpg" alt="Axiora capture 3" />
-            <div class="project-body">
-              <h3>Insights</h3>
-              <p>Résultats et interprétation.</p>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="#" target="_blank">Voir la démo (Streamlit)</a>
-          <a class="btn btn-ghost" href="#" target="_blank">Code / Repo (optionnel)</a>
-        </div>
-      </div>
-
-      <footer class="footer">© 2026 — Malak Mounji</footer>
-    </section>
-  </main>
-</body>
-</html>
+<!-- (Optionnel) Styles rapides si tu n'as pas encore de CSS -->
+<style>
+  .project-section { padding: 48px 0; }
+  .project-section .container { max-width: 980px; margin: 0 auto; padding: 0 18px; }
+  .project-section h2 { font-size: 32px; margin: 0 0 18px; }
+  .project-section h3 { font-size: 20px; margin: 22px 0 10px; }
+  .project-section p { line-height: 1.7; margin: 10px 0; }
+  .project-section ul { margin: 10px 0 10px 18px; line-height: 1.7; }
+  .project-links { margin-top: 18px; }
+  .project-links a { text-decoration: none; font-weight: 600; }
+</style>
