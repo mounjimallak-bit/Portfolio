@@ -1,87 +1,112 @@
 <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malak Mounji | Portfolio</title>
 
-        <!--==================== UNICONS ====================-->
-        
-        
-        <!--==================== SWIPER CSS ====================-->
-        
-        <link rel="stylesheet" href="swiper-bundle.min.css">
-        <!--==================== CSS ====================-->
-        <link rel="stylesheet" href="styles.css">
-        
-     
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
 
-        <title>Responsive Portfolio Website</title>
-    </head>
-    <body>
-        <!--==================== HEADER ====================-->
-        <header class="header" id="header">
-            
-        </header>
+<body>
+  <!-- ===== HEADER / NAV ===== -->
+  <header class="header" id="header" style="position:sticky;top:0;background:#fff;z-index:10;">
+    <nav style="max-width:1000px;margin:0 auto;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+      <strong>Malak</strong>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#portfolio">Portfolio</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+  </header>
 
-        <!--==================== MAIN ====================-->
-        <main class="main">
-            <!--==================== HOME ====================-->
-            <section class="home section" id="home">
-                
-            </section>
+  <main class="main" style="max-width:1000px;margin:0 auto;padding:24px 18px;">
 
-            <!--==================== ABOUT ====================-->
-            <section class="about section" id="about">
-                
-            </section>
+    <!-- ===== HOME ===== -->
+    <section class="home section" id="home" style="display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center;">
+      <div>
+        <h1 style="font-size:40px;margin:0;">Hi, I'm Malak</h1>
+        <h3 style="margin:10px 0 0;opacity:.8;">Data Science • ML • Power BI</h3>
+        <p style="margin-top:14px;line-height:1.6;max-width:520px;">
+          Étudiante ingénieure en Data Science & IA. Je construis des solutions d’analyse, des dashboards
+          et des applications data (Streamlit).
+        </p>
 
-            <!--==================== SKILLS ====================-->
-            <section class="skills section" id="skills">
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="#contact" style="padding:10px 14px;border-radius:10px;background:#6c63ff;color:#fff;text-decoration:none;">Contact me</a>
+          <a href="https://github.com/mounjimallak-bit" target="_blank" style="padding:10px 14px;border-radius:10px;border:1px solid #ddd;text-decoration:none;">GitHub</a>
+          <a href="https://axiora-data.streamlit.app/" target="_blank" style="padding:10px 14px;border-radius:10px;border:1px solid #ddd;text-decoration:none;">Axiora Demo</a>
+        </div>
+      </div>
 
-            </section>
+      <div style="display:flex;justify-content:center;">
+        <!-- remplace perfil.png si tu veux -->
+        <img src="perfil.png" alt="profile" style="width:260px;border-radius:50%;border:8px solid #6c63ff;object-fit:cover;" />
+      </div>
+    </section>
 
-            <!--==================== QUALIFICATION ====================-->
-            <section class="qualification section">
+    <hr style="margin:28px 0;opacity:.2;"/>
 
-            </section>
+    <!-- ===== ABOUT ===== -->
+    <section class="about section" id="about">
+      <h2>About</h2>
+      <p style="line-height:1.6;max-width:850px;">
+        Je m’intéresse à la data analytics, au machine learning et à la BI. J’aime transformer des données
+        en insights et livrer des projets clairs (storytelling + KPIs + dashboards).
+      </p>
+    </section>
 
-            <!--==================== SERVICES ====================-->
-            <section class="services section" id="services">
-                
-            </section>
+    <hr style="margin:28px 0;opacity:.2;"/>
 
-            <!--==================== PORTFOLIO ====================-->
-            <section class="portfolio section" id="portfolio">
-                
-            </section>
+    <!-- ===== SKILLS ===== -->
+    <section class="skills section" id="skills">
+      <h2>Skills</h2>
+      <p>Python • SQL • Scikit-learn • Streamlit • Plotly • Power BI • MongoDB • Neo4j</p>
+    </section>
 
-            <!--==================== PROJECT IN MIND ====================-->
-            <section class="project section">
+    <hr style="margin:28px 0;opacity:.2;"/>
 
-            </section>
+    <!-- ===== PORTFOLIO ===== -->
+    <section class="portfolio section" id="portfolio">
+      <h2>Portfolio</h2>
 
-            <!--==================== TESTIMONIAL ====================-->
-            <section class="testimonial section">
-                
-            </section>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;">
+        <a href="post/axiora/" style="text-decoration:none;border:1px solid #eee;border-radius:14px;padding:14px;display:flex;gap:12px;">
+          <img src="portfolio1.jpg" alt="Axiora" style="width:120px;height:80px;border-radius:10px;object-fit:cover;">
+          <div>
+            <h3 style="margin:0;">Axiora (Streamlit)</h3>
+            <p style="margin:8px 0 0;opacity:.8;">Analyse socio-économique + ML + visualisations.</p>
+            <span style="color:#6c63ff;">Voir détails →</span>
+          </div>
+        </a>
 
-            <!--==================== CONTACT ME ====================-->
-            <section class="contact section" id="contact">
+        <a href="post/powerbi/" style="text-decoration:none;border:1px solid #eee;border-radius:14px;padding:14px;display:flex;gap:12px;">
+          <img src="portfolio2.jpg" alt="Power BI" style="width:120px;height:80px;border-radius:10px;object-fit:cover;">
+          <div>
+            <h3 style="margin:0;">Dashboard Power BI</h3>
+            <p style="margin:8px 0 0;opacity:.8;">KPIs fournisseurs + ETL SQL.</p>
+            <span style="color:#6c63ff;">Voir détails →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-            </section>
-        </main>
+    <hr style="margin:28px 0;opacity:.2;"/>
 
-        <!--==================== FOOTER ====================-->
-        <footer class="footer">
-         
-        </footer>
-        
-        <!--==================== SCROLL TOP ====================-->
-        
+    <!-- ===== CONTACT ===== -->
+    <section class="contact section" id="contact">
+      <h2>Contact</h2>
+      <p>Email : <a href="mailto:mounji.mallak@gmail.com">mounji.mallak@gmail.com</a></p>
+    </section>
 
-        <!--==================== SWIPER JS ====================-->
-        <script src="swiper-bundle.min.js"></script>
-<script src="main.js"></script>
-    </body>
+  </main>
+
+  <footer class="footer" style="text-align:center;padding:18px;opacity:.7;">
+    © 2026 — Malak Mounji
+  </footer>
+</body>
 </html>
-
