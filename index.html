@@ -8,64 +8,208 @@
 </head>
 
 <body>
-  <div class="page">
-    <div class="card">
+  <!-- Background glow -->
+  <div class="bg-glow"></div>
 
-      <!-- LEFT PURPLE SIDE -->
-      <div class="left">
-        <div class="brand">Malak</div>
+  <header class="header">
+    <div class="container nav">
+      <a class="logo" href="#home">Malak</a>
 
-        <div class="avatar-wrap">
-          <div class="ring ring-outer"></div>
-          <div class="ring ring-inner"></div>
+      <nav class="nav-links">
+        <a href="#home" class="active">Home</a>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#portfolio">Portfolio</a>
+        <a href="#contact">Contact</a>
+      </nav>
 
-          <div class="avatar">
-            <!-- Remplace malak.jpeg par ton fichier exact -->
-            <img src="malak.jpeg" alt="Malak Mounji">
-          </div>
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="#portfolio">Voir projets</a>
+        <a class="btn btn-primary" href="#contact">Contact Me</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <div class="hero-left">
+        <p class="kicker">Hello, I'm</p>
+        <h1 class="title">Malak Mounji</h1>
+        <p class="subtitle">
+          Étudiante ingénieure — Data & Intelligence Artificielle
+        </p>
+
+        <p class="desc">
+          Je conçois des solutions data claires et utiles : analyse, reporting et applications interactives.
+          Objectif : transformer des données brutes en décisions.
+        </p>
+
+        <div class="cta">
+          <!-- Mets ton vrai PDF dans le repo: CV_Malak_Mounji.pdf -->
+          <a class="btn btn-primary" href="CV_Malak_Mounji.pdf" download>Download CV</a>
+          <a class="btn btn-ghost" href="#about">About me</a>
+        </div>
+
+        <div class="social">
+          <a href="mailto:mounji.mallak@gmail.com" title="Email">✉</a>
+          <a href="#" target="_blank" title="LinkedIn">in</a>
+          <a href="https://github.com/mounjimallak-bit" target="_blank" title="GitHub">⌂</a>
         </div>
       </div>
 
-      <!-- RIGHT WHITE SIDE -->
-      <div class="right">
-        <!-- NAV -->
-        <header class="topbar">
-          <nav class="nav">
-            <a href="#home" class="nav-link active">Home</a>
-            <a href="#about" class="nav-link">About Me</a>
-            <a href="#portfolio" class="nav-link">Portfolio</a>
-          </nav>
-
-          <a class="btn btn-primary" href="#contact">Contact Me</a>
-
-          <button class="mode" aria-label="Toggle theme" title="Toggle theme">
-            ☾
-          </button>
-        </header>
-
-        <!-- HERO CONTENT -->
-        <main class="hero" id="home">
-          <div class="hero-text">
-            <h1 class="title">Malak Mounji</h1>
-            <p class="subtitle">Data Scientist / ML & BI</p>
-
-            <a class="btn btn-shadow" href="#" download>Download CV</a>
+      <div class="hero-right">
+        <div class="photo-card">
+          <div class="photo-arch">
+            <!-- Remplace par ton fichier exact -->
+            <img src="malak.jpeg" alt="Malak Mounji" />
           </div>
-
-          <!-- Social Icons (simple) -->
-          <div class="social">
-            <a href="#" title="Email">✉</a>
-            <a href="#" title="LinkedIn">in</a>
-            <a href="#" title="GitHub">⌂</a>
-          </div>
-        </main>
-
-        <!-- anchors (optional) -->
-        <div id="about"></div>
-        <div id="portfolio"></div>
-        <div id="contact"></div>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <div class="section-head">
+        <h2>About Me</h2>
+        <p>Profil orienté projets, rigueur, et sens du résultat.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Ce que je fais</h3>
+          <p>
+            Je travaille sur des projets data de bout en bout : nettoyage, analyse exploratoire,
+            visualisation, et restitution via dashboards ou applications.
+          </p>
+          <p>
+            J’accorde une attention particulière à la clarté (KPI, storytelling, structure)
+            et à la qualité (organisation, reproductibilité).
+          </p>
+        </div>
+
+        <div class="card stats">
+          <div class="stat">
+            <div class="stat-num">2+</div>
+            <div class="stat-txt">Projets portfolio</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">ENSA</div>
+            <div class="stat-txt">Ingénierie (Data/IA)</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">BI</div>
+            <div class="stat-txt">Dashboards & KPIs</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section">
+      <div class="section-head">
+        <h2>Skills</h2>
+        <p>Compétences clés pour un stage PFA orienté data.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3>Data & Analyse</h3>
+          <ul>
+            <li>Data cleaning, EDA</li>
+            <li>Visualisation & storytelling</li>
+            <li>KPIs & reporting</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Outils</h3>
+          <ul>
+            <li>Python, SQL</li>
+            <li>Power BI</li>
+            <li>Streamlit</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Bases de données</h3>
+          <ul>
+            <li>MySQL</li>
+            <li>MongoDB</li>
+            <li>Neo4j</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="section">
+      <div class="section-head">
+        <h2>Portfolio</h2>
+        <p>Chaque projet ouvre une page dédiée (détails, outils, résultats).</p>
+      </div>
+
+      <div class="projects">
+        <a class="project-card" href="post/axiora/">
+          <img src="portfolio1.jpg" alt="Axiora" />
+          <div class="project-body">
+            <h3>Axiora — Application d’analyse</h3>
+            <p>Exploration et visualisation via une interface web (Streamlit).</p>
+            <span class="project-link">Voir détails →</span>
+          </div>
+        </a>
+
+        <a class="project-card" href="post/powerbi/">
+          <img src="portfolio2.jpg" alt="Power BI" />
+          <div class="project-body">
+            <h3>Dashboard Power BI — KPIs</h3>
+            <p>Tableaux de bord, KPIs et restitution claire pour décision.</p>
+            <span class="project-link">Voir détails →</span>
+          </div>
+        </a>
+
+        <a class="project-card" href="post/project3/">
+          <img src="portfolio3.jpg" alt="Projet 3" />
+          <div class="project-body">
+            <h3>Projet (à venir)</h3>
+            <p>Une page modèle pour ajouter rapidement d’autres projets.</p>
+            <span class="project-link">Voir détails →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+      <div class="section-head">
+        <h2>Contact</h2>
+        <p>Écris-moi pour un stage PFA / collaboration / opportunité.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Coordonnées</h3>
+          <p><strong>Email :</strong> <a href="mailto:mounji.mallak@gmail.com">mounji.mallak@gmail.com</a></p>
+          <p><strong>GitHub :</strong> <a href="https://github.com/mounjimallak-bit" target="_blank">mounjimallak-bit</a></p>
+          <p><strong>LinkedIn :</strong> <a href="#" target="_blank">à ajouter</a></p>
+        </div>
+
+        <div class="card">
+          <h3>Message</h3>
+          <form class="form" onsubmit="return false;">
+            <input type="text" placeholder="Votre nom" />
+            <input type="email" placeholder="Votre email" />
+            <textarea rows="4" placeholder="Votre message"></textarea>
+            <button class="btn btn-primary" type="button">Send Message</button>
+          </form>
+          <p class="form-note">(* formulaire visuel. On peut l’activer plus tard.)</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      © 2026 — Malak Mounji • Portfolio
+    </footer>
+  </main>
 </body>
 </html>
