@@ -11,7 +11,6 @@
 <body>
   <div class="bg-glow"></div>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="container nav">
       <a class="logo" href="../../index.html#portfolio">← Retour</a>
@@ -32,14 +31,11 @@
 
   <main class="container">
 
-    <!-- TITRE PROJET -->
+    <!-- TITRE -->
     <section class="section" style="border-top:none;">
       <div class="section-head">
         <h2>Axiora Data — Analyse, Visualisation & Prévision des Indicateurs Socio-Économiques (Souss-Massa)</h2>
-        <p>
-          <strong>Auteurs :</strong> Malak Mounji <br>
-          <strong>Technos :</strong> Streamlit · Plotly · Pandas · NumPy · Scikit-learn · GeoPandas · FPDF · Gemini API
-        </p>
+        <p><strong>Auteurs :</strong> Malak Mounji | <strong>Technos :</strong> Streamlit · Plotly · Pandas · NumPy · Scikit-learn · GeoPandas · FPDF · Gemini API</p>
       </div>
     </section>
 
@@ -50,18 +46,24 @@
       </div>
 
       <div class="card">
-        <ul style="columns:2; line-height:1.9;">
+        <ul style="line-height:2;">
           <li><a href="#introduction">Introduction</a></li>
-          <li><a href="#overview">Aperçu de la plateforme</a></li>
-          <li><a href="#data">Données & préparation</a></li>
-          <li><a href="#navigation">Navigation & UI</a></li>
-          <li><a href="#exploration">Exploration des Indices</a></li>
-          <li><a href="#visualisations">Visualisations</a></li>
-          <li><a href="#cartes">Cartes géographiques</a></li>
-          <li><a href="#ml">Prévision & Machine Learning</a></li>
-          <li><a href="#assistant">Assistant IA</a></li>
-          <li><a href="#report">Générateur de rapports</a></li>
-          <li><a href="#installation">Installation & exécution</a></li>
+          <li><a href="#overview">Aperçu de la plateforme — Objectifs — Fonctionnalités clés — Architecture générale</a></li>
+          <li><a href="#data">Données & préparation — Sources HCP — Structure des données — Nettoyage & validation — Construction des datasets</a></li>
+          <li><a href="#navigation">Navigation & UI — Menu principal — Accordéon Exploration — Filtres & contrôles — Composants UI</a></li>
+          <li><a href="#exploration">Exploration des Indices — Population — Marché du travail — Habitat — Finance — Enseignement — Pauvreté</a></li>
+          <li><a href="#population-details">Population — Division administrative — RGPH 2004/2014 — Estimations 2016–2018 — Groupes d’âge</a></li>
+          <li><a href="#marche">Marché du travail — Indicateurs activité/emploi/chômage — Comparaisons temporelles & spatiales</a></li>
+          <li><a href="#habitat">Habitat — Indicateurs logement & urbanisation — Évolutions & comparaisons</a></li>
+          <li><a href="#finance">Finance — Indicateurs financiers — Variations & tendances</a></li>
+          <li><a href="#enseignement">Enseignement — Indicateurs éducation — Analyses comparatives</a></li>
+          <li><a href="#pauvrete">Pauvreté — Taux de pauvreté — Taux de vulnérabilité — Analyses par commune/province</a></li>
+          <li><a href="#visualisations">Visualisations — Graphiques disponibles — Analyse comparative — Variation % — Heatmaps — Scatter — Tableaux interactifs</a></li>
+          <li><a href="#cartes">Cartes géographiques — Choroplèthes — Tooltips & zoom — Filtrage année/zone</a></li>
+          <li><a href="#ml">Prévision & Machine Learning — Objectifs — Régression linéaire — Pipeline — Visualisation prédictions — Extensions</a></li>
+          <li><a href="#assistant">Assistant IA — Rôle — Questions supportées — Réponses enrichies</a></li>
+          <li><a href="#report">Générateur de rapports — Paramétrage — Contenu PDF — Export automatique</a></li>
+          <li><a href="#installation">Installation & exécution — Pré-requis — Installation — Lancement Streamlit — Clés API</a></li>
           <li><a href="#resultats">Résultats & points forts</a></li>
           <li><a href="#conclusion">Conclusion</a></li>
           <li><a href="#roadmap">Roadmap</a></li>
@@ -76,151 +78,39 @@
       </div>
 
       <div class="grid-2">
-
         <div class="card">
           <h3>Contexte</h3>
           <p>
-            Les indicateurs socio-économiques constituent un levier essentiel pour la compréhension
-            du développement territorial et la prise de décision stratégique.
-            La région Souss-Massa présente une diversité démographique, économique et sociale
-            nécessitant une analyse approfondie et structurée des données officielles.
-          </p>
-          <p>
-            Dans ce contexte, <strong>Axiora Data</strong> a été développé comme une plateforme
-            intelligente d’analyse, de visualisation et de prévision des indicateurs socio-économiques
-            régionaux, basée sur les données du Haut-Commissariat au Plan (HCP).
+            Les indicateurs socio-économiques constituent un levier essentiel pour la compréhension du développement territorial et la prise de décision stratégique. 
+            Axiora Data a été développé comme une plateforme intelligente d’analyse, de visualisation et de prévision des indicateurs socio-économiques régionaux basés sur les données du HCP.
           </p>
         </div>
 
         <div class="card">
           <h3>Problématique</h3>
-          <ul>
-            <li>Exploration interactive limitée</li>
-            <li>Comparaison multi-années complexe</li>
-            <li>Analyse territoriale non centralisée</li>
-            <li>Absence de prévision automatisée</li>
-          </ul>
           <p>
-            Il existe donc un besoin d’un outil interactif, dynamique,
-            prédictif et orienté aide à la décision.
+            Les données publiques sont souvent statiques (PDF, tableaux bruts), ce qui limite l’exploration interactive, la comparaison multi-années et la projection des tendances futures. 
+            Il existe donc un besoin d’un outil interactif, dynamique, prédictif et orienté aide à la décision.
           </p>
         </div>
-
       </div>
 
       <div class="card" style="margin-top:16px;">
         <h3>Objectif du Projet</h3>
         <ul>
-          <li>Centraliser et structurer les indicateurs socio-économiques</li>
+          <li>Centraliser les indicateurs socio-économiques</li>
           <li>Offrir une visualisation interactive avancée</li>
-          <li>Permettre des comparaisons temporelles et spatiales</li>
           <li>Intégrer des modèles de Machine Learning</li>
-          <li>Fournir un assistant IA conversationnel</li>
-          <li>Générer automatiquement des rapports décisionnels</li>
+          <li>Ajouter un assistant IA conversationnel</li>
+          <li>Automatiser la génération de rapports PDF</li>
         </ul>
       </div>
 
       <div class="card" style="margin-top:16px;">
         <h3>Vision</h3>
         <p>
-          Axiora Data est une plateforme d’intelligence socio-économique
-          combinant Data Analytics, Visualisation avancée,
-          Intelligence artificielle, Géospatial et automatisation de reporting.
+          Axiora Data est une plateforme d’intelligence socio-économique combinant Data Analytics, Visualisation avancée, Intelligence artificielle, Géospatial et automatisation de reporting.
         </p>
-      </div>
-
-    </section>
-
-    <!-- PROCHAINES SECTIONS (VIDES POUR L’INSTANT) -->
-
-    <section id="overview" class="section">
-      <div class="section-head">
-        <h2>Aperçu de la plateforme</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="data" class="section">
-      <div class="section-head">
-        <h2>Données & préparation</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="navigation" class="section">
-      <div class="section-head">
-        <h2>Navigation & UI</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="exploration" class="section">
-      <div class="section-head">
-        <h2>Exploration des Indices</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="visualisations" class="section">
-      <div class="section-head">
-        <h2>Visualisations</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="cartes" class="section">
-      <div class="section-head">
-        <h2>Cartes géographiques</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="ml" class="section">
-      <div class="section-head">
-        <h2>Prévision & Machine Learning</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="assistant" class="section">
-      <div class="section-head">
-        <h2>Assistant IA</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="report" class="section">
-      <div class="section-head">
-        <h2>Générateur automatique de rapports</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="installation" class="section">
-      <div class="section-head">
-        <h2>Installation & exécution</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="resultats" class="section">
-      <div class="section-head">
-        <h2>Résultats & points forts</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="conclusion" class="section">
-      <div class="section-head">
-        <h2>Conclusion</h2>
-        <p>Section à compléter.</p>
-      </div>
-    </section>
-
-    <section id="roadmap" class="section">
-      <div class="section-head">
-        <h2>Roadmap</h2>
-        <p>Section à compléter.</p>
       </div>
     </section>
 
