@@ -3,87 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Malak Mounji | Portfolio Data</title>
-  <style>
-    body{font-family:Arial,sans-serif;margin:0;background:#0b1220;color:#e8eefc}
-    .hero{padding:56px 20px;text-align:center;background:#0f1b33}
-    .hero h1{margin:0;font-size:42px}
-    .hero p{margin:10px 0 0;opacity:.9}
-    .container{max-width:900px;margin:0 auto;padding:24px}
-    .card{background:#0f1b33;border:1px solid #1c2e57;border-radius:14px;padding:18px;margin:14px 0}
-    a{color:#7aa2ff;text-decoration:none}
-    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{background:#172a52;padding:10px 14px;border-radius:10px;display:inline-block}
-    .tag{display:inline-block;background:#172a52;border-radius:999px;padding:6px 10px;margin:6px 6px 0 0;font-size:13px}
-    footer{text-align:center;padding:18px;opacity:.8}
-  </style>
+  <title>Malak Mounji | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="hero">
-    <h1>Malak Mounji</h1>
-    <p>Data Science • Machine Learning • Business Intelligence</p>
-    <div class="btns" style="justify-content:center">
-      <a class="btn" href="https://axiora-data.streamlit.app/" target="_blank">Démo Axiora</a>
-      <a class="btn" href="https://github.com/mounjimallak-bit" target="_blank">GitHub</a>
-      <a class="btn" href="mailto:mounji.mallak@gmail.com">Email</a>
+
+  <!-- HERO -->
+  <header class="hero" style="background-image:url('assets/hero.jpg')">
+    <div class="hero-overlay">
+      <h1>Malak Mounji</h1>
+      <p>Data Science • Machine Learning • Business Intelligence</p>
+      <div class="hero-links">
+        <a class="btn" href="https://axiora-data.streamlit.app/" target="_blank">Démo Axiora</a>
+        <a class="btn" href="https://github.com/mounjimallak-bit" target="_blank">GitHub</a>
+        <a class="btn" href="mailto:mounji.mallak@gmail.com">Email</a>
+      </div>
     </div>
   </header>
 
   <main class="container">
-    <section>
+
+    <!-- ABOUT -->
+    <section class="section">
       <h2>À propos</h2>
       <p>
-        Étudiante ingénieure en Data Science & IA. J’aime transformer des données en insights via
-        Python/SQL, construire des dashboards (Power BI) et développer des applications data (Streamlit).
+        Étudiante ingénieure en Data Science & IA. Je construis des solutions d’analyse de données,
+        des dashboards Power BI et des applications data en Python (Streamlit).
       </p>
     </section>
 
-    <section>
+    <!-- PROJECTS -->
+    <section class="section">
       <h2>Projets</h2>
 
-      <div class="card">
-        <h3>Axiora — AI Socio-Economic Analysis</h3>
-        <p>Plateforme d’analyse socio-économique : modèles ML + visualisations interactives + assistant NLP.</p>
-        <div>
-          <span class="tag">Python</span>
-          <span class="tag">Scikit-learn</span>
-          <span class="tag">Streamlit</span>
-          <span class="tag">Plotly</span>
-          <span class="tag">NLP</span>
-        </div>
-        <div class="btns">
-          <a class="btn" href="https://axiora-data.streamlit.app/" target="_blank">Voir la démo</a>
-          <a class="btn" href="#" target="_blank">Code (à ajouter)</a>
-        </div>
-      </div>
+      <div class="projects">
 
-      <div class="card">
-        <h3>Supplier Performance Dashboard (Power BI)</h3>
-        <p>Analyse performance fournisseurs + KPIs logistiques + dashboards Power BI.</p>
-        <div>
-          <span class="tag">Power BI</span>
-          <span class="tag">SQL</span>
-          <span class="tag">Python</span>
-          <span class="tag">ETL</span>
-          <span class="tag">KPI</span>
-        </div>
-        <div class="btns">
-          <a class="btn" href="#" target="_blank">Screenshots (à ajouter)</a>
-          <a class="btn" href="#" target="_blank">Détails</a>
-        </div>
+        <!-- Axiora card -->
+        <a class="card" href="post/axiora/">
+          <img src="assets/axiora.png" alt="Axiora" />
+          <div class="card-content">
+            <h3>Axiora — Plateforme d’analyse socio-économique IA</h3>
+            <p>ML + visualisations interactives + assistant NLP. (Streamlit, Plotly, Scikit-learn)</p>
+            <div class="tags">
+              <span>Python</span><span>Streamlit</span><span>Plotly</span><span>ML</span><span>NLP</span>
+            </div>
+            <span class="link">Voir détails →</span>
+          </div>
+        </a>
+
+        <!-- Power BI card -->
+        <a class="card" href="post/powerbi/">
+          <img src="assets/powerbi.png" alt="Power BI Dashboard" />
+          <div class="card-content">
+            <h3>Supplier Performance Dashboard (Power BI)</h3>
+            <p>ETL SQL + KPIs logistiques + dashboard Power BI.</p>
+            <div class="tags">
+              <span>Power BI</span><span>SQL</span><span>KPI</span><span>ETL</span>
+            </div>
+            <span class="link">Voir détails →</span>
+          </div>
+        </a>
+
       </div>
     </section>
 
-    <section>
-      <h2>Compétences</h2>
+    <!-- CONTACT -->
+    <section class="section">
+      <h2>Contact</h2>
       <p>
-        Python • SQL • Scikit-learn • Streamlit • Plotly • Power BI • MongoDB • Neo4j
+        Email : <a href="mailto:mounji.mallak@gmail.com">mounji.mallak@gmail.com</a>
       </p>
     </section>
+
   </main>
 
-  <footer>
-    © 2026 — Malak Mounji
-  </footer>
+  <footer class="footer">© 2026 — Malak Mounji</footer>
 </body>
 </html>
