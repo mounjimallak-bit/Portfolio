@@ -40,36 +40,126 @@
     </section>
 
     <!-- TABLE DES MATIÈRES -->
-    <section class="section">
-      <div class="section-head">
-        <h2>Table des matières</h2>
-      </div>
+   <section class="section">
+  <div class="section-head">
+    <h2>Table des matières</h2>
+  </div>
 
-      <div class="card">
-        <ul style="line-height:2;">
-          <li><a href="#introduction">Introduction</a></li>
-          <li><a href="#overview">Aperçu de la plateforme — Objectifs — Fonctionnalités clés — Architecture générale</a></li>
-          <li><a href="#data">Données & préparation — Sources HCP — Structure des données — Nettoyage & validation — Construction des datasets</a></li>
-          <li><a href="#navigation">Navigation & UI — Menu principal — Accordéon Exploration — Filtres & contrôles — Composants UI</a></li>
-          <li><a href="#exploration">Exploration des Indices — Population — Marché du travail — Habitat — Finance — Enseignement — Pauvreté</a></li>
-          <li><a href="#population-details">Population — Division administrative — RGPH 2004/2014 — Estimations 2016–2018 — Groupes d’âge</a></li>
-          <li><a href="#marche">Marché du travail — Indicateurs activité/emploi/chômage — Comparaisons temporelles & spatiales</a></li>
-          <li><a href="#habitat">Habitat — Indicateurs logement & urbanisation — Évolutions & comparaisons</a></li>
-          <li><a href="#finance">Finance — Indicateurs financiers — Variations & tendances</a></li>
-          <li><a href="#enseignement">Enseignement — Indicateurs éducation — Analyses comparatives</a></li>
-          <li><a href="#pauvrete">Pauvreté — Taux de pauvreté — Taux de vulnérabilité — Analyses par commune/province</a></li>
-          <li><a href="#visualisations">Visualisations — Graphiques disponibles — Analyse comparative — Variation % — Heatmaps — Scatter — Tableaux interactifs</a></li>
-          <li><a href="#cartes">Cartes géographiques — Choroplèthes — Tooltips & zoom — Filtrage année/zone</a></li>
-          <li><a href="#ml">Prévision & Machine Learning — Objectifs — Régression linéaire — Pipeline — Visualisation prédictions — Extensions</a></li>
-          <li><a href="#assistant">Assistant IA — Rôle — Questions supportées — Réponses enrichies</a></li>
-          <li><a href="#report">Générateur de rapports — Paramétrage — Contenu PDF — Export automatique</a></li>
-          <li><a href="#installation">Installation & exécution — Pré-requis — Installation — Lancement Streamlit — Clés API</a></li>
-          <li><a href="#resultats">Résultats & points forts</a></li>
-          <li><a href="#conclusion">Conclusion</a></li>
-          <li><a href="#roadmap">Roadmap</a></li>
-        </ul>
-      </div>
-    </section>
+  <div class="card">
+    <ul style="list-style:none; padding-left:0; line-height:2;">
+
+      <li><a href="#introduction"><strong>Introduction</strong></a></li>
+
+      <br>
+
+      <li><a href="#overview"><strong>Aperçu de la plateforme</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#objectifs">Objectifs</a></li>
+        <li><a href="#fonctionnalites">Fonctionnalités clés</a></li>
+        <li><a href="#architecture">Architecture générale</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#data"><strong>Données & préparation</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#sources">Sources des données (HCP)</a></li>
+        <li><a href="#structure-donnees">Structure des données</a></li>
+        <li><a href="#nettoyage">Nettoyage & validation</a></li>
+        <li><a href="#datasets">Construction des datasets par module</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#navigation"><strong>Navigation & UI</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#menu">Menu principal</a></li>
+        <li><a href="#accordeon">Accordéon “Exploration des Indices”</a></li>
+        <li><a href="#filtres">Filtres & contrôles interactifs</a></li>
+        <li><a href="#components">Composants UI réutilisables</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#exploration"><strong>Exploration des Indices</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#population">Population</a></li>
+        <li><a href="#marche">Marché du travail</a></li>
+        <li><a href="#habitat">Habitat</a></li>
+        <li><a href="#finance">Finance</a></li>
+        <li><a href="#enseignement">Enseignement</a></li>
+        <li><a href="#pauvrete">Pauvreté</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#visualisations"><strong>Visualisations</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#graphiques">Graphiques disponibles</a></li>
+        <li><a href="#comparative">Analyse comparative & évolution</a></li>
+        <li><a href="#variation">Variation en %</a></li>
+        <li><a href="#heatmap">Heatmaps / Corrélations</a></li>
+        <li><a href="#scatter">Scatter multi-dimension</a></li>
+        <li><a href="#tableaux">Tableaux interactifs</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#cartes"><strong>Cartes géographiques</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#choropleth">Cartes choroplèthes</a></li>
+        <li><a href="#tooltips">Tooltips & zoom</a></li>
+        <li><a href="#filtrage">Filtrage par année / zone</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#ml"><strong>Prévision & Machine Learning</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#objectif-prevision">Objectifs des prévisions</a></li>
+        <li><a href="#modele">Modèle utilisé (Régression linéaire)</a></li>
+        <li><a href="#pipeline">Pipeline de prévision</a></li>
+        <li><a href="#visualisation-pred">Visualisation des prédictions</a></li>
+        <li><a href="#extensions">Extensions possibles</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#assistant"><strong>Assistant IA (Chatbot)</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#role-assistant">Rôle de l’assistant</a></li>
+        <li><a href="#questions">Types de questions supportées</a></li>
+        <li><a href="#reponses">Réponses enrichies</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#report"><strong>Générateur automatique de rapports</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#parametrage">Paramétrage du rapport</a></li>
+        <li><a href="#contenu-pdf">Contenu du PDF</a></li>
+        <li><a href="#export">Export & nommage automatique</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#installation"><strong>Installation & exécution</strong></a></li>
+      <ul style="padding-left:20px;">
+        <li><a href="#prerequis">Pré-requis</a></li>
+        <li><a href="#install">Installation</a></li>
+        <li><a href="#run">Lancement Streamlit</a></li>
+        <li><a href="#api">Configuration des clés API</a></li>
+      </ul>
+
+      <br>
+
+      <li><a href="#resultats"><strong>Résultats & points forts</strong></a></li>
+      <li><a href="#conclusion"><strong>Conclusion</strong></a></li>
+      <li><a href="#roadmap"><strong>Roadmap</strong></a></li>
+
+    </ul>
+  </div>
+</section>
 
     <!-- INTRODUCTION -->
     <section id="introduction" class="section">
