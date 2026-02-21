@@ -1,0 +1,60 @@
+.section-head h2 {
+  margin-bottom: 6px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+  backdrop-filter: blur(10px);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.card h4 {
+  margin: 18px 0 10px;
+  color: #817391;
+}
+
+.card ul {
+  margin: 10px 0 14px 18px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  margin: 18px 0;
+}
+
+.next-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #817391;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid #817391;
+  color: #817391;
+}
