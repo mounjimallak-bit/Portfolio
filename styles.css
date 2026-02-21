@@ -387,3 +387,22 @@ a:hover{ opacity:.9; }
   .projects{ grid-template-columns: 1fr; }
   .title{ font-size: 40px; }
 }
+/* ============ AXIORA INTRO CENTER ============ */
+
+#axiora-intro .section-head{
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+#axiora-intro .section-head h2{
+  font-size: 32px;
+}
+
+#axiora-intro .section-head p{
+  max-width: 600px;
+  margin: 8px auto 0;
+}
+
+#axiora-intro .grid-2{
+  margin-top: 24px;
+}
