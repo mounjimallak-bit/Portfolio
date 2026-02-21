@@ -405,430 +405,209 @@
 
 
 
-    <section id="data-preparation" class="ax-section">
-  <div class="ax-wrap">
+   <section id="data-preparation" class="ax-section">
 
-    <!-- ================== HEADER ================== -->
-    <header class="ax-header">
-      <h2>Données & Préparation</h2>
-      <p class="ax-lead">
-        AXIORA s’appuie sur des fichiers Excel officiels (RGPH et indicateurs de pauvreté).
-        Le processus de préparation est conçu pour garantir : <strong>traçabilité</strong>, <strong>cohérence</strong>
-        et <strong>exploitabilité</strong> (analyses, cartes et génération de rapports).
-      </p>
-    </header>
+  <div class="container">
 
-    <!-- ================== DONNEES BRUTES ================== -->
-    <article class="ax-card">
-      <h3>1) Données brutes (visualisation directe)</h3>
+    <!-- ================= TITRE ================= -->
+    <h2 class="ax-title">Données & Préparation</h2>
+
+    <p class="ax-lead">
+      AXIORA repose sur des données statistiques officielles issues du RGPH et des indicateurs de pauvreté.
+      Avant toute exploitation analytique ou cartographique, un processus structuré de préparation est appliqué
+      afin de garantir cohérence, fiabilité et exploitabilité.
+    </p>
+
+    <!-- ================= RGPH BRUT ================= -->
+    <h3 class="ax-subtitle">1) Données brutes — RGPH (Structure démographique)</h3>
+
+    <p class="ax-text">
+      Le fichier RGPH contient des informations démographiques détaillées par territoire :
+      codes administratifs, superficie, population légale, population municipale,
+      structure par sexe et répartition par classes d’âge.
+    </p>
+
+    <div class="ax-table-full">
+      <iframe src="RGPH2014.html" class="ax-iframe-full"></iframe>
+    </div>
+
+    <!-- ================= ANALYSE BRUT ================= -->
+    <h3 class="ax-subtitle">Analyse des données brutes</h3>
+
+    <p class="ax-text">
+      L’analyse du fichier brut met en évidence plusieurs caractéristiques structurelles :
+    </p>
+
+    <ul class="ax-list">
+      <li>Présence de séparateurs d’espaces dans les nombres (ex : 421 844)</li>
+      <li>Pourcentages avec symbole %</li>
+      <li>Décimales exprimées avec virgule (format français)</li>
+      <li>Lignes hiérarchiques parfois partiellement vides (Rural, Centre, etc.)</li>
+      <li>Colonnes dont les intitulés varient selon l’export</li>
+    </ul>
+
+    <p class="ax-text">
+      Ces éléments empêchent une exploitation directe dans un pipeline analytique ou un modèle de Machine Learning.
+      Le nettoyage permet donc :
+    </p>
+
+    <ul class="ax-list">
+      <li>Conversion correcte en numérique</li>
+      <li>Standardisation des colonnes</li>
+      <li>Suppression des ambiguïtés de format</li>
+      <li>Prévention des erreurs statistiques</li>
+      <li>Préparation à l’intégration cartographique et IA</li>
+    </ul>
+
+    <!-- ================= PAUVRETE BRUT ================= -->
+    <h3 class="ax-subtitle">2) Données brutes — Indicateurs de Pauvreté</h3>
+
+    <p class="ax-text">
+      Le fichier pauvreté contient des indicateurs socio-économiques par territoire.
+      Il présente également des formats hétérogènes nécessitant normalisation.
+    </p>
+
+    <div class="ax-table-full">
+      <iframe src="chtouka_pauvr.html" class="ax-iframe-full"></iframe>
+    </div>
+
+    <!-- ================= CLEANING ================= -->
+    <h3 class="ax-subtitle">3) Étapes de préparation des données</h3>
+
+    <!-- A -->
+    <div class="ax-step">
+      <div class="ax-step-title">A — Normalisation des colonnes</div>
       <p class="ax-text">
-        Les fichiers bruts sont affichés ici tels qu’ils ont été exportés, afin de montrer la structure réelle des données.
-        Les tableaux restent consultables (scroll) et téléchargeables.
+        Uniformisation des noms de colonnes pour assurer une structure cohérente.
       </p>
-
-      <div class="ax-grid-2">
-        <!-- RGPH -->
-        <div class="ax-panel">
-          <h4>RGPH — Structure démographique</h4>
-          <p class="ax-small">
-            Variables principales : codes administratifs, superficie, populations (légale/municipale),
-            structure par sexe, classes d’âge.
-          </p>
-
-          <div class="ax-table-wrapper ax-table-xl">
-            <iframe src="RGPH2014.html" class="ax-iframe"></iframe>
-          </div>
-
-          <div class="ax-actions">
-            <a href="RGPH2014.xlsx" download class="ax-btn ax-btn-primary">Télécharger RGPH (Excel)</a>
-            <a href="RGPH2014.html" class="ax-btn ax-btn-ghost" target="_blank" rel="noopener">Ouvrir en plein écran</a>
-          </div>
-        </div>
-
-        <!-- PAUVRETE -->
-        <div class="ax-panel">
-          <h4>Pauvreté — Indicateurs socio-économiques</h4>
-          <p class="ax-small">
-            Indicateurs territoriaux utiles pour mesurer vulnérabilité, pauvreté et comparaisons entre communes/provinces.
-          </p>
-
-          <div class="ax-table-wrapper ax-table-xl">
-            <iframe src="chtouka_pauvr.html" class="ax-iframe"></iframe>
-          </div>
-
-          <div class="ax-actions">
-            <a href="chtouka pauvr.xlsx" download class="ax-btn ax-btn-primary">Télécharger Pauvreté (Excel)</a>
-            <a href="chtouka_pauvr.html" class="ax-btn ax-btn-ghost" target="_blank" rel="noopener">Ouvrir en plein écran</a>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <!-- ================== CLEANING ================== -->
-    <article class="ax-card">
-      <h3>2) Préparation des données : étapes & logique</h3>
-
-      <div class="ax-steps">
-        <div class="ax-step">
-          <div class="ax-step-title">A — Lecture & normalisation des colonnes</div>
-          <p class="ax-text">
-            Les fichiers Excel contiennent parfois des formats hétérogènes (séparateurs, espaces, pourcentages, valeurs manquantes).
-            Cette étape harmonise les noms de colonnes et prépare un schéma stable (mêmes variables, mêmes intitulés) pour toute la plateforme.
-          </p>
-        </div>
-
-        <div class="ax-step">
-          <div class="ax-step-title">B — Conversion numérique contrôlée</div>
-          <p class="ax-text">
-            On convertit uniquement les colonnes attendues en numérique (superficie, populations, parts, âges).
-            Les symboles (<em>%</em>, espaces, séparateurs) sont supprimés avant conversion.
-            Les valeurs non convertibles deviennent <code>NaN</code> (gérées ensuite) pour éviter les erreurs silencieuses.
-          </p>
-        </div>
-
-        <div class="ax-step">
-          <div class="ax-step-title">C — Gestion des valeurs manquantes</div>
-          <p class="ax-text">
-            Certaines lignes (ex. “Rural” ou lignes administratives) peuvent avoir des champs vides.
-            La règle : conserver la ligne si elle a un intérêt territorial, mais marquer les champs manquants proprement.
-            Les calculs et visualisations utilisent ensuite des filtres/contrôles pour éviter les biais.
-          </p>
-        </div>
-
-        <div class="ax-step">
-          <div class="ax-step-title">D — Structuration “finale” pour consommation</div>
-          <p class="ax-text">
-            Après nettoyage, les données sont exportées sous forme de fichiers structurés (CSV/JSON).
-            Dans AXIORA, cela permet : filtres rapides, cartes, agrégations, comparaisons,
-            et génération de rapports automatiques.
-          </p>
-        </div>
-      </div>
-
-      <!-- Code toggle -->
-      <div class="ax-code-block">
-        <button class="ax-btn ax-btn-secondary" type="button" onclick="toggleCode('cleaningCode')">
-          Afficher le code du cleaning
-        </button>
-
-        <div id="cleaningCode" class="ax-code hidden">
-<pre><code># Cleaning pipeline (exemple robuste et réutilisable)
-import pandas as pd
-import numpy as np
-import re
-import json
-
-def normalize_colname(c: str) -&gt; str:
+      <button onclick="toggleCode('codeA')" class="ax-btn">Afficher le code</button>
+      <pre id="codeA" class="ax-code hidden"><code>
+def normalize_colname(c):
+    import re
     c = str(c).strip()
     c = re.sub(r"\s+", " ", c)
     return c
 
+df.columns = [normalize_colname(c) for c in df.columns]
+      </code></pre>
+    </div>
+
+    <!-- B -->
+    <div class="ax-step">
+      <div class="ax-step-title">B — Conversion numérique</div>
+      <p class="ax-text">
+        Suppression des symboles (%) et des séparateurs d’espace.
+        Conversion contrôlée en float.
+      </p>
+      <button onclick="toggleCode('codeB')" class="ax-btn">Afficher le code</button>
+      <pre id="codeB" class="ax-code hidden"><code>
 def to_number(x):
-    if pd.isna(x):
-        return np.nan
-    s = str(x).strip()
-    # enlever espaces insécables + espaces normales
-    s = s.replace("\u202f", "").replace("\u00a0", "").replace(" ", "")
-    # enlever %
-    s = s.replace("%", "")
-    # virgule décimale -&gt; point
-    s = s.replace(",", ".")
-    # garder chiffres / point / signe
+    import re
+    s = str(x).replace(" ", "").replace("%","").replace(",",".")
     s = re.sub(r"[^0-9\.\-]", "", s)
     try:
-        return float(s) if s != "" else np.nan
+        return float(s)
     except:
-        return np.nan
+        return None
+      </code></pre>
+    </div>
 
-# ---- 1) Lecture RGPH
-rgph_path = "RGPH2014.xlsx"
-df_rgph = pd.read_excel(rgph_path)
-
-# Normaliser colonnes
-df_rgph.columns = [normalize_colname(c) for c in df_rgph.columns]
-
-# Colonnes à convertir (adapter aux noms exacts du fichier)
-num_cols_rgph = [
-    "Supereficie Km²",
-    "Population légale",
-    "Population municipale",
-    "Part Mas", "Part Fem",
-    "0-4 ans", "5-9 ans", "10-14 ans",
-    "M15ans", "15-59 ans",
-    "15-19 ans", "20-24 ans", "25-29 ans", "30-34 ans", "35-39 ans",
-    "40-44 ans", "45-49 ans", "50-54 ans", "55-59 ans",
-    "60ans et plus"
-]
-
-for c in num_cols_rgph:
-    if c in df_rgph.columns:
-        df_rgph[c] = df_rgph[c].apply(to_number)
-
-# Nettoyage minimal des identifiants
-if "CONC" in df_rgph.columns:
-    df_rgph["CONC"] = df_rgph["CONC"].astype(str).str.strip()
-
-# ---- 2) Lecture Pauvreté
-pauv_path = "chtouka pauvr.xlsx"
-df_pauv = pd.read_excel(pauv_path)
-df_pauv.columns = [normalize_colname(c) for c in df_pauv.columns]
-
-# Exemple : convertir toutes colonnes sauf identifiants en numérique
-id_cols = [c for c in df_pauv.columns if "code" in c.lower() or "conc" in c.lower() or "local" in c.lower()]
-for c in df_pauv.columns:
-    if c not in id_cols:
-        df_pauv[c] = df_pauv[c].apply(to_number)
-
-# ---- 3) Export JSON (pour affichage dictionnaire dans la page)
-final_rgph = df_rgph.fillna("").to_dict(orient="records")
-final_pauv = df_pauv.fillna("").to_dict(orient="records")
-
-with open("final_rgph.json", "w", encoding="utf-8") as f:
-    json.dump(final_rgph, f, ensure_ascii=False, indent=2)
-
-with open("final_pauvrete.json", "w", encoding="utf-8") as f:
-    json.dump(final_pauv, f, ensure_ascii=False, indent=2)
-</code></pre>
-        </div>
-      </div>
-    </article>
-
-    <!-- ================== APERCU DONNEES CLEAN (DICT) ================== -->
-    <article class="ax-card">
-      <h3>3) Aperçu des données nettoyées (format dictionnaire)</h3>
+    <!-- C -->
+    <div class="ax-step">
+      <div class="ax-step-title">C — Gestion des valeurs manquantes</div>
       <p class="ax-text">
-        Ci-dessous, un aperçu <strong>JSON (dictionnaire)</strong> des données nettoyées.
-        Dans la version finale, ce contenu est chargé depuis <code>final_rgph.json</code> et <code>final_pauvrete.json</code>.
+        Identification des lignes vides ou administratives afin d’éviter les biais analytiques.
       </p>
+      <button onclick="toggleCode('codeC')" class="ax-btn">Afficher le code</button>
+      <pre id="codeC" class="ax-code hidden"><code>
+df["is_empty"] = df[numeric_cols].isna().all(axis=1)
+df_clean = df.loc[~df["is_empty"]]
+      </code></pre>
+    </div>
 
-      <div class="ax-grid-2">
-        <div class="ax-panel">
-          <h4>RGPH (clean) — aperçu JSON</h4>
-          <div class="ax-json-toolbar">
-            <button class="ax-btn ax-btn-secondary" type="button" onclick="loadJSON('final_rgph.json','rgphJson')">
-              Charger le JSON RGPH
-            </button>
-            <button class="ax-btn ax-btn-ghost" type="button" onclick="copyText('rgphJson')">Copier</button>
-          </div>
-          <pre id="rgphJson" class="ax-json">Clique sur “Charger le JSON RGPH” pour afficher l’aperçu…</pre>
-        </div>
+    <!-- ================= DATA AFTER CLEANING ================= -->
+    <h3 class="ax-subtitle">4) Données après nettoyage (format dictionnaire)</h3>
 
-        <div class="ax-panel">
-          <h4>Pauvreté (clean) — aperçu JSON</h4>
-          <div class="ax-json-toolbar">
-            <button class="ax-btn ax-btn-secondary" type="button" onclick="loadJSON('final_pauvrete.json','pauvJson')">
-              Charger le JSON Pauvreté
-            </button>
-            <button class="ax-btn ax-btn-ghost" type="button" onclick="copyText('pauvJson')">Copier</button>
-          </div>
-          <pre id="pauvJson" class="ax-json">Clique sur “Charger le JSON Pauvreté” pour afficher l’aperçu…</pre>
-        </div>
-      </div>
+    <p class="ax-text">
+      Après traitement, les données sont exportées sous forme de dictionnaire JSON
+      structuré par territoire pour faciliter l’intégration dans AXIORA.
+    </p>
 
-      <p class="ax-note">
-        <strong>Note :</strong> si GitHub Pages bloque le chargement, vérifie que les fichiers JSON sont bien committés
-        dans le même dossier que la page (<code>post/axiora/</code>) et que le nom est exactement identique.
-      </p>
-    </article>
+    <button onclick="loadJSON('final_rgph.json','jsonOutput')" class="ax-btn">
+      Charger le dictionnaire nettoyé
+    </button>
+
+    <pre id="jsonOutput" class="ax-json">
+Cliquez sur "Charger le dictionnaire nettoyé" pour afficher l’aperçu.
+    </pre>
 
   </div>
 
-  <!-- ================== SCRIPTS ================== -->
+  <!-- JS -->
   <script>
     function toggleCode(id){
-      const el = document.getElementById(id);
-      el.classList.toggle('hidden');
+      document.getElementById(id).classList.toggle("hidden");
     }
 
-    async function loadJSON(file, targetId){
-      const target = document.getElementById(targetId);
-      try{
-        const res = await fetch(file, { cache: "no-store" });
-        if(!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
-
-        // Afficher seulement un aperçu (ex: 20 lignes) pour ne pas charger toute la page
-        const preview = Array.isArray(data) ? data.slice(0, 20) : data;
-        target.textContent = JSON.stringify(preview, null, 2);
-      }catch(e){
-        target.textContent =
-          "Impossible de charger " + file + ".\n" +
-          "• Vérifie que le fichier existe dans le même dossier.\n" +
-          "• Vérifie le nom exact.\n" +
-          "Erreur: " + e.message;
-      }
-    }
-
-    function copyText(id){
-      const el = document.getElementById(id);
-      const text = el.textContent || "";
-      navigator.clipboard.writeText(text);
+    async function loadJSON(file,target){
+      const res = await fetch(file);
+      const data = await res.json();
+      document.getElementById(target).textContent =
+        JSON.stringify(data.slice(0,20), null, 2);
     }
   </script>
 
-  <!-- ================== STYLES ================== -->
+  <!-- STYLE -->
   <style>
-    :root{
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.72);
-      --card: rgba(255,255,255,.06);
-      --line: rgba(255,255,255,.14);
-      --shadow: 0 10px 30px rgba(0,0,0,.22);
+    .ax-section{ padding:60px 0; }
+    .ax-title{ font-size:44px; margin-bottom:20px; }
+    .ax-subtitle{ font-size:28px; margin:50px 0 15px; }
+    .ax-lead{ font-size:18px; line-height:1.8; opacity:.85; }
+    .ax-text{ font-size:17px; line-height:1.9; opacity:.85; margin-bottom:15px; }
+    .ax-list{ font-size:17px; line-height:1.9; opacity:.85; margin-left:20px; }
+
+    .ax-table-full{ margin:20px 0 40px; }
+    .ax-iframe-full{
+      width:100%;
+      height:650px;
+      border:none;
+      background:white;
     }
 
-    .ax-section{ padding: 56px 0; color: var(--text); }
-    .ax-wrap{ width: min(1180px, 92%); margin: 0 auto; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; }
-
-    .ax-header h2{ font-size: 44px; letter-spacing: .2px; margin: 0 0 10px; }
-    .ax-lead{ font-size: 18px; line-height: 1.85; color: var(--muted); max-width: 980px; }
-
-    .ax-card{
-      margin-top: 34px;
-      padding: 24px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-    }
-
-    .ax-card h3{ font-size: 24px; margin: 0 0 12px; }
-    .ax-text{ font-size: 17px; line-height: 1.85; color: var(--muted); margin: 0 0 14px; }
-    .ax-small{ font-size: 15.5px; line-height: 1.75; color: var(--muted); margin: 0 0 14px; }
-
-    .ax-grid-2{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .ax-panel{
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(0,0,0,.14);
-    }
-
-    .ax-panel h4{ margin: 0 0 8px; font-size: 18px; }
-
-    .ax-table-wrapper{
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    /* Fenêtres plus grandes et visibles */
-    .ax-table-xl .ax-iframe{
-      width: 100%;
-      height: 560px;   /* + grand */
-      border: none;
-      background: white;
-    }
-
-    .ax-actions{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
+    .ax-step{ margin-bottom:40px; }
+    .ax-step-title{ font-weight:700; margin-bottom:8px; }
 
     .ax-btn{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      background: rgba(255,255,255,.06);
-      color: var(--text);
+      margin-top:10px;
+      padding:8px 14px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.3);
+      background:transparent;
+      color:white;
+      cursor:pointer;
     }
 
-    .ax-btn-primary{
-      background: rgba(120, 120, 255, .18);
-      border-color: rgba(120,120,255,.45);
-    }
-
-    .ax-btn-secondary{
-      background: rgba(255,255,255,.10);
-    }
-
-    .ax-btn-ghost{
-      background: transparent;
-    }
-
-    .ax-steps{ display: grid; gap: 14px; margin-top: 8px; }
-    .ax-step{
-      padding: 14px 14px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(0,0,0,.10);
-    }
-
-    .ax-step-title{
-      font-weight: 800;
-      margin-bottom: 6px;
-      font-size: 16px;
-    }
-
-    .ax-code-block{ margin-top: 14px; }
     .ax-code{
-      margin-top: 12px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      overflow: hidden;
-      background: rgba(0,0,0,.35);
+      margin-top:10px;
+      padding:15px;
+      background:rgba(0,0,0,.4);
+      font-size:14px;
+      max-height:400px;
+      overflow:auto;
     }
 
-    .ax-code pre{
-      margin: 0;
-      padding: 14px;
-      overflow: auto;
-      font-size: 13px;
-      line-height: 1.55;
-      color: rgba(255,255,255,.88);
-      max-height: 520px;
-    }
-
-    .hidden{ display: none; }
-
-    .ax-json-toolbar{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin: 10px 0 10px;
-    }
+    .hidden{ display:none; }
 
     .ax-json{
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      background: rgba(0,0,0,.35);
-      overflow: auto;
-      max-height: 520px;
-      font-size: 13px;
-      line-height: 1.55;
-      color: rgba(255,255,255,.88);
-      white-space: pre;
-    }
-
-    .ax-note{
-      margin-top: 14px;
-      font-size: 14.5px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    @media (max-width: 980px){
-      .ax-grid-2{ grid-template-columns: 1fr; }
-      .ax-header h2{ font-size: 34px; }
-      .ax-table-xl .ax-iframe{ height: 480px; }
+      margin-top:20px;
+      padding:20px;
+      background:rgba(0,0,0,.4);
+      max-height:500px;
+      overflow:auto;
+      font-size:14px;
     }
   </style>
+
 </section>
     
     <footer class="footer">
