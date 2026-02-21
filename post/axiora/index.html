@@ -404,88 +404,146 @@
 
 
 
-
-   <section id="data-preparation" class="ax-section">
-
+<section id="data-preparation" class="ax-section">
   <div class="container">
 
     <!-- ================= TITRE ================= -->
-    <h2 class="ax-title">Données & Préparation</h2>
+    <h2 class="ax-title">Données &amp; préparation</h2>
 
     <p class="ax-lead">
-      AXIORA repose sur des données statistiques officielles issues du RGPH et des indicateurs de pauvreté.
-      Avant toute exploitation analytique ou cartographique, un processus structuré de préparation est appliqué
-      afin de garantir cohérence, fiabilité et exploitabilité.
+      AXIORA s’appuie sur des données statistiques officielles (HCP) : <strong>RGPH</strong> (structure démographique)
+      et <strong>indicateurs de pauvreté</strong>. Avant toute analyse, cartographie, IA (Q&amp;A) ou génération de rapports,
+      un pipeline de préparation est appliqué pour garantir <strong>cohérence</strong>, <strong>fiabilité</strong> et
+      <strong>exploitabilité</strong>.
     </p>
 
-    <!-- ================= RGPH BRUT ================= -->
+    <!-- ================= SOMMAIRE (FORMAT IMAGE) ================= -->
+    <h3 class="ax-subtitle ax-subtitle-tight">Données &amp; préparation</h3>
+    <ul class="ax-toc">
+      <li><a href="#sources-hcp">Sources des données (HCP)</a></li>
+      <li><a href="#structure-donnees">Structure des données</a></li>
+      <li><a href="#nettoyage-validation">Nettoyage &amp; validation</a></li>
+      <li><a href="#datasets-modules">Construction des datasets par module</a></li>
+    </ul>
+
+    <!-- ========================================================= -->
+    <!-- ================= 1) SOURCES ============================ -->
+    <!-- ========================================================= -->
+    <h3 id="sources-hcp" class="ax-subtitle">Sources des données (HCP)</h3>
+
+    <p class="ax-text">
+      Deux fichiers Excel ont été téléchargés au même endroit que cette page (dossier <code>post/axiora/</code>) :
+    </p>
+
+    <ul class="ax-list">
+      <li><strong>RGPH2014.xlsx</strong> : structure démographique par territoire (codes, populations, tranches d’âge, etc.).</li>
+      <li><strong>chtouka pauvr.xlsx</strong> : indicateurs socio-économiques / pauvreté par territoire.</li>
+    </ul>
+
+    <p class="ax-note">
+      Pour affichage dans le portfolio, chaque fichier Excel est exporté en HTML (table) et intégré ci-dessous via <code>&lt;iframe&gt;</code>.
+    </p>
+
+    <!-- ========================================================= -->
+    <!-- ================= 2) STRUCTURE ========================== -->
+    <!-- ========================================================= -->
+    <h3 id="structure-donnees" class="ax-subtitle">Structure des données</h3>
+
+    <p class="ax-text">
+      <strong>RGPH</strong> : données hiérarchisées (Région → Préfecture/Province → Cercle/Commune → Centre/Rural),
+      avec des colonnes mixtes (<em>texte + nombres</em>) : populations, parts (%) et âges (0-4, 5-9, …).
+      <br/>
+      <strong>Pauvreté</strong> : indicateurs chiffrés (taux, parts, niveaux, agrégats) souvent exportés avec
+      formats hétérogènes (espaces, virgules, symboles).
+    </p>
+
+    <!-- ========================================================= -->
+    <!-- ================= RGPH BRUT (FULL WIDTH) ================ -->
+    <!-- ========================================================= -->
     <h3 class="ax-subtitle">1) Données brutes — RGPH (Structure démographique)</h3>
 
     <p class="ax-text">
-      Le fichier RGPH contient des informations démographiques détaillées par territoire :
-      codes administratifs, superficie, population légale, population municipale,
-      structure par sexe et répartition par classes d’âge.
+      Le RGPH contient des informations démographiques détaillées par territoire :
+      <strong>codes administratifs</strong>, <strong>superficie</strong>, <strong>population légale</strong>,
+      <strong>population municipale</strong>, <strong>répartition par sexe</strong> et <strong>classes d’âge</strong>.
     </p>
 
     <div class="ax-table-full">
-      <iframe src="RGPH2014.html" class="ax-iframe-full"></iframe>
+      <iframe
+        src="RGPH2014.html"
+        class="ax-iframe-full"
+        title="RGPH2014 - Données brutes (table)"
+        loading="lazy"
+      ></iframe>
     </div>
 
-    <!-- ================= ANALYSE BRUT ================= -->
-    <h3 class="ax-subtitle">Analyse des données brutes</h3>
+    <!-- ================= ANALYSE BRUT RGPH ================= -->
+    <h3 class="ax-subtitle">Analyse des données brutes (RGPH) — pourquoi nettoyer ?</h3>
 
     <p class="ax-text">
-      L’analyse du fichier brut met en évidence plusieurs caractéristiques structurelles :
+      Les exports HCP/Excel sont très utiles pour la lecture, mais <strong>pas directement exploitables</strong>
+      dans un pipeline analytique (pandas), une carte (GeoJSON/Leaflet) ou un modèle ML.
+      Les principaux points bloquants observés :
     </p>
 
     <ul class="ax-list">
-      <li>Présence de séparateurs d’espaces dans les nombres (ex : 421 844)</li>
-      <li>Pourcentages avec symbole %</li>
-      <li>Décimales exprimées avec virgule (format français)</li>
-      <li>Lignes hiérarchiques parfois partiellement vides (Rural, Centre, etc.)</li>
-      <li>Colonnes dont les intitulés varient selon l’export</li>
+      <li><strong>Espaces</strong> dans les nombres (ex : <em>421 844</em> / <em>33 610 084</em>) → empêche la conversion numérique.</li>
+      <li><strong>Pourcentages</strong> avec symbole <code>%</code> → nécessite extraction/normalisation.</li>
+      <li><strong>Décimales</strong> avec virgule (format FR) → conversion contrôlée en <code>float</code>.</li>
+      <li><strong>Lignes hiérarchiques</strong> (Rural/Centre) parfois partielles → valeurs manquantes à filtrer ou compléter.</li>
+      <li><strong>Noms de colonnes</strong> variables selon l’export → standardisation indispensable.</li>
     </ul>
 
     <p class="ax-text">
-      Ces éléments empêchent une exploitation directe dans un pipeline analytique ou un modèle de Machine Learning.
-      Le nettoyage permet donc :
+      Le nettoyage permet : (1) conversions numériques fiables, (2) colonnes cohérentes,
+      (3) suppression des ambiguïtés, (4) prévention d’erreurs statistiques,
+      (5) fusion plus simple avec la pauvreté et intégration cartographique/IA.
     </p>
 
-    <ul class="ax-list">
-      <li>Conversion correcte en numérique</li>
-      <li>Standardisation des colonnes</li>
-      <li>Suppression des ambiguïtés de format</li>
-      <li>Prévention des erreurs statistiques</li>
-      <li>Préparation à l’intégration cartographique et IA</li>
-    </ul>
-
-    <!-- ================= PAUVRETE BRUT ================= -->
-    <h3 class="ax-subtitle">2) Données brutes — Indicateurs de Pauvreté</h3>
+    <!-- ========================================================= -->
+    <!-- ================= PAUVRETE BRUT ========================= -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">2) Données brutes — Indicateurs de pauvreté</h3>
 
     <p class="ax-text">
-      Le fichier pauvreté contient des indicateurs socio-économiques par territoire.
-      Il présente également des formats hétérogènes nécessitant normalisation.
+      Le fichier “pauvreté” regroupe des indicateurs socio-économiques par territoire. On y retrouve les mêmes
+      problématiques de format (virgules, espaces, symboles) et parfois des valeurs manquantes selon le niveau territorial.
     </p>
 
     <div class="ax-table-full">
-      <iframe src="chtouka_pauvr.html" class="ax-iframe-full"></iframe>
+      <iframe
+        src="chtouka pauvr.html"
+        class="ax-iframe-full"
+        title="Pauvreté - Données brutes (table)"
+        loading="lazy"
+      ></iframe>
     </div>
 
-    <!-- ================= CLEANING ================= -->
-    <h3 class="ax-subtitle">3) Étapes de préparation des données</h3>
+    <!-- ========================================================= -->
+    <!-- ================= 3) CLEANING =========================== -->
+    <!-- ========================================================= -->
+    <h3 id="nettoyage-validation" class="ax-subtitle">Nettoyage &amp; validation</h3>
+
+    <p class="ax-text">
+      Ci-dessous : un pipeline de préparation (extrait) présenté par étapes. Chaque étape a un bouton
+      “Afficher le code” pour garder la page lisible.
+    </p>
 
     <!-- A -->
     <div class="ax-step">
       <div class="ax-step-title">A — Normalisation des colonnes</div>
       <p class="ax-text">
-        Uniformisation des noms de colonnes pour assurer une structure cohérente.
+        Objectif : obtenir des noms de colonnes <strong>stables</strong> (trim, espaces multiples, caractères invisibles),
+        afin d’éviter des erreurs lors des jointures et transformations.
       </p>
-      <button onclick="toggleCode('codeA')" class="ax-btn">Afficher le code</button>
+      <button type="button" onclick="toggleCode('codeA')" class="ax-btn">Afficher le code</button>
       <pre id="codeA" class="ax-code hidden"><code>
-def normalize_colname(c):
-    import re
+import re
+
+def normalize_colname(c: str) -> str:
     c = str(c).strip()
-    c = re.sub(r"\s+", " ", c)
+    c = re.sub(r"\s+", " ", c)                 # espaces multiples -> 1
+    c = c.replace("\u202f", " ").replace("\xa0", " ")  # espaces insécables (Excel/HCP)
     return c
 
 df.columns = [normalize_colname(c) for c in df.columns]
@@ -494,122 +552,275 @@ df.columns = [normalize_colname(c) for c in df.columns]
 
     <!-- B -->
     <div class="ax-step">
-      <div class="ax-step-title">B — Conversion numérique</div>
+      <div class="ax-step-title">B — Conversion numérique (espaces, %, virgules)</div>
       <p class="ax-text">
-        Suppression des symboles (%) et des séparateurs d’espace.
-        Conversion contrôlée en float.
+        Objectif : transformer les champs “visuels” (ex : <em>33 610 084</em>, <em>49,8%</em>) en valeurs numériques
+        exploitables (<code>int</code>/<code>float</code>) avec une conversion <strong>robuste</strong>.
       </p>
-      <button onclick="toggleCode('codeB')" class="ax-btn">Afficher le code</button>
+      <button type="button" onclick="toggleCode('codeB')" class="ax-btn">Afficher le code</button>
       <pre id="codeB" class="ax-code hidden"><code>
+import re
+import pandas as pd
+import numpy as np
+
 def to_number(x):
-    import re
-    s = str(x).replace(" ", "").replace("%","").replace(",",".")
+    if pd.isna(x):
+        return np.nan
+    s = str(x)
+    # enlève espaces standards + insécables
+    s = s.replace(" ", "").replace("\u202f", "").replace("\xa0", "")
+    # enlève %
+    s = s.replace("%", "")
+    # virgule française -> point
+    s = s.replace(",", ".")
+    # garde uniquement chiffres / . / -
     s = re.sub(r"[^0-9\.\-]", "", s)
-    try:
-        return float(s)
-    except:
-        return None
+    return pd.to_numeric(s, errors="coerce")
+
+# Exemple :
+# numeric_cols = ["Superficie Km²", "Population légale", "Part Mas", ...]
+# df[numeric_cols] = df[numeric_cols].applymap(to_number)
       </code></pre>
     </div>
 
     <!-- C -->
     <div class="ax-step">
-      <div class="ax-step-title">C — Gestion des valeurs manquantes</div>
+      <div class="ax-step-title">C — Gestion des valeurs manquantes &amp; lignes hiérarchiques</div>
       <p class="ax-text">
-        Identification des lignes vides ou administratives afin d’éviter les biais analytiques.
+        Certains niveaux territoriaux (ex : “Rural”, “Centre”) peuvent apparaître avec des lignes partiellement vides.
+        On identifie et traite ces cas pour éviter de fausser les statistiques (moyennes, corrélations) et la cartographie.
       </p>
-      <button onclick="toggleCode('codeC')" class="ax-btn">Afficher le code</button>
+      <button type="button" onclick="toggleCode('codeC')" class="ax-btn">Afficher le code</button>
       <pre id="codeC" class="ax-code hidden"><code>
-df["is_empty"] = df[numeric_cols].isna().all(axis=1)
-df_clean = df.loc[~df["is_empty"]]
+# Exemple : supprimer les lignes où toutes les colonnes numériques sont vides
+numeric_cols = [c for c in df.columns if c not in ["CONC", "Localités"]]
+
+mask_all_nan = df[numeric_cols].isna().all(axis=1)
+df_clean = df.loc[~mask_all_nan].copy()
+
+# Option : compléter certains champs texte si nécessaire (propagation hiérarchique)
+df_clean["Localités"] = df_clean["Localités"].ffill()
       </code></pre>
     </div>
 
-    <!-- ================= DATA AFTER CLEANING ================= -->
-    <h3 class="ax-subtitle">4) Données après nettoyage (format dictionnaire)</h3>
+    <!-- D -->
+    <div class="ax-step">
+      <div class="ax-step-title">D — Standardisation des clés territoriales (pour fusion RGPH + pauvreté)</div>
+      <p class="ax-text">
+        Pour fusionner les deux sources, on normalise la clé (ex : code <code>CONC</code> ou identifiant territorial)
+        afin de garantir une correspondance exacte et éviter les doublons.
+      </p>
+      <button type="button" onclick="toggleCode('codeD')" class="ax-btn">Afficher le code</button>
+      <pre id="codeD" class="ax-code hidden"><code>
+def normalize_code(x):
+    # garde uniquement chiffres et force en string
+    s = "".join(ch for ch in str(x) if ch.isdigit())
+    return s if s else None
+
+rgph["CONC"]  = rgph["CONC"].apply(normalize_code)
+pauvr["CONC"] = pauvr["CONC"].apply(normalize_code)
+
+# Exemple de fusion
+df_merged = rgph.merge(pauvr, on="CONC", how="left")
+      </code></pre>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ================= 4) DATA AFTER CLEANING ================ -->
+    <!-- ========================================================= -->
+    <h3 id="datasets-modules" class="ax-subtitle">Construction des datasets par module</h3>
 
     <p class="ax-text">
-      Après traitement, les données sont exportées sous forme de dictionnaire JSON
-      structuré par territoire pour faciliter l’intégration dans AXIORA.
+      Après préparation, AXIORA consomme des structures simples : tables propres (CSV/Parquet) et/ou dictionnaires JSON
+      par territoire (idéals pour le module IA Q&amp;A et le générateur de rapports).
     </p>
 
-    <button onclick="loadJSON('final_rgph.json','jsonOutput')" class="ax-btn">
-      Charger le dictionnaire nettoyé
-    </button>
+    <h3 class="ax-subtitle">Données après nettoyage (format dictionnaire)</h3>
 
-    <pre id="jsonOutput" class="ax-json">
-Cliquez sur "Charger le dictionnaire nettoyé" pour afficher l’aperçu.
-    </pre>
+    <p class="ax-text">
+      Aperçu du dictionnaire nettoyé (ex : <code>final_axiora.json</code>). Clique pour charger et afficher un extrait.
+      <br/>
+      <span class="ax-note">
+        Astuce : si ton JSON n’est pas un tableau, le script affiche les premières clés de l’objet.
+      </span>
+    </p>
+
+    <div class="ax-actions">
+      <button type="button" onclick="loadJSON('final_rgph.json','jsonOutput')" class="ax-btn">
+        Charger RGPH nettoyé (JSON)
+      </button>
+      <button type="button" onclick="loadJSON('final_pauvrete.json','jsonOutput')" class="ax-btn">
+        Charger Pauvreté nettoyée (JSON)
+      </button>
+      <button type="button" onclick="loadJSON('final_axiora.json','jsonOutput')" class="ax-btn">
+        Charger Dataset fusionné (JSON)
+      </button>
+    </div>
+
+    <pre id="jsonOutput" class="ax-json">Clique sur un bouton pour afficher l’aperçu.</pre>
 
   </div>
 
-  <!-- JS -->
+  <!-- ================= JS ================= -->
   <script>
     function toggleCode(id){
-      document.getElementById(id).classList.toggle("hidden");
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle("hidden");
     }
 
-    async function loadJSON(file,target){
-      const res = await fetch(file);
-      const data = await res.json();
-      document.getElementById(target).textContent =
-        JSON.stringify(data.slice(0,20), null, 2);
+    async function loadJSON(file, targetId){
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      try{
+        const res = await fetch(file, { cache: "no-store" });
+        if (!res.ok) throw new Error("Impossible de charger " + file);
+
+        const data = await res.json();
+
+        // Cas 1 : tableau -> affiche un extrait
+        if (Array.isArray(data)){
+          target.textContent = JSON.stringify(data.slice(0, 20), null, 2);
+          return;
+        }
+
+        // Cas 2 : objet -> affiche quelques clés
+        if (data && typeof data === "object"){
+          const keys = Object.keys(data);
+          const preview = {};
+          keys.slice(0, 15).forEach(k => preview[k] = data[k]);
+          target.textContent = JSON.stringify(preview, null, 2);
+          return;
+        }
+
+        // Autre
+        target.textContent = String(data);
+
+      }catch(err){
+        target.textContent = "Erreur : " + err.message;
+      }
     }
   </script>
 
-  <!-- STYLE -->
+  <!-- ================= STYLE (SANS CADRES / SANS BLOCS BLANCS) ================= -->
   <style>
-    .ax-section{ padding:60px 0; }
-    .ax-title{ font-size:44px; margin-bottom:20px; }
-    .ax-subtitle{ font-size:28px; margin:50px 0 15px; }
-    .ax-lead{ font-size:18px; line-height:1.8; opacity:.85; }
-    .ax-text{ font-size:17px; line-height:1.9; opacity:.85; margin-bottom:15px; }
-    .ax-list{ font-size:17px; line-height:1.9; opacity:.85; margin-left:20px; }
+    .ax-section{ padding: 60px 0; }
 
-    .ax-table-full{ margin:20px 0 40px; }
+    /* Typo + largeur (texte plus “large” comme tu veux) */
+    .ax-title{ font-size: 44px; margin: 0 0 18px; letter-spacing: .2px; }
+    .ax-subtitle{ font-size: 28px; margin: 44px 0 14px; }
+    .ax-subtitle-tight{ margin-top: 18px; }
+    .ax-lead{
+      font-size: 18px;
+      line-height: 1.9;
+      opacity: .90;
+      max-width: 980px;
+      margin-bottom: 18px;
+    }
+    .ax-text{
+      font-size: 17px;
+      line-height: 2.0;
+      opacity: .88;
+      max-width: 980px;
+      margin: 0 0 14px;
+    }
+    .ax-note{
+      font-size: 15px;
+      line-height: 1.8;
+      opacity: .75;
+      max-width: 980px;
+      margin: 10px 0 0;
+    }
+
+    /* Sommaire (même style que ton image) */
+    .ax-toc{
+      list-style: circle;
+      padding-left: 18px;
+      margin: 10px 0 18px;
+      font-size: 16px;
+      line-height: 1.9;
+    }
+    .ax-toc a{
+      text-decoration: underline;
+      color: inherit;
+      opacity: .92;
+    }
+    .ax-toc a:hover{ opacity: 1; }
+
+    /* Listes */
+    .ax-list{
+      font-size: 17px;
+      line-height: 2.0;
+      opacity: .88;
+      margin: 0 0 18px 18px;
+      max-width: 980px;
+    }
+
+    /* Iframe tables (grand + lisible) */
+    .ax-table-full{ margin: 18px 0 34px; }
     .ax-iframe-full{
-      width:100%;
-      height:650px;
-      border:none;
-      background:white;
+      width: 100%;
+      height: 820px;          /* plus grand */
+      border: none;           /* pas de cadre blanc */
+      background: transparent;
     }
 
-    .ax-step{ margin-bottom:40px; }
-    .ax-step-title{ font-weight:700; margin-bottom:8px; }
+    /* Étapes (sans cadres) */
+    .ax-step{ margin: 26px 0 34px; }
+    .ax-step-title{ font-weight: 800; margin: 0 0 6px; font-size: 18px; }
 
+    /* Boutons (discrets) */
     .ax-btn{
-      margin-top:10px;
-      padding:8px 14px;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,.3);
-      background:transparent;
-      color:white;
-      cursor:pointer;
+      margin-top: 8px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.06);
+      color: inherit;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+    .ax-btn:hover{ border-color: rgba(255,255,255,.45); }
+
+    .ax-actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
 
+    /* Code (sans bloc blanc, affiché seulement si bouton) */
     .ax-code{
-      margin-top:10px;
-      padding:15px;
-      background:rgba(0,0,0,.4);
-      font-size:14px;
-      max-height:400px;
-      overflow:auto;
+      margin-top: 10px;
+      padding: 14px 16px;
+      background: rgba(0,0,0,.35);
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 420px;
+      overflow: auto;
+      white-space: pre;
     }
-
-    .hidden{ display:none; }
 
     .ax-json{
-      margin-top:20px;
-      padding:20px;
-      background:rgba(0,0,0,.4);
-      max-height:500px;
-      overflow:auto;
-      font-size:14px;
+      margin-top: 14px;
+      padding: 16px;
+      background: rgba(0,0,0,.35);
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 560px;
+      overflow: auto;
+      white-space: pre;
     }
-  </style>
 
+    .hidden{ display: none; }
+  </style>
 </section>
-    
     <footer class="footer">
       © 2026 — Malak Mounji
     </footer>
