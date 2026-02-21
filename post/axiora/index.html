@@ -369,412 +369,452 @@
    - ./outputs/rgph_clean.csv
    - ./outputs/rgph_clean.json
    - ./outputs/rgph_dict.json
-======================= -->
+======================= ----------------------------------------------------------------------------------------------------------------
 
-<section id="data-preparation" style="max-width: 980px; margin: 0 auto; padding: 28px 16px; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;">
-  <header style="margin-bottom: 18px;">
-    <h2 style="margin: 0 0 8px; font-size: 28px; line-height: 1.15;">Données & Préparation (Cleaning)</h2>
-    <p style="margin: 0; color: #444; font-size: 15.5px; line-height: 1.6;">
-      Dans AXIORA, l’objectif est de <b>conserver les données brutes telles qu’elles sont</b> (traçabilité),
-      puis de produire une version <b>finale propre</b> (numérique, cohérente) exploitable par les modules:
-      <i>analytics</i>, <i>cartographie</i>, <i>IA Q&amp;A</i> et <i>générateur de rapports</i>.
-    </p>
-  </header>
 
-  <!-- ====== 1) SOURCES ====== -->
-  <article style="border: 1px solid #e6e6e6; border-radius: 14px; padding: 16px; margin-bottom: 14px;">
-    <h3 style="margin: 0 0 10px; font-size: 18px;">1) Sources de données (brutes)</h3>
 
-    <ul style="margin: 0; padding-left: 18px; color: #333; line-height: 1.7;">
-      <li>
-        <b>RGPH / Structure démographique</b> (Excel):
-        <code style="background:#f6f6f6; padding:2px 6px; border-radius: 6px;">RGPH2014.xlsx</code>
-      </li>
-      <li>
-        <b>Pauvreté / Indicateurs</b> (Excel):
-        <code style="background:#f6f6f6; padding:2px 6px; border-radius: 6px;">chtouka pauvr.xlsx</code>
-      </li>
-    </ul>
 
-    <div style="margin-top: 12px; background:#fafafa; border: 1px solid #eee; border-radius: 12px; padding: 12px;">
-      <p style="margin: 0 0 8px; color:#333;">
-        <b>Organisation recommandée</b> (dans ton repo):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <section id="data-preparation" class="ax-section">
+  <div class="ax-wrap">
+    <header class="ax-header">
+      <h2>Données &amp; Préparation (Cleaning)</h2>
+      <p class="ax-lead">
+        Cette section décrit les <b>données brutes</b> utilisées dans le projet AXIORA (RGPH + indicateurs de pauvreté),
+        puis la <b>préparation</b> appliquée pour obtenir un jeu de données cohérent et exploitable pour l’analyse, la cartographie
+        et la génération de rapports.
       </p>
-      <pre style="margin:0; white-space: pre-wrap; line-height:1.55;"><code>axiora/
-  post/
-    data_preparation.html   &lt;-- cette page
-    RGPH2014.xlsx
-    chtouka pauvr.xlsx
-    outputs/
-      (fichiers générés automatiquement)</code></pre>
-    </div>
-  </article>
+    </header>
 
-  <!-- ====== 2) PRINCIPE: BRUT vs FINAL ====== -->
-  <article style="border: 1px solid #e6e6e6; border-radius: 14px; padding: 16px; margin-bottom: 14px;">
-    <h3 style="margin: 0 0 10px; font-size: 18px;">2) Principe AXIORA: « brut » vs « final »</h3>
+    <!-- 1) SOURCES -->
+    <article class="ax-card" id="sources">
+      <h3>1) Données brutes (sources)</h3>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-      <div style="border:1px solid #eee; border-radius: 12px; padding: 12px;">
-        <h4 style="margin:0 0 6px; font-size: 15.5px;">✅ Données brutes</h4>
-        <p style="margin:0; color:#444; line-height:1.65;">
-          On ne les “corrige” pas: on les garde comme preuve (format d’origine, séparateurs, pourcentages, champs vides).
-          Elles servent aussi à reproduire le cleaning à tout moment.
+      <div class="ax-grid-2">
+        <div class="ax-block">
+          <h4>RGPH — Structure démographique (Excel)</h4>
+          <p>
+            Le fichier RGPH regroupe des informations démographiques par territoire (région, province/préfecture,
+            cercle/caïdat/commune, centres, etc.). On y retrouve notamment :
+          </p>
+          <ul class="ax-list">
+            <li><b>Identifiants territoriaux</b> : code (ex. <i>CONC</i>) + nom de la localité</li>
+            <li><b>Superficie</b> (km²)</li>
+            <li><b>Population</b> : population légale et population municipale</li>
+            <li><b>Structure par sexe</b> : part masculine / part féminine</li>
+            <li><b>Structure par âge</b> : classes (0–4, 5–9, 10–14, 15–19, …, 60+)</li>
+          </ul>
+          <p class="ax-file">
+            Fichier : <span>RGPH2014.xlsx</span>
+          </p>
+        </div>
+
+        <div class="ax-block">
+          <h4>Pauvreté — Indicateurs socio-économiques (Excel)</h4>
+          <p>
+            Le fichier “pauvreté” contient des indicateurs permettant d’évaluer la vulnérabilité des ménages et/ou
+            le niveau de pauvreté à l’échelle territoriale (selon la structure du fichier). Typiquement on y trouve :
+          </p>
+          <ul class="ax-list">
+            <li><b>Codes/territoires</b> : clés de jointure (province, commune, etc.)</li>
+            <li><b>Indicateurs</b> : taux/indices (pauvreté, vulnérabilité, etc.)</li>
+            <li><b>Mesures de contexte</b> : variables explicatives (selon disponibilité)</li>
+          </ul>
+          <p class="ax-file">
+            Fichier : <span>chtouka pauvr.xlsx</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="ax-note">
+        <p>
+          <b>Important :</b> les fichiers bruts sont conservés <b>tels quels</b> (traçabilité). Le nettoyage se fait sur une copie
+          de travail et les résultats sont exportés séparément.
         </p>
       </div>
-      <div style="border:1px solid #eee; border-radius: 12px; padding: 12px;">
-        <h4 style="margin:0 0 6px; font-size: 15.5px;">✅ Données finales (clean)</h4>
-        <p style="margin:0; color:#444; line-height:1.65;">
-          Version normalisée et numérique: colonnes renommées, types convertis, valeurs manquantes gérées,
-          et export en CSV/Parquet/JSON pour le dashboard, la carte, et l’IA.
-        </p>
+    </article>
+
+    <!-- 2) EXEMPLES BRUTS -->
+    <article class="ax-card" id="raw-examples">
+      <h3>2) Exemples de données brutes (pour illustrer le cleaning)</h3>
+
+      <div class="ax-grid-2">
+        <div class="ax-block">
+          <h4>Extrait brut RGPH (tel que reçu)</h4>
+          <p class="ax-muted">
+            Exemple typique : nombres avec espaces (séparateurs), pourcentages en “%”, décimales en virgule,
+            et lignes hiérarchiques parfois partiellement vides.
+          </p>
+
+          <div class="ax-raw">
+            <pre><code>CONC        Localités                 Population légale   Part Mas   Part Fem   0-4 ans
+900101011   Agadir (Mun,)            421 844             50,3%      49,7%      8,9
+900105093   Centre: Drargua          50 946              50,9%      49,1%      12,3
+900107033   Centre: Aourir           35 365              51,4%      48,6%      9,8</code></pre>
+          </div>
+        </div>
+
+        <div class="ax-block">
+          <h4>Extrait brut “Pauvreté” (tel que reçu)</h4>
+          <p class="ax-muted">
+            Les indicateurs peuvent contenir des valeurs manquantes, des formats hétérogènes et des libellés non standardisés.
+            Ci-dessous un exemple “type” (structure indicative).
+          </p>
+
+          <div class="ax-raw">
+            <pre><code>Territoire            Indicateur                 Valeur
+Chtouka Ait Baha      Taux de pauvreté          12,4%
+Chtouka Ait Baha      Taux de vulnérabilité     19,6%
+Biougra               Taux de pauvreté          8,1%</code></pre>
+          </div>
+        </div>
       </div>
-    </div>
-  </article>
+    </article>
 
-  <!-- ====== 3) ETAPES DE CLEANING ====== -->
-  <article style="border: 1px solid #e6e6e6; border-radius: 14px; padding: 16px; margin-bottom: 14px;">
-    <h3 style="margin: 0 0 10px; font-size: 18px;">3) Pipeline de cleaning (étapes + code)</h3>
+    <!-- 3) PIPELINE CLEANING -->
+    <article class="ax-card" id="cleaning">
+      <h3>3) Préparation des données : étapes et logique</h3>
 
-    <p style="margin: 0 0 10px; color:#444; line-height: 1.7;">
-      Le pipeline ci-dessous est écrit pour <b>Python + Pandas</b>. Il s’exécute localement (ou notebook),
-      lit les fichiers Excel bruts, produit une table propre, puis génère un <b>JSON “dic complet”</b>
-      (structure prête à être consommée par AXIORA).
-    </p>
+      <div class="ax-steps">
+        <div class="ax-step">
+          <h4>A — Lecture et copie de travail</h4>
+          <p>
+            Lecture des fichiers Excel en conservant les valeurs brutes en texte (évite les conversions implicites).
+            On crée ensuite une copie de travail destinée aux transformations.
+          </p>
+          <div class="ax-code">
+            <pre><code>import pandas as pd
 
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code># ✅ Installation (si besoin)
-# pip install pandas openpyxl pyarrow
+rgph_raw = pd.read_excel("RGPH2014.xlsx", sheet_name=0, dtype=str)
+pauv_raw = pd.read_excel("chtouka pauvr.xlsx", sheet_name=0, dtype=str)
 
-from pathlib import Path
-import re
-import json
-import pandas as pd
+rgph = rgph_raw.copy()
+pauv = pauv_raw.copy()</code></pre>
+          </div>
+        </div>
 
-BASE_DIR = Path(__file__).resolve().parent  # dossier: axiora/post/
-RGPH_PATH = BASE_DIR / "RGPH2014.xlsx"
-PAUV_PATH = BASE_DIR / "chtouka pauvr.xlsx"
+        <div class="ax-step">
+          <h4>B — Normalisation des noms de colonnes</h4>
+          <p>
+            Standardiser les noms pour éviter les variations (espaces multiples, accents, “Km²”, etc.).
+            Objectif : obtenir des clés stables (ex. <i>population_legale</i>, <i>supereficie_km2</i>).
+          </p>
+          <div class="ax-code">
+            <pre><code>import re
 
-OUT_DIR = BASE_DIR / "outputs"
-OUT_DIR.mkdir(exist_ok=True)</code></pre>
-    </div>
-
-    <hr style="border:none; border-top:1px solid #eee; margin: 14px 0;">
-
-    <!-- Step A -->
-    <h4 style="margin: 0 0 6px; font-size: 16px;">Étape A — Lecture des fichiers (sans altérer le brut)</h4>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      On charge l’Excel en gardant les valeurs telles qu’elles apparaissent (espaces, “%”, séparateurs).
-      Ensuite seulement on crée une copie “work” pour transformer.
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code># 1) Lire RGPH (choisis sheet_name si ton fichier a plusieurs feuilles)
-rgph_raw = pd.read_excel(RGPH_PATH, sheet_name=0, dtype=str)  # tout en texte = brut
-rgph = rgph_raw.copy()  # version de travail
-
-# 2) Lire pauvreté (si utilisé dans une jointure plus tard)
-pauv_raw = pd.read_excel(PAUV_PATH, sheet_name=0, dtype=str)
-pauv = pauv_raw.copy()
-
-print("RGPH brut:", rgph_raw.shape, " | Pauv brut:", pauv_raw.shape)</code></pre>
-    </div>
-
-    <hr style="border:none; border-top:1px solid #eee; margin: 14px 0;">
-
-    <!-- Step B -->
-    <h4 style="margin: 0 0 6px; font-size: 16px;">Étape B — Standardiser les noms de colonnes</h4>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      Les fichiers RGPH contiennent souvent des colonnes avec espaces multiples, accents, et variantes
-      (<i>Supereficie Km²</i>, <i>Population légale</i>, etc.). On normalise pour avoir des clés stables.
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code>def norm_col(c: str) -&gt; str:
+def norm_col(c):
     c = (c or "").strip()
-    c = re.sub(r"\s+", " ", c)              # espaces multiples -&gt; 1 espace
-    c = c.replace("²", "2")                # Km² -&gt; Km2
-    c = c.replace("%", "pct")              # % -&gt; pct
-    c = c.replace("-", "_")
-    c = c.replace("’", "'")
+    c = re.sub(r"\s+", " ", c)
+    c = c.replace("²", "2").replace("%", "pct").replace("-", "_")
     c = c.lower()
-    c = re.sub(r"[^a-z0-9_ ]", "", c)      # retirer caractères spéciaux
-    c = c.replace(" ", "_")
+    c = re.sub(r"[^a-z0-9_ ]", "", c).replace(" ", "_")
     return c
 
 rgph.columns = [norm_col(c) for c in rgph.columns]
-pauv.columns = [norm_col(c) for c in pauv.columns]
+pauv.columns = [norm_col(c) for c in pauv.columns]</code></pre>
+          </div>
+        </div>
 
-print(rgph.columns.tolist())</code></pre>
-    </div>
+        <div class="ax-step">
+          <h4>C — Conversion fiable des valeurs numériques</h4>
+          <p>
+            Conversion des formats fréquents : séparateurs d’espace (ex. <i>421 844</i>), virgule décimale (ex. <i>10,2</i>),
+            et pourcentage (ex. <i>50,3%</i>). Les valeurs vides sont converties en <i>NA</i>.
+          </p>
+          <div class="ax-code">
+            <pre><code>import pandas as pd
+import re
 
-    <hr style="border:none; border-top:1px solid #eee; margin: 14px 0;">
-
-    <!-- Step C -->
-    <h4 style="margin: 0 0 6px; font-size: 16px;">Étape C — Nettoyer les chiffres (espaces, séparateurs, %)</h4>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      Dans tes données, on voit des nombres comme <b>33 848 242</b> (espaces fines) et des pourcentages comme
-      <b>49,8%</b> ou des décimaux <b>10,2</b>. L’objectif est de convertir tout ça en numérique fiable.
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code>NBSP = "\u00A0"     # non-breaking space
-NNBSP = "\u202F"    # narrow no-break space (souvent utilisé comme séparateur)
+NBSP = "\u00A0"
+NNBSP = "\u202F"
 
 def to_number(x):
-    """Convertit '33 848 242', '49,8%', '10,2' -&gt; float/int. Retourne NA si vide."""
     if x is None:
         return pd.NA
     s = str(x).strip()
-    if s == "" or s.lower() in {"na", "n/a", "nan", "none"}:
+    if s == "" or s.lower() in {"na","n/a","nan","none"}:
         return pd.NA
-    # retirer % et espaces spéciales
     s = s.replace("%", "")
     s = s.replace(NNBSP, "").replace(NBSP, "").replace(" ", "")
-    # décimales FR
     s = s.replace(",", ".")
-    # garder seulement chiffres + point + signe
     s = re.sub(r"[^0-9\.\-+]", "", s)
     if s in {"", ".", "-", "+"}:
         return pd.NA
     try:
-        val = float(s)
-        # si entier exact, retourner int (optionnel)
-        if val.is_integer():
-            return int(val)
-        return val
+        v = float(s)
+        return int(v) if v.is_integer() else v
     except ValueError:
-        return pd.NA</code></pre>
-    </div>
+        return pd.NA
 
-    <p style="margin: 10px 0 10px; color:#444; line-height:1.7;">
-      Ensuite, on applique la conversion aux colonnes numériques RGPH (surface, populations, parts, âges).
-      Les colonnes qui restent en texte: <b>localites</b> (nom), et parfois un code administratif (<b>conc</b>).
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code># Exemple: adapter si tes colonnes ont d'autres noms après normalisation
-text_cols = {"conc", "localites"}  # à garder en texte
+text_cols = {"conc", "localites"}
 num_cols = [c for c in rgph.columns if c not in text_cols]
-
 for c in num_cols:
-    rgph[c] = rgph[c].map(to_number)
+    rgph[c] = rgph[c].map(to_number)</code></pre>
+          </div>
+        </div>
 
-# Harmoniser "conc" si vide (certaines lignes ont le code dans une autre colonne ou vide)
-if "conc" in rgph.columns:
-    rgph["conc"] = rgph["conc"].astype("string").str.strip()</code></pre>
-    </div>
-
-    <hr style="border:none; border-top:1px solid #eee; margin: 14px 0;">
-
-    <!-- Step D -->
-    <h4 style="margin: 0 0 6px; font-size: 16px;">Étape D — Gérer les lignes “structure” et les valeurs manquantes</h4>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      Dans ton extrait, certaines lignes sont des sous-niveaux (ex: <i>Drargua Rural</i>) sans chiffres.
-      On ne supprime pas aveuglément: on les marque (<b>is_empty_row</b>) et on décide selon le besoin:
-      <b>exclure</b> pour l’analyse, ou <b>garder</b> pour l’arborescence administrative.
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code>def row_is_empty_numeric(df: pd.DataFrame, numeric_columns: list[str]) -&gt; pd.Series:
-    # vrai si toutes les colonnes numériques sont vides/NA
+        <div class="ax-step">
+          <h4>D — Gestion des lignes hiérarchiques / valeurs manquantes</h4>
+          <p>
+            Certaines lignes représentent des niveaux administratifs (ex. “Rural”, “Centre”) parfois sans valeurs.
+            On les identifie pour éviter de fausser les calculs, tout en gardant l’information si nécessaire.
+          </p>
+          <div class="ax-code">
+            <pre><code>def row_is_empty_numeric(df, numeric_columns):
     return df[numeric_columns].isna().all(axis=1)
 
-numeric_columns = [c for c in rgph.columns if c not in {"conc", "localites"}]
-rgph["is_empty_row"] = row_is_empty_numeric(rgph, numeric_columns)
+numeric_cols = [c for c in rgph.columns if c not in {"conc","localites"}]
+rgph["is_empty_row"] = row_is_empty_numeric(rgph, numeric_cols)
 
-# Nettoyer nom localité
-if "localites" in rgph.columns:
-    rgph["localites"] = rgph["localites"].astype("string").str.strip()
-
-# Dataset "analysis_ready" (uniquement lignes avec valeurs)
 rgph_analysis = rgph.loc[~rgph["is_empty_row"]].copy()</code></pre>
-    </div>
+          </div>
+        </div>
 
-    <hr style="border:none; border-top:1px solid #eee; margin: 14px 0;">
-
-    <!-- Step E -->
-    <h4 style="margin: 0 0 6px; font-size: 16px;">Étape E — Contrôles qualité (cohérence rapide)</h4>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      On ajoute des checks simples pour détecter anomalies fréquentes:
-      <b>parts homme/femme ≈ 100%</b>, <b>groupes d’âge ≈ 100%</b> (si exprimés en %),
-      et <b>pop municipale ≤ pop légale</b> (souvent proche).
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code>def approx_sum(df, cols, tol=2.0):
+        <div class="ax-step">
+          <h4>E — Contrôles qualité (cohérence)</h4>
+          <p>
+            Vérifications rapides pour détecter incohérences (ex. parts Homme/Femme proches de 100, population municipale
+            non supérieure à la légale, etc.). Les flags aident à repérer les lignes à inspecter.
+          </p>
+          <div class="ax-code">
+            <pre><code>def approx_sum(df, cols, tol=2.0):
     s = df[cols].sum(axis=1, skipna=False)
     return (s.between(100 - tol, 100 + tol)) | s.isna()
 
-# Adapter aux noms exacts après normalisation
-sex_cols = [c for c in rgph_analysis.columns if c in {"part_mas", "part_fem"}]
-if len(sex_cols) == 2:
-    rgph_analysis["qc_sex_100"] = approx_sum(rgph_analysis, sex_cols, tol=2.0)
+if {"part_mas","part_fem"}.issubset(rgph_analysis.columns):
+    rgph_analysis["qc_sex_100"] = approx_sum(rgph_analysis, ["part_mas","part_fem"], tol=2.0)
 
-# Ex: colonnes d'âge: 0_4_ans, 5_9_ans, ...
-age_cols = [c for c in rgph_analysis.columns if re.match(r"^\d+_\d+_ans$", c) or c in {"m15ans", "15_59_ans", "60ans_et_plus"}]
-if len(age_cols) &gt;= 5:
-    rgph_analysis["qc_age_100"] = approx_sum(rgph_analysis, age_cols, tol=6.0)
-
-# Pop check (si colonnes présentes)
-if {"population_legale", "population_municipale"}.issubset(rgph_analysis.columns):
+if {"population_legale","population_municipale"}.issubset(rgph_analysis.columns):
     rgph_analysis["qc_pop_ok"] = rgph_analysis["population_municipale"] &lt;= rgph_analysis["population_legale"]</code></pre>
-    </div>
+          </div>
+        </div>
 
-    <hr style="border:none; border-top:1px solid #eee; margin: 14px 0;">
+        <div class="ax-step">
+          <h4>F — Export final (formats utiles)</h4>
+          <p>
+            Export en CSV/Parquet/JSON pour faciliter l’analyse et l’intégration.
+            Le JSON peut être structuré par localité (clé = code si présent) pour un accès direct.
+          </p>
+          <div class="ax-code">
+            <pre><code>from pathlib import Path
+import json
+import pandas as pd
+import re
 
-    <!-- Step F -->
-    <h4 style="margin: 0 0 6px; font-size: 16px;">Étape F — Export “final” (CSV/Parquet/JSON)</h4>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      On exporte la version propre. <b>Parquet</b> est idéal pour performance (dashboard),
-      <b>CSV</b> pour compatibilité, <b>JSON</b> pour l’API et le front.
-    </p>
+out_dir = Path("outputs")
+out_dir.mkdir(exist_ok=True)
 
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code>rgph_analysis.to_parquet(OUT_DIR / "rgph_clean.parquet", index=False)
-rgph_analysis.to_csv(OUT_DIR / "rgph_clean.csv", index=False, encoding="utf-8")
+rgph_analysis.to_csv(out_dir / "rgph_clean.csv", index=False, encoding="utf-8")
+rgph_analysis.to_parquet(out_dir / "rgph_clean.parquet", index=False)
+rgph_analysis.to_json(out_dir / "rgph_clean.json", orient="records", force_ascii=False)
 
-# JSON records (liste de lignes)
-rgph_analysis.to_json(OUT_DIR / "rgph_clean.json", orient="records", force_ascii=False)</code></pre>
-    </div>
-
-    <hr style="border:none; border-top:1px solid #eee; margin: 14px 0;">
-
-    <!-- Step G -->
-    <h4 style="margin: 0 0 6px; font-size: 16px;">Étape G — Données finales sous forme de “dic complet” (structure AXIORA)</h4>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      Ici, on construit un dictionnaire <b>complet</b> par localité: métadonnées + indicateurs + distribution d’âge.
-      C’est le format pratique pour:
-      <b>IA Q&amp;A</b> (“répondre aux questions”), <b>cartes</b>, et <b>rapports PDF</b>.
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code>def build_axiora_dict(df: pd.DataFrame) -&gt; dict:
+def build_dict(df):
     out = {}
-
-    # Colonnes attendues (adapter si besoin)
-    key_code = "conc" if "conc" in df.columns else None
-    key_name = "localites" if "localites" in df.columns else None
-
-    for _, row in df.iterrows():
-        code = str(row[key_code]) if key_code else None
-        name = str(row[key_name]) if key_name else None
-        # clé unique: code si présent, sinon nom
+    for _, r in df.iterrows():
+        code = str(r["conc"]) if "conc" in df.columns else None
+        name = str(r["localites"]) if "localites" in df.columns else None
         k = code if code and code != "&lt;NA&gt;" else name
 
-        # Exemple de blocs
-        meta = {
-            "code": code,
-            "name": name,
-        }
-
-        demo = {}
-        for c in ["supereficie_km2", "population_legale", "population_municipale"]:
-            if c in df.columns:
-                demo[c] = row[c] if pd.notna(row[c]) else None
-
-        sex = {}
-        for c in ["part_mas", "part_fem"]:
-            if c in df.columns:
-                sex[c] = row[c] if pd.notna(row[c]) else None
-
         age = {}
-        # colonnes âge typiques: 0_4_ans, 5_9_ans, 10_14_ans + m15ans + 15_59_ans + 60ans_et_plus
         for c in df.columns:
-            if c in {"m15ans", "15_59_ans", "60ans_et_plus"} or re.match(r"^\d+_\d+_ans$", c):
-                age[c] = row[c] if pd.notna(row[c]) else None
-
-        qc = {}
-        for c in ["qc_sex_100", "qc_age_100", "qc_pop_ok"]:
-            if c in df.columns:
-                qc[c] = bool(row[c]) if pd.notna(row[c]) else None
+            if c in {"m15ans","15_59_ans","60ans_et_plus"} or re.match(r"^\d+_\d+_ans$", c):
+                age[c] = r[c] if pd.notna(r[c]) else None
 
         out[k] = {
-            "meta": meta,
-            "demography": demo,
-            "sex_structure": sex,
-            "age_structure": age,
-            "quality_checks": qc
+            "code": code,
+            "localite": name,
+            "population_legale": r.get("population_legale", None),
+            "population_municipale": r.get("population_municipale", None),
+            "supereficie_km2": r.get("supereficie_km2", None),
+            "part_mas": r.get("part_mas", None),
+            "part_fem": r.get("part_fem", None),
+            "age": age
         }
-
     return out
 
-rgph_dict = build_axiora_dict(rgph_analysis)
+rgph_dict = build_dict(rgph_analysis)
+with open(out_dir / "rgph_dict.json", "w", encoding="utf-8") as f:
+    json.dump(rgph_dict, f, ensure_ascii=False, indent=2)</code></pre>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
 
-with open(OUT_DIR / "rgph_dict.json", "w", encoding="utf-8") as f:
-    json.dump(rgph_dict, f, ensure_ascii=False, indent=2)
-
-print("✅ Dictionnaire généré:", OUT_DIR / "rgph_dict.json")</code></pre>
-    </div>
-
-    <p style="margin: 10px 0 0; color:#444; line-height:1.7;">
-      Résultat: <code style="background:#f6f6f6; padding:2px 6px; border-radius: 6px;">outputs/rgph_dict.json</code>
-      contient une entrée par localité (clé = <i>code</i> si présent).
-    </p>
-  </article>
-
-  <!-- ====== 4) EXEMPLE DE SORTIE ====== -->
-  <article style="border: 1px solid #e6e6e6; border-radius: 14px; padding: 16px; margin-bottom: 14px;">
-    <h3 style="margin: 0 0 10px; font-size: 18px;">4) Exemple (format final “dic”)</h3>
-    <p style="margin: 0 0 10px; color:#444; line-height:1.7;">
-      Exemple simplifié d’une entrée (le vrai fichier contient toutes les localités):
-    </p>
-
-    <div style="background:#0b1020; color:#eaf0ff; border-radius: 14px; padding: 14px; overflow:auto;">
-      <pre style="margin:0; line-height:1.6;"><code>{
-  "900101011": {
-    "meta": {
-      "code": "900101011",
-      "name": "Agadir (Mun,)"
-    },
-    "demography": {
-      "supereficie_km2": 112,
-      "population_legale": 421844,
-      "population_municipale": 420288
-    },
-    "sex_structure": {
-      "part_mas": 50.3,
-      "part_fem": 49.7
-    },
-    "age_structure": {
-      "0_4_ans": 8.9,
-      "5_9_ans": 8.2,
-      "10_14_ans": 8.0,
-      "m15ans": 25.0,
-      "15_59_ans": 66.4,
-      "60ans_et_plus": 8.6
-    },
-    "quality_checks": {
-      "qc_sex_100": true,
-      "qc_age_100": null,
-      "qc_pop_ok": true
+  <style>
+    /* ---------- AXIORA: Data & Preparation (Professional wide text) ---------- */
+    .ax-section{
+      width: 100%;
+      padding: 34px 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      color: rgba(255,255,255,.92);
     }
-  }
-}</code></pre>
-    </div>
-  </article>
+    .ax-wrap{
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+    .ax-header h2{
+      margin: 0 0 10px;
+      font-size: 38px;
+      line-height: 1.15;
+      letter-spacing: .2px;
+    }
+    .ax-lead{
+      margin: 0 0 18px;
+      font-size: 18px;
+      line-height: 1.8;
+      color: rgba(255,255,255,.78);
+      max-width: 100%;
+    }
+    .ax-card{
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 18px;
+      margin: 14px 0;
+      background: rgba(0,0,0,.18);
+      backdrop-filter: blur(10px);
+    }
+    .ax-card h3{
+      margin: 0 0 12px;
+      font-size: 20px;
+      letter-spacing: .2px;
+    }
+    .ax-block h4{
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: rgba(255,255,255,.92);
+    }
+    .ax-block p{
+      margin: 0 0 10px;
+      font-size: 16.5px;
+      line-height: 1.85;
+      color: rgba(255,255,255,.78);
+    }
+    .ax-muted{ color: rgba(255,255,255,.70); }
 
-  <!-- ====== 5) POURQUOI C’EST PRO ====== -->
-  <article style="border: 1px solid #e6e6e6; border-radius: 14px; padding: 16px;">
-    <h3 style="margin: 0 0 10px; font-size: 18px;">5) Pourquoi ce pipeline est “pro” (dans un portfolio)</h3>
-    <ul style="margin: 0; padding-left: 18px; color:#333; line-height:1.7;">
-      <li><b>Traçabilité</b>: le brut n’est jamais modifié (audit + reproductibilité).</li>
-      <li><b>Normalisation</b>: mêmes colonnes, mêmes unités, mêmes types partout.</li>
-      <li><b>Robuste aux formats marocains/français</b>: séparateurs (espaces fines), virgule décimale, “%”.</li>
-      <li><b>Qualité</b>: checks rapides pour repérer incohérences (ex: 100%, pop).</li>
-      <li><b>Prêt pour l’IA</b>: export JSON “dic complet” directement utilisable par le module Q&amp;A et le générateur de rapports.</li>
-    </ul>
-  </article>
+    .ax-grid-2{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 900px){
+      .ax-grid-2{ grid-template-columns: 1fr; }
+      .ax-header h2{ font-size: 30px; }
+    }
 
-  <footer style="margin-top: 14px; color:#666; font-size: 13.5px; line-height: 1.6;">
-    <p style="margin:0;">
-      <b>Note</b>: si ton fichier RGPH a plusieurs feuilles ou des en-têtes non standard,
-      change <code style="background:#f6f6f6; padding:2px 6px; border-radius:6px;">sheet_name</code>
-      et/ou utilise <code style="background:#f6f6f6; padding:2px 6px; border-radius:6px;">skiprows</code>
-      dans <code style="background:#f6f6f6; padding:2px 6px; border-radius:6px;">read_excel()</code>.
-    </p>
-  </footer>
+    .ax-list{
+      margin: 0 0 10px;
+      padding-left: 18px;
+      color: rgba(255,255,255,.80);
+      line-height: 1.8;
+      font-size: 16.5px;
+    }
+    .ax-file{
+      margin: 10px 0 0;
+      font-size: 16px;
+      color: rgba(255,255,255,.75);
+    }
+    .ax-file span{
+      font-weight: 700;
+      color: rgba(255,255,255,.92);
+    }
+
+    .ax-note{
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.06);
+    }
+    .ax-note p{
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.8;
+      color: rgba(255,255,255,.78);
+    }
+
+    .ax-raw{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.30);
+      border-radius: 14px;
+      padding: 12px;
+      overflow: auto;
+    }
+    .ax-raw pre{ margin:0; }
+    .ax-raw code{
+      font-size: 14.5px;
+      line-height: 1.65;
+      color: rgba(255,255,255,.90);
+      white-space: pre;
+    }
+
+    .ax-steps{ display: grid; gap: 14px; }
+    .ax-step{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,.05);
+    }
+    .ax-step h4{
+      margin: 0 0 6px;
+      font-size: 17px;
+      color: rgba(255,255,255,.92);
+    }
+    .ax-step p{
+      margin: 0 0 10px;
+      font-size: 16.5px;
+      line-height: 1.85;
+      color: rgba(255,255,255,.78);
+    }
+
+    .ax-code{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.38);
+      border-radius: 14px;
+      padding: 12px;
+      overflow: auto;
+    }
+    .ax-code pre{ margin:0; }
+    .ax-code code{
+      font-size: 14.5px;
+      line-height: 1.65;
+      color: rgba(255,255,255,.92);
+      white-space: pre;
+    }
+  </style>
 </section>
+
     
     <footer class="footer">
       © 2026 — Malak Mounji
