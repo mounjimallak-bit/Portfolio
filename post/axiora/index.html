@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axiora — Introduction du projet</title>
+  <title>Axiora Data — Détails du projet</title>
 
   <link rel="stylesheet" href="../../styles.css" />
 </head>
@@ -11,6 +11,7 @@
 <body>
   <div class="bg-glow"></div>
 
+  <!-- HEADER -->
   <header class="header">
     <div class="container nav">
       <a class="logo" href="../../index.html#portfolio">← Retour</a>
@@ -30,11 +31,48 @@
   </header>
 
   <main class="container">
-    <section class="section" style="border-top:none;">
 
+    <!-- TITRE PROJET -->
+    <section class="section" style="border-top:none;">
       <div class="section-head">
-        <h2>Axiora Data — Plateforme d’Intelligence Socio-Économique</h2>
-        <p>Analyse, Visualisation & Prévision des Indicateurs Régionaux (Souss-Massa)</p>
+        <h2>Axiora Data — Analyse, Visualisation & Prévision des Indicateurs Socio-Économiques (Souss-Massa)</h2>
+        <p>
+          <strong>Auteurs :</strong> Malak Mounji <br>
+          <strong>Technos :</strong> Streamlit · Plotly · Pandas · NumPy · Scikit-learn · GeoPandas · FPDF · Gemini API
+        </p>
+      </div>
+    </section>
+
+    <!-- TABLE DES MATIÈRES -->
+    <section class="section">
+      <div class="section-head">
+        <h2>Table des matières</h2>
+      </div>
+
+      <div class="card">
+        <ul style="columns:2; line-height:1.9;">
+          <li><a href="#introduction">Introduction</a></li>
+          <li><a href="#overview">Aperçu de la plateforme</a></li>
+          <li><a href="#data">Données & préparation</a></li>
+          <li><a href="#navigation">Navigation & UI</a></li>
+          <li><a href="#exploration">Exploration des Indices</a></li>
+          <li><a href="#visualisations">Visualisations</a></li>
+          <li><a href="#cartes">Cartes géographiques</a></li>
+          <li><a href="#ml">Prévision & Machine Learning</a></li>
+          <li><a href="#assistant">Assistant IA</a></li>
+          <li><a href="#report">Générateur de rapports</a></li>
+          <li><a href="#installation">Installation & exécution</a></li>
+          <li><a href="#resultats">Résultats & points forts</a></li>
+          <li><a href="#conclusion">Conclusion</a></li>
+          <li><a href="#roadmap">Roadmap</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- INTRODUCTION -->
+    <section id="introduction" class="section">
+      <div class="section-head">
+        <h2>Introduction</h2>
       </div>
 
       <div class="grid-2">
@@ -56,20 +94,15 @@
 
         <div class="card">
           <h3>Problématique</h3>
-          <p>
-            Les données publiques sont souvent disponibles sous forme statique (rapports PDF,
-            tableaux bruts), ce qui limite :
-          </p>
           <ul>
-            <li>L’exploration interactive</li>
-            <li>La comparaison multi-années</li>
-            <li>L’analyse comparative entre provinces et communes</li>
-            <li>La génération automatique d’insights</li>
-            <li>La projection des tendances futures</li>
+            <li>Exploration interactive limitée</li>
+            <li>Comparaison multi-années complexe</li>
+            <li>Analyse territoriale non centralisée</li>
+            <li>Absence de prévision automatisée</li>
           </ul>
           <p>
-            Il existe donc un besoin d’un outil interactif, dynamique, prédictif
-            et orienté aide à la décision.
+            Il existe donc un besoin d’un outil interactif, dynamique,
+            prédictif et orienté aide à la décision.
           </p>
         </div>
 
@@ -78,38 +111,123 @@
       <div class="card" style="margin-top:16px;">
         <h3>Objectif du Projet</h3>
         <ul>
-          <li>Centraliser et structurer les indicateurs socio-économiques régionaux</li>
+          <li>Centraliser et structurer les indicateurs socio-économiques</li>
           <li>Offrir une visualisation interactive avancée</li>
           <li>Permettre des comparaisons temporelles et spatiales</li>
-          <li>Intégrer des modèles de Machine Learning pour la prévision</li>
-          <li>Fournir un assistant IA capable d’interpréter les données</li>
-          <li>Générer automatiquement des rapports décisionnels en PDF</li>
+          <li>Intégrer des modèles de Machine Learning</li>
+          <li>Fournir un assistant IA conversationnel</li>
+          <li>Générer automatiquement des rapports décisionnels</li>
         </ul>
       </div>
 
       <div class="card" style="margin-top:16px;">
         <h3>Vision</h3>
         <p>
-          Axiora Data ne se limite pas à un simple tableau de bord.
-          Il s’agit d’une <strong>plateforme d’intelligence socio-économique</strong>,
-          combinant :
-        </p>
-        <ul>
-          <li>Data Analytics</li>
-          <li>Visualisation avancée</li>
-          <li>Intelligence artificielle</li>
-          <li>Géospatial</li>
-          <li>Automatisation de reporting</li>
-        </ul>
-        <p>
-          L’objectif final est de transformer les données statistiques
-          en <strong>outil stratégique d’aide à la décision</strong>.
+          Axiora Data est une plateforme d’intelligence socio-économique
+          combinant Data Analytics, Visualisation avancée,
+          Intelligence artificielle, Géospatial et automatisation de reporting.
         </p>
       </div>
 
-      <footer class="footer">© 2026 — Malak Mounji</footer>
-
     </section>
+
+    <!-- PROCHAINES SECTIONS (VIDES POUR L’INSTANT) -->
+
+    <section id="overview" class="section">
+      <div class="section-head">
+        <h2>Aperçu de la plateforme</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="data" class="section">
+      <div class="section-head">
+        <h2>Données & préparation</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="navigation" class="section">
+      <div class="section-head">
+        <h2>Navigation & UI</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="exploration" class="section">
+      <div class="section-head">
+        <h2>Exploration des Indices</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="visualisations" class="section">
+      <div class="section-head">
+        <h2>Visualisations</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="cartes" class="section">
+      <div class="section-head">
+        <h2>Cartes géographiques</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="ml" class="section">
+      <div class="section-head">
+        <h2>Prévision & Machine Learning</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="assistant" class="section">
+      <div class="section-head">
+        <h2>Assistant IA</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="report" class="section">
+      <div class="section-head">
+        <h2>Générateur automatique de rapports</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="installation" class="section">
+      <div class="section-head">
+        <h2>Installation & exécution</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="resultats" class="section">
+      <div class="section-head">
+        <h2>Résultats & points forts</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="conclusion" class="section">
+      <div class="section-head">
+        <h2>Conclusion</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <section id="roadmap" class="section">
+      <div class="section-head">
+        <h2>Roadmap</h2>
+        <p>Section à compléter.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      © 2026 — Malak Mounji
+    </footer>
+
   </main>
 </body>
 </html>
