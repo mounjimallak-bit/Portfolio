@@ -417,90 +417,31 @@
     </header>
 
     <!-- 1) SOURCES -->
-    <article class="ax-card" id="sources">
-      <h3>1) Données brutes (sources)</h3>
+   <article class="ax-card">
+      <h3>Données brutes — RGPH (Structure démographique)</h3>
 
-      <div class="ax-grid-2">
-        <div class="ax-block">
-          <h4>RGPH — Structure démographique (Excel)</h4>
-          <p>
-            Le fichier RGPH regroupe des informations démographiques par territoire (région, province/préfecture,
-            cercle/caïdat/commune, centres, etc.). On y retrouve notamment :
-          </p>
-          <ul class="ax-list">
-            <li><b>Identifiants territoriaux</b> : code (ex. <i>CONC</i>) + nom de la localité</li>
-            <li><b>Superficie</b> (km²)</li>
-            <li><b>Population</b> : population légale et population municipale</li>
-            <li><b>Structure par sexe</b> : part masculine / part féminine</li>
-            <li><b>Structure par âge</b> : classes (0–4, 5–9, 10–14, 15–19, …, 60+)</li>
-          </ul>
-          <p class="ax-file">
-            Fichier : <span>RGPH2014.xlsx</span>
-          </p>
-        </div>
+      <p class="ax-text">
+        Le fichier RGPH contient les informations démographiques détaillées par territoire :
+        codes administratifs, superficie, population légale, population municipale,
+        structure par sexe et répartition par classes d’âge.
+      </p>
 
-        <div class="ax-block">
-          <h4>Pauvreté — Indicateurs socio-économiques (Excel)</h4>
-          <p>
-            Le fichier “pauvreté” contient des indicateurs permettant d’évaluer la vulnérabilité des ménages et/ou
-            le niveau de pauvreté à l’échelle territoriale (selon la structure du fichier). Typiquement on y trouve :
-          </p>
-          <ul class="ax-list">
-            <li><b>Codes/territoires</b> : clés de jointure (province, commune, etc.)</li>
-            <li><b>Indicateurs</b> : taux/indices (pauvreté, vulnérabilité, etc.)</li>
-            <li><b>Mesures de contexte</b> : variables explicatives (selon disponibilité)</li>
-          </ul>
-          <p class="ax-file">
-            Fichier : <span>chtouka pauvr.xlsx</span>
-          </p>
-        </div>
+      <div class="ax-table-wrapper">
+        <iframe 
+          src="RGPH2014.html"
+          class="ax-iframe">
+        </iframe>
       </div>
 
-      <div class="ax-note">
-        <p>
-          <b>Important :</b> les fichiers bruts sont conservés <b>tels quels</b> (traçabilité). Le nettoyage se fait sur une copie
-          de travail et les résultats sont exportés séparément.
-        </p>
+      <div class="ax-download">
+        <a href="RGPH2014.xlsx" download class="btn btn-primary">
+          Télécharger le fichier Excel RGPH
+        </a>
       </div>
     </article>
 
     <!-- 2) EXEMPLES BRUTS -->
-    <article class="ax-card" id="raw-examples">
-      <h3>2) Exemples de données brutes (pour illustrer le cleaning)</h3>
-
-      <div class="ax-grid-2">
-        <div class="ax-block">
-          <h4>Extrait brut RGPH (tel que reçu)</h4>
-          <p class="ax-muted">
-            Exemple typique : nombres avec espaces (séparateurs), pourcentages en “%”, décimales en virgule,
-            et lignes hiérarchiques parfois partiellement vides.
-          </p>
-
-          <div class="ax-raw">
-            <pre><code>CONC        Localités                 Population légale   Part Mas   Part Fem   0-4 ans
-900101011   Agadir (Mun,)            421 844             50,3%      49,7%      8,9
-900105093   Centre: Drargua          50 946              50,9%      49,1%      12,3
-900107033   Centre: Aourir           35 365              51,4%      48,6%      9,8</code></pre>
-          </div>
-        </div>
-
-        <div class="ax-block">
-          <h4>Extrait brut “Pauvreté” (tel que reçu)</h4>
-          <p class="ax-muted">
-            Les indicateurs peuvent contenir des valeurs manquantes, des formats hétérogènes et des libellés non standardisés.
-            Ci-dessous un exemple “type” (structure indicative).
-          </p>
-
-          <div class="ax-raw">
-            <pre><code>Territoire            Indicateur                 Valeur
-Chtouka Ait Baha      Taux de pauvreté          12,4%
-Chtouka Ait Baha      Taux de vulnérabilité     19,6%
-Biougra               Taux de pauvreté          8,1%</code></pre>
-          </div>
-        </div>
-      </div>
-    </article>
-
+   
     <!-- 3) PIPELINE CLEANING -->
     <article class="ax-card" id="cleaning">
       <h3>3) Préparation des données : étapes et logique</h3>
