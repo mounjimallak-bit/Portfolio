@@ -157,8 +157,9 @@ img {
   width: 260px;
   height: 260px;
   object-fit: cover;
-  border-radius: 50%;
-  border: 8px solid #6c63ff; /* même couleur que bouton */
+  border-radius: 50% !important;
+  border: 8px solid #6c63ff;
+  display: block;
 }
 /*==================== NAV ====================*/
 
