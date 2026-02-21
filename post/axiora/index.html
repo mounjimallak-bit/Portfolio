@@ -197,7 +197,157 @@
     <footer class="footer">
       © 2026 — Malak Mounji
     </footer>
+     <section id="overview" class="section">
+  <div class="section-head">
+    <h2>Aperçu de la plateforme</h2>
+    <p>Vue structurée des objectifs, fonctionnalités et architecture.</p>
+  </div>
 
+  <!-- OBJECTIFS -->
+  <div id="objectifs" class="outline-block">
+    <h3 class="outline-title">Objectifs</h3>
+    <ul class="outline-list">
+      <li>Centraliser et structurer les indicateurs socio-économiques (HCP) pour la région Souss-Massa.</li>
+      <li>Permettre une exploration interactive (années, provinces, communes, indicateurs).</li>
+      <li>Faciliter la comparaison multi-années et multi-territoires (variation %, tendances).</li>
+      <li>Intégrer un module de prévision (ML) pour projeter l’évolution des indicateurs.</li>
+      <li>Renforcer l’aide à la décision via un assistant IA et des rapports automatiques.</li>
+    </ul>
+  </div>
+
+  <!-- FONCTIONNALITES -->
+  <div id="fonctionnalites" class="outline-block">
+    <h3 class="outline-title">Fonctionnalités clés</h3>
+    <ul class="outline-list">
+      <li><strong>Dashboard</strong> : indicateurs synthétiques et vues rapides.</li>
+      <li><strong>Exploration des indices</strong> : Population, Travail, Habitat, Finance, Enseignement, Pauvreté.</li>
+      <li><strong>Filtres dynamiques</strong> : année, province/commune, type d’indicateur, mode comparaison.</li>
+      <li><strong>Visualisations interactives</strong> : courbes, barres, heatmaps, scatter, tableaux.</li>
+      <li><strong>Cartes géographiques</strong> : choroplèthes pauvreté/vulnérabilité avec tooltips & zoom.</li>
+      <li><strong>Prévisions ML</strong> : projection de tendances et visualisation des prédictions.</li>
+      <li><strong>Assistant IA</strong> : réponses, résumés et interprétation des résultats.</li>
+      <li><strong>Rapports PDF</strong> : génération automatique avec graphiques + cartes + synthèse.</li>
+    </ul>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div id="architecture" class="outline-block">
+    <h3 class="outline-title">Architecture générale</h3>
+
+    <div class="arch-wrap">
+
+      <!-- Ligne 1 -->
+      <div class="arch-row">
+        <div class="arch-node">
+          <div class="arch-badge">1</div>
+          <div class="arch-content">
+            <div class="arch-title">Sources & Données (HCP)</div>
+            <div class="arch-sub">Population · Pauvreté/Vulnérabilité · Travail · Habitat · Finance · Enseignement</div>
+            <ul class="arch-points">
+              <li>Organisation par <strong>province</strong> et <strong>commune</strong></li>
+              <li>Gestion multi-années (ex. 2004 / 2007 / 2014 / 2016–2018)</li>
+              <li>Formats : tables/dicts structurés</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="arch-arrow">→</div>
+
+        <div class="arch-node">
+          <div class="arch-badge">2</div>
+          <div class="arch-content">
+            <div class="arch-title">Préparation & Validation</div>
+            <div class="arch-sub">Pandas · NumPy</div>
+            <ul class="arch-points">
+              <li>Nettoyage, conversion types, gestion valeurs manquantes</li>
+              <li>Normalisation des libellés (provinces/communes)</li>
+              <li>Construction de datasets par module</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ligne 2 -->
+      <div class="arch-row">
+        <div class="arch-node">
+          <div class="arch-badge">3</div>
+          <div class="arch-content">
+            <div class="arch-title">Analyse & Indicateurs</div>
+            <div class="arch-sub">KPI · Variation % · Comparaison</div>
+            <ul class="arch-points">
+              <li>Comparaison année N / N-1 et tendances</li>
+              <li>Top/Bottom (communes les plus touchées)</li>
+              <li>Résumés analytiques (insights)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="arch-arrow">→</div>
+
+        <div class="arch-node">
+          <div class="arch-badge">4</div>
+          <div class="arch-content">
+            <div class="arch-title">Visualisation & Cartographie</div>
+            <div class="arch-sub">Plotly · GeoPandas</div>
+            <ul class="arch-points">
+              <li>Graphiques interactifs : barres, courbes, heatmaps, scatter</li>
+              <li>Cartes choroplèthes : pauvreté/vulnérabilité</li>
+              <li>Tooltips, zoom, filtrage par zone/année</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ligne 3 -->
+      <div class="arch-row">
+        <div class="arch-node">
+          <div class="arch-badge">5</div>
+          <div class="arch-content">
+            <div class="arch-title">Prévision (Machine Learning)</div>
+            <div class="arch-sub">Scikit-learn (Régression)</div>
+            <ul class="arch-points">
+              <li>Entraînement sur historique → prédiction future</li>
+              <li>Affichage des courbes (réel vs prédit)</li>
+              <li>Extensions possibles : RandomForest / XGBoost / Prophet</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="arch-arrow">→</div>
+
+        <div class="arch-node">
+          <div class="arch-badge">6</div>
+          <div class="arch-content">
+            <div class="arch-title">Services IA & Reporting</div>
+            <div class="arch-sub">Gemini API · FPDF</div>
+            <ul class="arch-points">
+              <li>Chatbot : questions, explications, synthèses</li>
+              <li>Rapport PDF : sections, graphiques, cartes, conclusion</li>
+              <li>Export automatique & nommage</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ligne 4 -->
+      <div class="arch-row arch-row-center">
+        <div class="arch-node arch-node-wide">
+          <div class="arch-badge">7</div>
+          <div class="arch-content">
+            <div class="arch-title">Interface Utilisateur (Streamlit)</div>
+            <div class="arch-sub">Sidebar · Boutons · Switchs · Pages</div>
+            <ul class="arch-points">
+              <li>Navigation par modules (indices) + sections dédiées (IA, PDF, cartes)</li>
+              <li>Contrôles interactifs : selects, toggles, sliders, comparaisons</li>
+              <li>Expérience fluide : feedback, alertes, indicateurs synthétiques</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
   </main>
 </body>
 </html>
