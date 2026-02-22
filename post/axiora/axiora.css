@@ -18,8 +18,27 @@
   margin-bottom: 10px;
 }
 
-.ax-step { margin: 26px 0 34px; }
-.ax-step-title { font-weight: 800; margin: 0 0 6px; font-size: 18px; }
+/* Iframe tables (RGPH + Pauvreté même taille) */
+.ax-table-full {
+  margin: 18px 0 34px;
+}
+
+.ax-iframe-full {
+  width: 100%;
+  height: 500px;
+  border: none;
+  background: transparent;
+}
+
+.ax-step {
+  margin: 26px 0 34px;
+}
+
+.ax-step-title {
+  font-weight: 800;
+  margin: 0 0 6px;
+  font-size: 18px;
+}
 
 .ax-btn {
   margin-top: 8px;
@@ -36,11 +55,12 @@
   gap: 6px;
 }
 
-.ax-btn:hover { border-color: rgba(255,255,255,.45); }
+.ax-btn:hover {
+  border-color: rgba(255,255,255,.45);
+}
 
 /* Code affiché par défaut */
-.ax-code,
-.ax-json {
+.ax-code {
   margin-top: 10px;
   padding: 14px 16px;
   background: rgba(0,0,0,.35);
@@ -48,94 +68,151 @@
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.6;
+  max-height: 420px;
   overflow: auto;
   white-space: pre;
 }
 
-.ax-code { max-height: 420px; }
-.ax-json { max-height: 560px; margin-top: 14px; padding: 16px; }
-.hidden { display: none; }
-
-
-/* =========================================================
-   1. Tables RGPH & Pauvreté — Zéro vide, zoom parfait
-========================================================= */
-
-.ax-table-full,
-.ax-table-poverty {
-  width: 100%;
-  height: 520px; /* Même hauteur pour les deux */
-  margin: 18px 0 34px;
-  border-radius: 12px;
-  overflow: hidden; /* Côté sécurité : cache tout dépassement */
-  background: #fff; /* Évite les fonds vides si le tableau est court */
-}
-
-.ax-iframe-full {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-.ax-iframe-poverty {
-  width: 100%; /* Prend toute la largeur de son conteneur */
-  height: 100%; /* Prend toute la hauteur */
-  border: none;
-  zoom: 1.25; /* LE VRAI FIX : Le zoom natif du navigateur, aucun vide possible ! */
-}
-
-@media (max-width: 980px){
-  .ax-table-full, .ax-table-poverty { height: 460px; }
-}
-
-
-/* =========================================================
-   2. Navigation & UI — Images plus petites et parfaitement alignées
-========================================================= */
-
-#navigation .ax-media {
-  display: flex;
-  align-items: stretch; /* FORCE l'image et le code à avoir la MÊME hauteur */
-  gap: 24px;
-  margin: 16px 0 32px;
-}
-
-#navigation .ax-media-text {
-  flex: 60%; /* Le code prend 60% de l'espace */
-  display: flex;
-  flex-direction: column;
-}
-
-#navigation .ax-media-figure {
-  flex: 40%; /* L'image prend 40% (elle est donc physiquement plus petite) */
-  display: flex;
-  flex-direction: column;
-}
-
-#navigation .ax-media-text .ax-code {
-  flex-grow: 1; /* S'étire pour remplir toute la hauteur */
-  margin: 0; 
+.ax-json {
+  margin-top: 14px;
   padding: 16px;
-  background: rgba(0,0,0,.38);
-  border-radius: 14px;
-  font-size: 13px; 
-  line-height: 1.55;
-  max-height: none; /* Enlève la limite de hauteur ici */
+  background: rgba(0,0,0,.35);
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  max-height: 560px;
+  overflow: auto;
+  white-space: pre;
 }
 
-#navigation .ax-media-figure .ax-img {
+.hidden {
+  display: none;
+}
+
+/* Container : définit l'encombrement final réel sur la page */
+.ax-table-poverty {
+  margin: 14px auto 22px;
   width: 100%;
-  height: 100%; /* S'adapte au millimètre près à la hauteur du code */
-  object-fit: cover; /* L'astuce magique : l'image remplit la zone sans aucun blanc/vide */
-  object-position: left top; /* Aligné proprement en haut à gauche */
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.15);
-  box-shadow: 0 12px 30px rgba(0,0,0,.28);
+  height: 620px;
+  overflow: auto;
+  position: relative;
 }
 
-/* Responsive pour téléphone */
-@media (max-width: 980px){
-  #navigation .ax-media { flex-direction: column; }
-  #navigation .ax-media-text, #navigation .ax-media-figure { flex: 100%; }
-  #navigation .ax-media-figure .ax-img { height: auto; object-fit: contain; }
+/* Iframe pauvreté : on agrandit et on compense */
+.ax-iframe-poverty {
+  border: none;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  transform-origin: top left;
+  transform: scale(1.35);
+
+  width: calc(100% / 1.35);
+  height: calc(100% / 1.35);
 }
+
+/*  Optionnel: sur grands écrans, on augmente encore un peu */
+@media (min-width: 1100px) {
+  .ax-table-poverty {
+    height: 640px;
+  }
+
+  .ax-iframe-poverty {
+    transform: scale(1.45);
+    width: calc(100% / 1.45);
+    height: calc(100% / 1.45);
+  }
+}
+
+/* =========================================================
+   Navigation & UI — SOLUTION FINALE (force taille image + code)
+   IMPORTANT: on cible UNIQUEMENT la section navigation
+========================================================= */
+
+/* 1) On verrouille la zone navigation pour éviter conflits */
+#navigation .ax-media{
+  display: grid !important;
+  grid-template-columns: 1.2fr 1fr !important;
+  gap: 24px !important;
+  align-items: start !important;
+  margin: 20px 0 40px !important;
+}
+
+/* 2) colonnes */
+#navigation .ax-media-text{
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#navigation .ax-media-figure{
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* 3) IMAGE — on force une vraie taille visible */
+#navigation .ax-media-figure .ax-img{
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 560px !important;     /* ✅ image plus grande */
+  min-width: 420px !important;     /* ✅ évite “petit” */
+  height: auto !important;         /* ✅ pas de crop */
+  object-fit: contain !important;  /* ✅ conserve la capture entière */
+
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  box-shadow: 0 15px 40px rgba(0,0,0,.3) !important;
+}
+
+/* 4) CODE — annule max-height global seulement dans navigation */
+#navigation .ax-media-text .ax-code{
+  max-height: none !important;     /* ✅ annule 420px */
+  min-height: 560px !important;    /* ✅ “même présence” que l’image */
+  overflow: auto !important;
+
+  padding: 16px !important;
+  background: rgba(0,0,0,.40) !important;
+  border-radius: 16px !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  white-space: pre !important;
+}
+
+/* 5) Images wide ne changent pas */
+#navigation .ax-img-wide{
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 10px 30px rgba(0,0,0,.22);
+}
+
+/* 6) Responsive */
+@media (max-width: 980px){
+  #navigation .ax-media{
+    grid-template-columns: 1fr !important;
+  }
+
+  #navigation .ax-media-figure .ax-img{
+    min-width: 0 !important;
+    max-width: 520px !important;
+  }
+
+  #navigation .ax-media-text .ax-code{
+    min-height: auto !important;
+    max-height: 450px !important;
+  }
+}
+
+/* =========================================================
+   Anti-cache helper (optionnel)
+   -> Si rien ne change sur GitHub Pages, renomme le fichier
+   axiora.css -> axiora.v2.css puis change le <link> dans HTML.
+========================================================= */
