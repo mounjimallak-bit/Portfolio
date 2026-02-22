@@ -694,122 +694,250 @@ data_clean_preview = {
 
 
 
-      <section id="navigation" class="ax-section">
+   
+
+<section id="navigation" class="ax-section">
   <div class="container">
 
     <div class="section-head">
       <h2>Navigation &amp; UI</h2>
-      <p>Architecture d’interface : navigation rapide, contrôles clairs et composants réutilisables</p>
+      <p>Expérience “app-like” sous Streamlit : routage interne, menus scalables, composants réutilisables</p>
     </div>
 
     <p class="ax-lead">
-      L’objectif n’était pas seulement de “faire un dashboard Streamlit”, mais de livrer une expérience proche d’une
-      application data en production : navigation stable, interactions fluides et interface lisible même quand les filtres
-      deviennent nombreux. J’ai donc structuré l’UI autour d’un routage interne, d’un menu hiérarchisé et de composants
-      réutilisables (cartes KPI, en-tête, blocs de contenu).
+      AXIORA est conçu comme une application d’exploration data : navigation stable, interactions rapides et interface
+      structurée. Le cœur de l’UX repose sur une gestion d’état (<code>st.session_state</code>), des callbacks et une
+      organisation UI pensée “produit” (menu hiérarchique, filtres lisibles, composants KPI).
     </p>
 
     <!-- ========================================================= -->
-    <!-- ================= 1) MENU PRINCIPAL ===================== -->
+    <!-- 1) MENU PRINCIPAL : texte à côté + bouton code -->
     <!-- ========================================================= -->
-    <h3 id="menu" class="ax-subtitle">1) Menu principal fixe : navigation sans rupture</h3>
+    <h3 id="menu" class="ax-subtitle">1) Menu principal fixe : routage interne (state-driven)</h3>
 
-    <p class="ax-text">
-      Plutôt que d’empiler des pages séparées, la navigation est gérée via un état applicatif (session) afin de conserver
-      une barre latérale stable et d’éviter la sensation de “rechargement complet” à chaque clic. Concrètement, chaque entrée
-      du menu déclenche un changement d’état et rend uniquement la section correspondante. Résultat : passage immédiat entre
-      exploration, assistant et générateur de rapports, sans perdre le contexte utilisateur.
-    </p>
+    <div class="ax-media">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Au lieu d’une navigation multi-pages classique, j’ai mis en place un <strong>routage interne</strong>
+          piloté par <code>st.session_state</code>. Chaque clic dans la sidebar déclenche un <strong>callback</strong>
+          qui met à jour l’état (<code>page</code> / <code>module</code>), puis l’application rend uniquement le bloc
+          concerné. Ce pattern réduit les ruptures de navigation et garde la sidebar cohérente.
+        </p>
 
-    <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">Menu principal (barre latérale)</h4>
-      <img class="ax-img"
-           src="images/side_bare.png"
-           alt="Menu principal Axiora Data (sidebar fixe)">
+        <ul class="ax-list">
+          <li><strong>State management :</strong> <code>page</code> stocké dans <code>session_state</code>.</li>
+          <li><strong>Callbacks :</strong> fonction <code>go_to()</code> appelée sur clic.</li>
+          <li><strong>UX :</strong> navigation instantanée entre exploration / assistant / reporting sans perdre le contexte.</li>
+        </ul>
+
+        <button type="button" class="ax-btn" onclick="toggleCode('codeNavMenu', this)">Masquer le code</button>
+        <pre id="codeNavMenu" class="ax-code"><code>
+# Streamlit — Routage interne (extrait)
+import streamlit as st
+
+if "page" not in st.session_state:
+    st.session_state.page = "Accueil"
+
+def go_to(page_name: str):
+    st.session_state.page = page_name
+
+# Sidebar : menu principal
+st.sidebar.markdown("### Menu Principal")
+
+if st.sidebar.button("Accueil"):
+    go_to("Accueil")
+
+if st.sidebar.button("Exploration des Indices"):
+    go_to("Exploration")
+
+if st.sidebar.button("Generateur Rapport & statistiques"):
+    go_to("Reporting")
+
+if st.sidebar.button("assistant axiora data"):
+    go_to("Assistant")
+
+# Render conditionnel
+if st.session_state.page == "Accueil":
+    render_home()
+elif st.session_state.page == "Exploration":
+    render_exploration()
+elif st.session_state.page == "Reporting":
+    render_reporting()
+elif st.session_state.page == "Assistant":
+    render_assistant()
+        </code></pre>
+      </div>
+
+      <div class="ax-media-figure">
+        <img class="ax-img"
+             src="images/side_bare.png"
+             alt="Menu principal Axiora Data (sidebar fixe)">
+        <div class="ax-caption">Sidebar fixe : accès direct aux modules (Exploration, Assistant, Reporting…).</div>
+      </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- ================= 2) ACCORDEON ========================== -->
+    <!-- 2) ACCORDEON : texte à côté + bouton code -->
     <!-- ========================================================= -->
-    <h3 id="accordeon" class="ax-subtitle">2) Accordéon “Exploration des Indices” : menu dense, mais lisible</h3>
+    <h3 id="accordeon" class="ax-subtitle">2) Accordéon “Exploration des Indices” : navigation scalable</h3>
 
-    <p class="ax-text">
-      La partie “Exploration des Indices” regroupe plusieurs familles (Population, Habitat, Finance, Enseignement, etc.).
-      Pour éviter un menu trop long, j’ai introduit un comportement type accordéon : un seul bloc s’ouvre/ se referme et
-      affiche uniquement les sous-sections pertinentes. Cette hiérarchie réduit la charge cognitive et rend la navigation
-      plus rapide sur desktop comme sur mobile.
-    </p>
+    <div class="ax-media">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          L’exploration couvre plusieurs domaines (Population, Travail, Habitat, Finance…). Pour éviter une sidebar longue,
+          j’ai implémenté un <strong>menu hiérarchique</strong> en mode accordéon : un état <code>indices_open</code>
+          contrôle l’affichage des sous-menus. Cela améliore la lisibilité, réduit la friction et facilite l’ajout de nouveaux
+          modules sans refactor lourd.
+        </p>
 
-    <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">Accordéon déployé : sous-menus par thématique</h4>
-      <img class="ax-img"
-           src="images/side_bare2.png"
-           alt="Accordéon Exploration des Indices (déployé)">
+        <ul class="ax-list">
+          <li><strong>UI conditionnelle :</strong> rendu des sous-menus uniquement si <code>indices_open</code> est vrai.</li>
+          <li><strong>Contrôle d’état :</strong> toggle <code>True/False</code> via callback.</li>
+          <li><strong>Scalabilité :</strong> structure extensible (ajout d’un module = 1 entrée).</li>
+        </ul>
+
+        <button type="button" class="ax-btn" onclick="toggleCode('codeNavAccordion', this)">Masquer le code</button>
+        <pre id="codeNavAccordion" class="ax-code"><code>
+# Streamlit — Accordéon sidebar (extrait)
+if "indices_open" not in st.session_state:
+    st.session_state.indices_open = False
+
+def toggle_indices():
+    st.session_state.indices_open = not st.session_state.indices_open
+
+label = "▼ Exploration des Indices" if st.session_state.indices_open else "▶ Exploration des Indices"
+st.sidebar.button(label, on_click=toggle_indices)
+
+if st.session_state.indices_open:
+    if st.sidebar.button("Population"):
+        go_to("Population")
+    if st.sidebar.button("Marche de Travail"):
+        go_to("Travail")
+    if st.sidebar.button("Habitat"):
+        go_to("Habitat")
+    if st.sidebar.button("Finance"):
+        go_to("Finance")
+    if st.sidebar.button("Enseignement"):
+        go_to("Enseignement")
+    if st.sidebar.button("Pauvrete"):
+        go_to("Pauvrete")
+        </code></pre>
+      </div>
+
+      <div class="ax-media-figure">
+        <img class="ax-img"
+             src="images/side_bare2.png"
+             alt="Accordéon Exploration des Indices (déployé)">
+        <div class="ax-caption">Accordéon : sous-sections visibles à la demande (UI plus compacte).</div>
+      </div>
     </div>
 
     <!-- ========================================================= -->
-    <!-- ================= 3) FILTRES & CONTROLES ================ -->
+    <!-- 3) FILTRES : (on laisse image large, mais code affichable) -->
     <!-- ========================================================= -->
-    <h3 id="filtres" class="ax-subtitle">3) Filtres &amp; contrôles : organisation “3 colonnes” pour guider l’analyse</h3>
+    <h3 id="filtres" class="ax-subtitle">3) Filtres &amp; contrôles : layout 3 zones (contrôle → insight → vérification)</h3>
 
     <p class="ax-text">
-      Pour éviter un écran saturé, l’espace de travail est organisé en trois zones stables :
-    </p>
-
-    <ul class="ax-list">
-      <li><strong>Colonne gauche :</strong> filtres (année, catégories, options d’affichage). L’utilisateur sait toujours où agir.</li>
-      <li><strong>Zone centrale :</strong> visualisation principale (graphique). Priorité à la lecture et à la comparaison.</li>
-      <li><strong>Colonne droite :</strong> table de contrôle (valeurs brutes). Transparence : on peut vérifier les chiffres derrière le graphe.</li>
-    </ul>
-
-    <p class="ax-text">
-      Ce layout améliore la compréhension : les interactions sont localisées, la visualisation reste dominante, et la table
-      joue le rôle de “preuve” — très apprécié en contexte data.
+      Pour éviter un écran surchargé, l’analyse est structurée en trois zones : <strong>contrôles</strong> (filtres),
+      <strong>visualisation</strong> (graphique) et <strong>transparence</strong> (table). Cette organisation est un pattern
+      courant dans les BI tools : elle facilite le raisonnement et limite les erreurs d’interprétation.
     </p>
 
     <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">Disposition 3 colonnes : filtres → graphe → table</h4>
-      <img class="ax-img"
+      <img class="ax-img-wide"
            src="images/side_bare3.png"
-           alt="Filtres et contrôles interactifs (layout 3 colonnes)">
+           alt="Disposition 3 colonnes : filtres, graphique, table">
+      <div class="ax-caption">Disposition 3 zones : filtres → visualisation → table de validation.</div>
+
+      <button type="button" class="ax-btn" onclick="toggleCode('codeNavFilters', this)">Masquer le code</button>
+      <pre id="codeNavFilters" class="ax-code"><code>
+# Streamlit — Layout 3 zones (extrait)
+import streamlit as st
+
+col_filters, col_chart, col_table = st.columns([0.95, 2.2, 1.0], gap="large")
+
+with col_filters:
+    year = st.radio("Choisir une année :", [2017, 2018], index=1)
+    show_g = st.checkbox("Afficher Garçons", value=True)
+    show_f = st.checkbox("Afficher Filles", value=True)
+    show_total = st.checkbox("Afficher Total", value=True)
+    chart_type = st.selectbox("Type de graphique", ["Aire", "Barres", "Ligne"])
+
+with col_chart:
+    # plotly chart (mise à jour en temps réel)
+    fig = build_figure(df, year, show_g, show_f, show_total, chart_type)
+    st.plotly_chart(fig, use_container_width=True)
+
+with col_table:
+    st.dataframe(df_filtered, use_container_width=True)
+      </code></pre>
     </div>
 
     <!-- ========================================================= -->
-    <!-- ================= 4) UI REUTILISABLE ==================== -->
+    <!-- 4) COMPONENTS UI : top bar + KPI (code affichable) -->
     <!-- ========================================================= -->
-    <h3 id="components" class="ax-subtitle">4) Composants UI réutilisables : top bar &amp; cartes KPI</h3>
+    <h3 id="components" class="ax-subtitle">4) Composants UI réutilisables : Top Bar &amp; KPI cards (HTML/CSS)</h3>
 
     <p class="ax-text">
-      Pour donner une identité “produit” à l’application, j’ai standardisé des composants visuels réutilisables :
-      une barre d’en-tête (Top Bar) et des cartes KPI. L’en-tête structure l’écran et clarifie le contexte.
-      Les KPI synthétisent immédiatement l’information (min/max, total, tendances), ce qui accélère l’analyse avant même
-      d’ouvrir les graphiques.
+      Pour donner un rendu “dashboard” plus professionnel, j’ai standardisé des composants réutilisables : une
+      <strong>Top Bar</strong> (contexte + navigation) et des <strong>cartes KPI</strong> (synthèse immédiate).
+      Ces composants sont injectés via <code>st.markdown(..., unsafe_allow_html=True)</code> avec CSS dédié.
     </p>
 
     <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">Top Bar (en-tête) : repères + cohérence visuelle</h4>
-      <img class="ax-img"
-           src="images/side_bare4.png"
-           alt="Top bar Axiora Data">
+      <h4 class="ax-subtitle" style="margin-top:0;">Top Bar : repères visuels &amp; cohérence</h4>
+      <img class="ax-img-wide" src="images/side_bare4.png" alt="Top bar Axiora Data">
     </div>
 
     <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">Cartes KPI : lecture rapide des ordres de grandeur</h4>
-      <img class="ax-img"
-           src="images/side_bare5.png"
-           alt="Cartes KPI (dashboards) Axiora Data">
+      <h4 class="ax-subtitle" style="margin-top:0;">KPI cards : synthèse (totaux / régions / indicateurs)</h4>
+      <img class="ax-img-wide" src="images/side_bare5.png" alt="Cartes KPI Axiora Data">
     </div>
 
     <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">Synthèse min / total / max : indicateurs clés en un coup d’œil</h4>
-      <img class="ax-img"
-           src="images/side_bare6.png"
-           alt="Bande KPI min total max Axiora Data">
+      <h4 class="ax-subtitle" style="margin-top:0;">KPI analytiques : min / total / max</h4>
+      <img class="ax-img-wide" src="images/side_bare6.png" alt="KPI min total max Axiora Data">
+
+      <button type="button" class="ax-btn" onclick="toggleCode('codeNavKpiCss', this)">Masquer le code</button>
+      <pre id="codeNavKpiCss" class="ax-code"><code>
+# Streamlit — Composants UI via HTML/CSS (extrait)
+import streamlit as st
+
+st.markdown("""
+&lt;style&gt;
+.kpi-wrap{ display:flex; gap:16px; justify-content:space-between; }
+.kpi{
+  flex:1; padding:18px 16px; border-radius:16px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+}
+.kpi h4{ margin:0; opacity:.8; font-weight:700; font-size:14px; }
+.kpi .value{ font-size:30px; font-weight:900; margin-top:6px; }
+.kpi .sub{ opacity:.75; margin-top:2px; font-size:13px; }
+&lt;/style&gt;
+
+&lt;div class="kpi-wrap"&gt;
+  &lt;div class="kpi"&gt;
+    &lt;h4&gt;Minimum&lt;/h4&gt;
+    &lt;div class="value"&gt;261&lt;/div&gt;
+    &lt;div class="sub"&gt;Taroudant&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="kpi"&gt;
+    &lt;h4&gt;Total Régional&lt;/h4&gt;
+    &lt;div class="value"&gt;15,337&lt;/div&gt;
+    &lt;div class="sub"&gt;Nbre d’unités&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="kpi"&gt;
+    &lt;h4&gt;Maximum&lt;/h4&gt;
+    &lt;div class="value"&gt;9,439&lt;/div&gt;
+    &lt;div class="sub"&gt;Agadir Ida Outanane&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+""", unsafe_allow_html=True)
+      </code></pre>
     </div>
 
   </div>
-</section>
-</section>
     <footer class="footer">
       © 2026 — Malak Mounji
     </footer>
