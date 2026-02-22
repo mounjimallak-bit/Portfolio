@@ -730,7 +730,7 @@ data_clean_preview = {
 
         <button type="button" class="ax-btn" onclick="toggleCode('codeNavMenu', this)">Masquer le code</button>
         <pre id="codeNavMenu" class="ax-code"><code>
-# Streamlit — Routage interne (extrait)
+
 import streamlit as st
 
 if "page" not in st.session_state:
@@ -796,7 +796,7 @@ elif st.session_state.page == "Assistant":
 
         <button type="button" class="ax-btn" onclick="toggleCode('codeNavAccordion', this)">Masquer le code</button>
         <pre id="codeNavAccordion" class="ax-code"><code>
-# Streamlit — Accordéon sidebar (extrait)
+
 if "indices_open" not in st.session_state:
     st.session_state.indices_open = False
 
@@ -849,7 +849,7 @@ if st.session_state.indices_open:
 
       <button type="button" class="ax-btn" onclick="toggleCode('codeNavFilters', this)">Masquer le code</button>
       <pre id="codeNavFilters" class="ax-code"><code>
-# Streamlit — Layout 3 zones (extrait)
+
 import streamlit as st
 
 col_filters, col_chart, col_table = st.columns([0.95, 2.2, 1.0], gap="large")
@@ -898,11 +898,10 @@ with col_table:
 
       <button type="button" class="ax-btn" onclick="toggleCode('codeNavKpiCss', this)">Masquer le code</button>
     <pre id="codeNavKpiCss" class="ax-code"><code>
-# Streamlit — KPI "data-driven" (valeurs calculées depuis le DataFrame)
+
 import streamlit as st
 
-# df_kpi contient les données après application des filtres (année, province, etc.)
-# Colonnes attendues : ["Province", "Valeur"]
+
 min_value = df_kpi["Valeur"].min()
 max_value = df_kpi["Valeur"].max()
 total_value = df_kpi["Valeur"].sum()
