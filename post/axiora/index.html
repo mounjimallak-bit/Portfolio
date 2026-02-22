@@ -6,6 +6,7 @@
   <title>Axiora Data — Détails du projet</title>
 
   <link rel="stylesheet" href="../../styles.css" />
+  <link rel="stylesheet" href="axiora.css" />
 </head>
 
 <body>
@@ -31,15 +32,13 @@
 
   <main class="container">
 
-    <!-- TITRE -->
     <section class="section" style="border-top:none;">
       <div class="section-head">
         <h1>Axiora Data — Analyse, Visualisation & Prévision des Indicateurs Socio-Économiques </h1>
           </div>
     </section>
 
-    <!-- TABLE DES MATIÈRES -->
-   <section class="section">
+    <section class="section">
   <div class="section-head">
     <h2>Table des matières</h2>
   </div>
@@ -160,7 +159,6 @@
   </div>
 </section>
 
-    <!-- INTRODUCTION -->
     <section id="introduction" class="section">
       <div class="section-head">
         <h2>Introduction</h2>
@@ -184,7 +182,7 @@
         </div>
       </div>
 
-    
+      
 
       <div class="card" style="margin-top:16px;">
         <h3>Vision</h3>
@@ -202,7 +200,6 @@
    
   </div>
 
-  <!-- OBJECTIFS -->
   <div id="objectifs" class="outline-block">
     <h1 class="outline-title">Objectifs</h1>
     <p></p>
@@ -216,7 +213,6 @@
     <p></p>
   </div>
 
-  <!-- FONCTIONNALITES -->
   <div id="fonctionnalites" class="outline-block">
     <h1 class="outline-title">Fonctionnalités clés</h1>
     <p></p>
@@ -234,14 +230,12 @@
     <p></p>
   </div>
 
-  <!-- ARCHITECTURE -->
   <div id="architecture" class="outline-block">
     <h1 class="outline-title">Architecture générale</h1>
     <p></p>
 
     <div class="arch-wrap">
 
-      <!-- Ligne 1 -->
       <div class="arch-row">
         <div class="arch-node">
           <div class="arch-badge">1</div>
@@ -272,7 +266,6 @@
         </div>
       </div>
 
-      <!-- Ligne 2 -->
       <div class="arch-row">
         <div class="arch-node">
           <div class="arch-badge">3</div>
@@ -303,7 +296,6 @@
         </div>
       </div>
 
-      <!-- Ligne 3 -->
       <div class="arch-row">
         <div class="arch-node">
           <div class="arch-badge">5</div>
@@ -334,7 +326,6 @@
         </div>
       </div>
 
-      <!-- Ligne 4 -->
       <div class="arch-row arch-row-center">
         <div class="arch-node arch-node-wide">
           <div class="arch-badge">7</div>
@@ -358,55 +349,9 @@
     
     
     
-    <!-- =======================
- AXIORA — Données & Préparation
- Place ce fichier dans: axiora/post/ (même dossier que RGPH2014.xlsx et chtouka pauvr.xlsx)
- Fichiers attendus (mêmes dossier):
-   - ./RGPH2014.xlsx
-   - ./chtouka pauvr.xlsx
- Optionnel (sorties générées par le script):
-   - ./outputs/rgph_clean.parquet
-   - ./outputs/rgph_clean.csv
-   - ./outputs/rgph_clean.json
-   - ./outputs/rgph_dict.json
-======================= ----------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<section id="data-preparation" class="ax-section">
+    <section id="data-preparation" class="ax-section">
   <div class="container">
 
-    <!-- ================= TITRE ================= -->
     <div class="section-head">
       <h1>Données &amp; préparation</h1>
       <p></p>
@@ -419,9 +364,6 @@
       <strong>compatibilité</strong> entre sources.
     </p>
 
-    <!-- ========================================================= -->
-    <!-- ================= 1) SOURCES ============================ -->
-    <!-- ========================================================= -->
     <h3 id="sources" class="ax-subtitle">Sources des données (HCP)</h3>
 
     <ul class="ax-list">
@@ -442,9 +384,6 @@
       <li><strong>tourisme17.xlsx</strong> : arrivées/nuitées/capacité hôtelière.</li>
     </ul>
 
-    <!-- ========================================================= -->
-    <!-- ================= 2) STRUCTURE ========================== -->
-    <!-- ========================================================= -->
     <h3 id="structure-donnees" class="ax-subtitle">Structure des données</h3>
 
     <p class="ax-text">
@@ -455,9 +394,6 @@
       formats hétérogènes (espaces, virgules, symboles).
     </p>
 
-    <!-- ========================================================= -->
-    <!-- ================= RGPH BRUT (FULL WIDTH) ================ -->
-    <!-- ========================================================= -->
     <div class="ax-frame">
       <h3 class="ax-subtitle">1- Données brutes — RGPH (Structure démographique)</h3>
 
@@ -483,7 +419,6 @@
       </div>
     </div>
 
-    <!-- ================= ANALYSE BRUT RGPH ================= -->
     <h3 class="ax-subtitle">Analyse des données brutes (RGPH) — pourquoi nettoyer ?</h3>
 
     <p class="ax-text">
@@ -506,9 +441,6 @@
       (5) fusion plus simple avec la pauvreté et intégration cartographique/IA.
     </p>
 
-    <!-- ========================================================= -->
-    <!-- ================= PAUVRETE BRUT (FULL WIDTH) ============ -->
-    <!-- ========================================================= -->
     <div class="ax-frame">
       <h3 class="ax-subtitle">2- Données brutes — Indicateurs de pauvreté</h3>
 
@@ -522,8 +454,7 @@
         <a class="ax-btn" href="chtouka_pauvr.html" download>Télécharger Pauvreté (HTML)</a>
       </div>
 
-      <!--  même taille que RGPH -->
-     <div class="ax-table-full ax-table-poverty">
+      <div class="ax-table-full ax-table-poverty">
   <iframe
     src="chtouka pauvr.html"
     class="ax-iframe-full ax-iframe-poverty"
@@ -533,9 +464,6 @@
 </div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- ================= 3) CLEANING =========================== -->
-    <!-- ========================================================= -->
     <h3 id="nettoyage" class="ax-subtitle">Nettoyage &amp; validation</h3>
 
     <p class="ax-text">
@@ -543,7 +471,6 @@
       
     </p>
 
-    <!-- A -->
     <div class="ax-step">
       <div class="ax-step-title">A — Normalisation des colonnes</div>
       <p class="ax-text">
@@ -564,7 +491,6 @@ df.columns = [normalize_colname(c) for c in df.columns]
       </code></pre>
     </div>
 
-    <!-- B -->
     <div class="ax-step">
       <div class="ax-step-title">B — Conversion numérique (espaces, %, virgules)</div>
       <p class="ax-text">
@@ -582,14 +508,13 @@ def to_number(x):
         return np.nan
     s = str(x)
     s = s.replace(" ", "").replace("\u202f", "").replace("\xa0", "")  
-    s = s.replace("%", "")                                          
-    s = s.replace(",", ".")                                          
+    s = s.replace("%", "")                                            
+    s = s.replace(",", ".")                                            
     s = re.sub(r"[^0-9\.\-]", "", s)                                
     return pd.to_numeric(s, errors="coerce")
       </code></pre>
     </div>
 
-    <!-- C -->
     <div class="ax-step">
       <div class="ax-step-title">C — Gestion des valeurs manquantes &amp; lignes hiérarchiques</div>
       <p class="ax-text">
@@ -609,7 +534,6 @@ df_clean["Localités"] = df_clean["Localités"].ffill()
       </code></pre>
     </div>
 
-    <!-- D -->
     <div class="ax-step">
       <div class="ax-step-title">D — Standardisation des clés territoriales (fusion RGPH + pauvreté)</div>
       <p class="ax-text">
@@ -628,7 +552,6 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
       </code></pre>
     </div>
 
-    <!--  NOUVEAU : extrait "data clean" basé sur ton fichier python -->
     <div class="ax-step">
       <div class="ax-step-title">E — Aperçu des données clean (extrait du dictionnaire)</div>
       <p class="ax-text">
@@ -654,9 +577,6 @@ data_clean_preview = {
       </code></pre>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- ================= 4) DATA AFTER CLEANING ================ -->
-    <!-- ========================================================= -->
     <h3 id="datasets" class="ax-subtitle">Construction des datasets par module</h3>
 
     <p class="ax-text">
@@ -691,7 +611,6 @@ data_clean_preview = {
 
   </div>
 
-  <!-- ================= JS ================= -->
   <script>
     function toggleCode(id, btn){
       const el = document.getElementById(id);
@@ -736,126 +655,6 @@ data_clean_preview = {
     }
   </script>
 
-  <!-- ================= STYLE ================= -->
-  <style>
-    .ax-list{
-      font-size: 17px;
-      line-height: 2.0;
-      opacity: .88;
-      margin: 0 0 18px 18px;
-      max-width: 980px;
-    }
-
-    .ax-actions{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-
-    /* Iframe tables (RGPH + Pauvreté même taille) */
-    .ax-table-full{ margin: 18px 0 34px; }
-    .ax-iframe-full{
-      width: 100%;
-      height: 500px;          
-      border: none;
-      background: transparent;
-    }
-
-    .ax-step{ margin: 26px 0 34px; }
-    .ax-step-title{ font-weight: 800; margin: 0 0 6px; font-size: 18px; }
-
-    .ax-btn{
-      margin-top: 8px;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.06);
-      color: inherit;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .ax-btn:hover{ border-color: rgba(255,255,255,.45); }
-
-    /* Code affiché par défaut */
-    .ax-code{
-      margin-top: 10px;
-      padding: 14px 16px;
-      background: rgba(0,0,0,.35);
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.6;
-      max-height: 420px;
-      overflow: auto;
-      white-space: pre;
-    }
-
-    .ax-json{
-      margin-top: 14px;
-      padding: 16px;
-      background: rgba(0,0,0,.35);
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.6;
-      max-height: 560px;
-      overflow: auto;
-      white-space: pre;
-    }
-
-    .hidden{ display: none; }
-   /* Container: enlève le vide inutile */
-/* Container : définit l'encombrement final réel sur la page */
-.ax-table-poverty {
-  margin: 14px auto 22px; /* 'auto' aide à centrer si besoin */
-  width: 100%;
-  
-  /* 👇 La hauteur VISIBLE finale souhaitée se met sur le conteneur */
-  height: 620px; 
-  
-  /* 👇 Gère les débordements liés au scale de l'iframe */
-  overflow: auto; 
-  position: relative;
-}
-
-/* Iframe pauvreté : on agrandit et on compense */
-.ax-iframe-poverty {
-  border: none;
-  background: transparent;
-  
-  /* Positionnement absolu dans le conteneur pour éviter les bugs de flux */
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  /* 👇 Scale : agrandit la table */
-  transform-origin: top left;
-  transform: scale(1.35);
-
-  /* 👇 Compense le scale pour que l'iframe remplisse exactement le conteneur */
-  width: calc(100% / 1.35);
-  height: calc(100% / 1.35); /* S'adapte à la hauteur du conteneur divisée par le scale */
-}
-
-/* ✅ Optionnel: sur grands écrans, on augmente encore un peu */
-@media (min-width: 1100px) {
-  .ax-table-poverty {
-    height: 640px; /* On ajuste la hauteur du conteneur pour le nouvel affichage */
-  }
-  
-  .ax-iframe-poverty {
-    transform: scale(1.45);
-    width: calc(100% / 1.45);
-    height: calc(100% / 1.45);
-  }
-}
-  </style>
 </section>
     <footer class="footer">
       © 2026 — Malak Mounji
