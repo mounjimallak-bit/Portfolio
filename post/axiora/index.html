@@ -694,7 +694,82 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
     }
   </script>
 
+  <!-- ================= STYLE (SANS CADRES / SANS BLOCS BLANCS) ================= -->
+  <style>
+   
 
+    /* Listes */
+    .ax-list{
+      font-size: 17px;
+      line-height: 2.0;
+      opacity: .88;
+      margin: 0 0 18px 18px;
+      max-width: 980px;
+    }
+
+    /* Iframe tables (grand + lisible) */
+    .ax-table-full{ margin: 18px 0 34px; }
+    .ax-iframe-full{
+      width: 100%;
+      height: 820px;          /* plus grand */
+      border: none;           /* pas de cadre blanc */
+      background: transparent;
+    }
+
+    /* Étapes (sans cadres) */
+    .ax-step{ margin: 26px 0 34px; }
+    .ax-step-title{ font-weight: 800; margin: 0 0 6px; font-size: 18px; }
+
+    /* Boutons (discrets) */
+    .ax-btn{
+      margin-top: 8px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.06);
+      color: inherit;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+    .ax-btn:hover{ border-color: rgba(255,255,255,.45); }
+
+    .ax-actions{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    /* Code (sans bloc blanc, affiché seulement si bouton) */
+    .ax-code{
+      margin-top: 10px;
+      padding: 14px 16px;
+      background: rgba(0,0,0,.35);
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 420px;
+      overflow: auto;
+      white-space: pre;
+    }
+
+    .ax-json{
+      margin-top: 14px;
+      padding: 16px;
+      background: rgba(0,0,0,.35);
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 560px;
+      overflow: auto;
+      white-space: pre;
+    }
+
+    .hidden{ display: none; }
+  </style>
 </section>
     <footer class="footer">
       © 2026 — Malak Mounji
