@@ -523,7 +523,7 @@
       </div>
 
       <!--  même taille que RGPH -->
-     <div class="ax-table-full">
+     <div class="ax-table-full ax-table-poverty">
   <iframe
     src="chtouka pauvr.html"
     class="ax-iframe-full ax-iframe-poverty"
@@ -810,21 +810,36 @@ data_clean_preview = {
     }
 
     .hidden{ display: none; }
-    /* ===== Pauvreté : agrandir le contenu dans l'iframe ===== */
-.ax-iframe-poverty{
-  height: 900px;      /* plus haut => plus lisible */
-  zoom: 1.45;         /* ✅ agrandit le contenu (Chrome/Edge) */
-  border: none;
-  background: transparent;
+   /* Container: enlève le vide inutile */
+.ax-table-poverty{
+  margin: 14px 0 22px;
 }
 
-/* Fallback si zoom n'est pas supporté */
-@supports not (zoom: 1){
+/* Iframe pauvreté : on agrandit et on "compense" width/height */
+.ax-iframe-poverty{
+  border: none;
+  background: transparent;
+
+  /* 👇 Taille visible finale (tu peux ajuster) */
+  height: 620px;           /* réduit le gros vide en bas */
+
+  /* 👇 Scale : agrandit la table */
+  transform: scale(1.35);
+  transform-origin: 0 0;
+
+  /* 👇 Compense le scale pour que ça remplisse toute la largeur */
+  width: calc(100% / 1.35);
+
+  /* 👇 Compense aussi la hauteur pour éviter que ça soit coupé */
+  height: calc(620px / 1.35);
+}
+
+/* ✅ Optionnel: sur grands écrans, on peut augmenter encore un peu */
+@media (min-width: 1100px){
   .ax-iframe-poverty{
-    transform: scale(1.25);
-    transform-origin: 0 0;
-    width: calc(100% / 1.25);
-    height: calc(900px / 1.25);
+    transform: scale(1.45);
+    width: calc(100% / 1.45);
+    height: calc(640px / 1.45);
   }
 }
   </style>
