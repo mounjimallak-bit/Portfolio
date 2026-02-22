@@ -494,21 +494,21 @@
     <!-- ========================================================= -->
     <!-- ================= PAUVRETE BRUT ========================= -->
     <!-- ========================================================= -->
-    <h3 class="ax-subtitle">2) Données brutes — Indicateurs de pauvreté</h3>
+  <h3 class="ax-subtitle">2) Données brutes — Indicateurs de pauvreté</h3>
 
-    <p class="ax-text">
-      Le fichier “pauvreté” regroupe des indicateurs socio-économiques par territoire. On y retrouve les mêmes
-      problématiques de format (virgules, espaces, symboles) et parfois des valeurs manquantes selon le niveau territorial.
-    </p>
+<p class="ax-text">
+  Le fichier “pauvreté” regroupe des indicateurs socio-économiques par territoire. On y retrouve les mêmes
+  problématiques de format (virgules, espaces, symboles) et parfois des valeurs manquantes selon le niveau territorial.
+</p>
 
-    <div class="ax-table-full">
-      <iframe
-        src="chtouka pauvr.html"
-        class="ax-iframe-full"
-        title="Pauvreté - Données brutes (table)"
-        loading="lazy"
-      ></iframe>
-    </div>
+<div class="ax-table-wide">
+  <iframe
+    src="chtouka_pauvr.html"
+    class="ax-iframe-zoom"
+    title="Pauvreté - Données brutes (table)"
+    loading="lazy"
+  ></iframe>
+</div>
 
     <!-- ========================================================= -->
     <!-- ================= 3) CLEANING =========================== -->
@@ -694,123 +694,7 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
     }
   </script>
 
-  <!-- ================= STYLE (SANS CADRES / SANS BLOCS BLANCS) ================= -->
-  <style>
-    .ax-section{ padding: 60px 0; }
 
-    /* Typo + largeur (texte plus “large” comme tu veux) */
-    .ax-title{ font-size: 44px; margin: 0 0 18px; letter-spacing: .2px; }
-    .ax-subtitle{ font-size: 28px; margin: 44px 0 14px; }
-    .ax-subtitle-tight{ margin-top: 18px; }
-    .ax-lead{
-      font-size: 18px;
-      line-height: 1.9;
-      opacity: .90;
-      max-width: 980px;
-      margin-bottom: 18px;
-    }
-    .ax-text{
-      font-size: 17px;
-      line-height: 2.0;
-      opacity: .88;
-      max-width: 980px;
-      margin: 0 0 14px;
-    }
-    .ax-note{
-      font-size: 15px;
-      line-height: 1.8;
-      opacity: .75;
-      max-width: 980px;
-      margin: 10px 0 0;
-    }
-
-    /* Sommaire (même style que ton image) */
-    .ax-toc{
-      list-style: circle;
-      padding-left: 18px;
-      margin: 10px 0 18px;
-      font-size: 16px;
-      line-height: 1.9;
-    }
-    .ax-toc a{
-      text-decoration: underline;
-      color: inherit;
-      opacity: .92;
-    }
-    .ax-toc a:hover{ opacity: 1; }
-
-    /* Listes */
-    .ax-list{
-      font-size: 17px;
-      line-height: 2.0;
-      opacity: .88;
-      margin: 0 0 18px 18px;
-      max-width: 980px;
-    }
-
-    /* Iframe tables (grand + lisible) */
-    .ax-table-full{ margin: 18px 0 34px; }
-    .ax-iframe-full{
-      width: 100%;
-      height: 820px;          /* plus grand */
-      border: none;           /* pas de cadre blanc */
-      background: transparent;
-    }
-
-    /* Étapes (sans cadres) */
-    .ax-step{ margin: 26px 0 34px; }
-    .ax-step-title{ font-weight: 800; margin: 0 0 6px; font-size: 18px; }
-
-    /* Boutons (discrets) */
-    .ax-btn{
-      margin-top: 8px;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.06);
-      color: inherit;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-    }
-    .ax-btn:hover{ border-color: rgba(255,255,255,.45); }
-
-    .ax-actions{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      margin-bottom: 10px;
-    }
-
-    /* Code (sans bloc blanc, affiché seulement si bouton) */
-    .ax-code{
-      margin-top: 10px;
-      padding: 14px 16px;
-      background: rgba(0,0,0,.35);
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.6;
-      max-height: 420px;
-      overflow: auto;
-      white-space: pre;
-    }
-
-    .ax-json{
-      margin-top: 14px;
-      padding: 16px;
-      background: rgba(0,0,0,.35);
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.6;
-      max-height: 560px;
-      overflow: auto;
-      white-space: pre;
-    }
-
-    .hidden{ display: none; }
-  </style>
 </section>
     <footer class="footer">
       © 2026 — Malak Mounji
