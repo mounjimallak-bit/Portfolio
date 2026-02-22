@@ -1,6 +1,6 @@
 /* =========================================
    Styles dédiés à la page Axiora Data
-   ========================================= */
+========================================= */
 
 .ax-list {
   font-size: 17px;
@@ -14,20 +14,7 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-/* Iframe tables (RGPH + Pauvreté même taille) */
-.ax-table-full {
-  margin: 18px 0 34px;
-}
-
-.ax-iframe-full {
-  width: 100%;
-  height: 500px;
-  border: none;
-  background: transparent;
+  margin: 10px 0;
 }
 
 .ax-step {
@@ -59,14 +46,16 @@
   border-color: rgba(255,255,255,.45);
 }
 
-/* Code affiché par défaut */
+/* =========================================================
+   CODE BLOCKS
+========================================================= */
+
 .ax-code {
   margin-top: 10px;
   padding: 14px 16px;
   background: rgba(0,0,0,.35);
-  border: none;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.6;
   max-height: 420px;
   overflow: auto;
@@ -77,7 +66,6 @@
   margin-top: 14px;
   padding: 16px;
   background: rgba(0,0,0,.35);
-  border: none;
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.6;
@@ -90,49 +78,39 @@
   display: none;
 }
 
-
-
-
 /* =========================================================
-   Tables RGPH & Pauvreté — largeur identique
+   TABLES RGPH & PAUVRETÉ — EXACTEMENT MÊME LARGEUR
 ========================================================= */
 
-/* Les deux utilisent maintenant la même base */
 .ax-table-full,
 .ax-table-poverty {
   width: 100%;
   max-width: 100%;
-  margin: 18px 0 34px;
+  margin: 20px 0 36px;
   position: relative;
   overflow: hidden;
 }
 
-/* Iframe RGPH normale */
-.ax-iframe-full {
-  width: 100%;
-  height: 520px;
-  border: none;
-  background: transparent;
-}
-
-/* Iframe Pauvreté agrandie mais largeur conservée */
+/* Iframes */
+.ax-iframe-full,
 .ax-iframe-poverty {
   width: 100%;
   height: 520px;
   border: none;
   background: transparent;
-
-  transform-origin: top left;
-  transform: scale(1.25);   /* agrandissement propre */
 }
 
-/* On compense le scale sans casser la largeur */
+/* Pauvreté légèrement agrandie MAIS largeur identique */
 .ax-table-poverty {
-  height: 520px;
   overflow: auto;
 }
 
-/* Responsive */
+.ax-iframe-poverty {
+  transform-origin: top left;
+  transform: scale(1.20);
+}
+
+/* Responsive tables */
 @media (max-width: 980px){
   .ax-iframe-full,
   .ax-iframe-poverty {
@@ -140,92 +118,65 @@
   }
 
   .ax-iframe-poverty {
-    transform: scale(1.15);
+    transform: scale(1.12);
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* =========================================================
-   Navigation & UI — version compacte (image + code réduits)
+   NAVIGATION & UI (Sidebar image 1 & 2)
+   Image et code bien alignés + même hauteur visuelle
 ========================================================= */
 
 #navigation .ax-media{
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;  /* un peu plus compact */
-  gap: 22px;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 26px;
   align-items: start;
-  margin: 16px 0 32px;
+  margin: 20px 0 40px;
 }
 
 /* Colonnes */
 #navigation .ax-media-text{
   min-width: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 #navigation .ax-media-figure{
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
 }
 
-/* ✅ IMAGE plus petite */
+/* IMAGE SIDEBAR (plus petite et propre) */
 #navigation .ax-media-figure .ax-img{
   width: 100%;
-  max-width: 340px;       /* ↓ réduite (avant 560) */
+  max-width: 320px;      /* ✔ taille plus petite */
   height: auto;
   object-fit: contain;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.15);
-  box-shadow: 0 12px 30px rgba(0,0,0,.28);
+  box-shadow: 0 10px 26px rgba(0,0,0,.28);
 }
 
-/* ✅ CODE plus compact */
+/* CODE navigation aligné à la taille visuelle image */
 #navigation .ax-media-text .ax-code{
-  max-height: none;       
-  min-height: 360px;      /* ↓ réduit (avant 560) */
-  padding: 14px;
-  background: rgba(0,0,0,.38);
+  max-height: none;      
+  min-height: 420px;     /* ✔ aligné visuellement */
+  font-size: 12.5px;
   border-radius: 14px;
-  font-size: 10px;      /* ↓ légèrement plus petit */
-  line-height: 1.55;
-  overflow: auto;
-  white-space: pre;
 }
 
-/* Responsive */
+/* Responsive navigation */
 @media (max-width: 980px){
   #navigation .ax-media{
     grid-template-columns: 1fr;
   }
 
+  #navigation .ax-media-figure .ax-img{
+    max-width: 360px;
+  }
+
   #navigation .ax-media-text .ax-code{
     min-height: auto;
     max-height: 420px;
-  }
-
-  #navigation .ax-media-figure .ax-img{
-    max-width: 420px;
   }
 }
