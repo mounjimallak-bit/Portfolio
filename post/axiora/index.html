@@ -525,7 +525,7 @@
       <!--  même taille que RGPH -->
       <div class="ax-table-full">
         <iframe
-          src="chtouka_pauvr.html"
+          src="chtouka pauvr.html"
           class="ax-iframe-full"
           title="Pauvreté - Données brutes (table)"
           loading="lazy"
@@ -536,11 +536,11 @@
     <!-- ========================================================= -->
     <!-- ================= 3) CLEANING =========================== -->
     <!-- ========================================================= -->
-    <h3 id="nettoyage-validation" class="ax-subtitle">Nettoyage &amp; validation</h3>
+    <h3 id="nettoyage" class="ax-subtitle">Nettoyage &amp; validation</h3>
 
     <p class="ax-text">
       Ci-dessous : un pipeline de préparation (extrait) présenté par étapes.
-      Le code est <strong>affiché par défaut</strong> et tu peux le masquer avec le bouton.
+      
     </p>
 
     <!-- A -->
@@ -556,8 +556,8 @@ import re
 
 def normalize_colname(c: str) -> str:
     c = str(c).strip()
-    c = re.sub(r"\s+", " ", c)                 # espaces multiples -> 1
-    c = c.replace("\u202f", " ").replace("\xa0", " ")  # espaces insécables (Excel/HCP)
+    c = re.sub(r"\s+", " ", c)                
+    c = c.replace("\u202f", " ").replace("\xa0", " ")  
     return c
 
 df.columns = [normalize_colname(c) for c in df.columns]
@@ -581,10 +581,10 @@ def to_number(x):
     if pd.isna(x):
         return np.nan
     s = str(x)
-    s = s.replace(" ", "").replace("\u202f", "").replace("\xa0", "")  # espaces
-    s = s.replace("%", "")                                           # %
-    s = s.replace(",", ".")                                          # virgule FR -> point
-    s = re.sub(r"[^0-9\.\-]", "", s)                                 # garde chiffres/. /-
+    s = s.replace(" ", "").replace("\u202f", "").replace("\xa0", "")  
+    s = s.replace("%", "")                                          
+    s = s.replace(",", ".")                                          
+    s = re.sub(r"[^0-9\.\-]", "", s)                                
     return pd.to_numeric(s, errors="coerce")
       </code></pre>
     </div>
@@ -598,13 +598,13 @@ def to_number(x):
       </p>
       <button type="button" onclick="toggleCode('codeC', this)" class="ax-btn">Masquer le code</button>
       <pre id="codeC" class="ax-code"><code>
-# Exemple : supprimer les lignes où toutes les colonnes numériques sont vides
+
 numeric_cols = [c for c in df.columns if c not in ["CONC", "Localités"]]
 
 mask_all_nan = df[numeric_cols].isna().all(axis=1)
 df_clean = df.loc[~mask_all_nan].copy()
 
-# Option : compléter certains champs texte si nécessaire (propagation hiérarchique)
+
 df_clean["Localités"] = df_clean["Localités"].ffill()
       </code></pre>
     </div>
@@ -637,8 +637,6 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
       </p>
       <button type="button" onclick="toggleCode('codeE', this)" class="ax-btn">Masquer le code</button>
       <pre id="codeE" class="ax-code"><code>
-# Exemple (aperçu) — Province : Agadir-Ida -Ou-Tanane
-# (format prêt pour JSON / API)
 
 data_clean_preview = {
   "Province": "Agadir-Ida -Ou-Tanane",
@@ -659,7 +657,7 @@ data_clean_preview = {
     <!-- ========================================================= -->
     <!-- ================= 4) DATA AFTER CLEANING ================ -->
     <!-- ========================================================= -->
-    <h3 id="datasets-modules" class="ax-subtitle">Construction des datasets par module</h3>
+    <h3 id="datasets" class="ax-subtitle">Construction des datasets par module</h3>
 
     <p class="ax-text">
       Après préparation, AXIORA consomme des structures simples : tables propres (CSV/Parquet) et/ou dictionnaires JSON
