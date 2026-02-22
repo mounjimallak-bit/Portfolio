@@ -161,7 +161,7 @@
 /* ✅ IMAGE plus petite */
 #navigation .ax-media-figure .ax-img{
   width: 100%;
-  max-width: 440px;       /* ↓ réduite (avant 560) */
+  max-width: 340px;       /* ↓ réduite (avant 560) */
   height: auto;
   object-fit: contain;
   border-radius: 14px;
@@ -172,11 +172,11 @@
 /* ✅ CODE plus compact */
 #navigation .ax-media-text .ax-code{
   max-height: none;       
-  min-height: 460px;      /* ↓ réduit (avant 560) */
+  min-height: 360px;      /* ↓ réduit (avant 560) */
   padding: 14px;
   background: rgba(0,0,0,.38);
   border-radius: 14px;
-  font-size: 13.5px;      /* ↓ légèrement plus petit */
+  font-size: 10px;      /* ↓ légèrement plus petit */
   line-height: 1.55;
   overflow: auto;
   white-space: pre;
