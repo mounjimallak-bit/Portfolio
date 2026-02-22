@@ -18,10 +18,6 @@
   margin-bottom: 10px;
 }
 
-/* Iframe tables (RGPH + Pauvreté même taille) */
-.ax-table-full {
-  margin: 18px 0 34px;
-}
 
 
 
@@ -85,34 +81,62 @@
   display: none;
 }
 
+
+/* =========================================================
+   TABLES RGPH & PAUVRETÉ — mêmes dimensions + zoom propre
+========================================================= */
+
+/* Les deux conteneurs ont EXACTEMENT la même taille */
 .ax-table-full,
-.ax-table-poverty {
+.ax-table-poverty{
   width: 100%;
-  height: 520px; 
+  height: 520px;
   margin: 18px 0 34px;
   border-radius: 12px;
-  overflow: hidden; /* C'est ça la magie : ça coupe ce qui dépasse sans faire de vide */
+  overflow: hidden;           /* coupe ce qui dépasse */
+  position: relative;         /* nécessaire pour l’iframe absolue */
+  background: transparent;    /* évite fond blanc */
 }
 
-.ax-iframe-full {
+/* Iframe “plein écran” dans son conteneur */
+.ax-iframe-full,
+.ax-iframe-poverty{
+  position: absolute;
+  inset: 0;                   /* top:0; right:0; bottom:0; left:0 */
+  border: none;
+  background: transparent;
+}
+
+/* RGPH : normal */
+.ax-iframe-full{
   width: 100%;
   height: 100%;
-  border: none;
 }
 
-.ax-iframe-poverty {
-  width: 100%; /* L'iframe fait 100% de base, donc aucun vide possible */
-  height: 100%; 
-  border: none;
-  transform: scale(1.25); /* On la grossit. Le surplus est caché par le parent */
+/* Pauvreté : zoom + compensation => AUCUN vide blanc */
+.ax-iframe-poverty{
+  --zoom: 1.25;               /* ✅ change ici si tu veux plus/moins */
   transform-origin: top left;
+  transform: scale(var(--zoom));
+
+  /* ✅ compensation du zoom */
+  width: calc(100% / var(--zoom));
+  height: calc(100% / var(--zoom));
 }
 
+/* Responsive */
 @media (max-width: 980px){
-  .ax-table-full, .ax-table-poverty { height: 460px; }
-  .ax-iframe-poverty { transform: scale(1.10); } /* Zoom un peu plus léger sur mobile */
+  .ax-table-full,
+  .ax-table-poverty{
+    height: 460px;
+  }
+
+  .ax-iframe-poverty{
+    --zoom: 1.12;             /* zoom plus léger sur mobile */
+    width: calc(100% / var(--zoom));
+    height: calc(100% / var(--zoom));
+  }
 }
- 
 
 /* =========================================================
    Navigation & UI — SOLUTION FINALE (force taille image + code)
