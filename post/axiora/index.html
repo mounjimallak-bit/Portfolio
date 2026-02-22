@@ -562,83 +562,116 @@ data_clean_preview = {
       </code></pre>
     </div>
 
-    <h3 id="datasets" class="ax-subtitle">Construction des datasets par module</h3>
+   <h3 id="datasets" class="ax-subtitle">Centralisation des datasets (Dictionnaire Python)</h3>
 
     <p class="ax-text">
-      Après préparation, AXIORA consomme des structures simples : tables propres (CSV/Parquet) et/ou dictionnaires JSON
-      par territoire (idéals pour le module IA Q&amp;A et le générateur de rapports).
+      Après l'étape de nettoyage, AXIORA ne s'appuie plus sur de multiples fichiers éparpillés. Toutes les données sont consolidées dans une structure de données unique : un <strong>dictionnaire Python unifié</strong> (<code>hcpdata.py</code>).
     </p>
 
-    <h3 class="ax-subtitle">Données après nettoyage (format dictionnaire)</h3>
-
     <p class="ax-text">
-      Aperçu du dictionnaire nettoyé (ex : <code>final_axiora.json</code>). Clique pour charger et afficher un extrait.
-      <br/>
-      <span class="ax-note">
-        Astuce : si ton JSON n’est pas un tableau, le script affiche les premières clés de l’objet.
-      </span>
+      Cette approche en mémoire est idéale pour Streamlit : elle permet d'alimenter instantanément les DataFrames Pandas pour les visualisations, tout en fournissant un contexte clair, structuré et hiérarchisé à l'assistant IA, sans aucune latence liée à la lecture de fichiers externes (CSV ou JSON).
     </p>
 
     <div class="ax-actions">
-      <button type="button" onclick="loadJSON('final_rgph.json','jsonOutput')" class="ax-btn">
-        Charger RGPH nettoyé (JSON)
+      <button type="button" onclick="showDictPreview('pauvrete')" class="ax-btn">
+        Aperçu Module Pauvreté
       </button>
-      <button type="button" onclick="loadJSON('final_pauvrete.json','jsonOutput')" class="ax-btn">
-        Charger Pauvreté nettoyée (JSON)
+      <button type="button" onclick="showDictPreview('population')" class="ax-btn">
+        Aperçu Module Population
       </button>
-      <button type="button" onclick="loadJSON('final_axiora.json','jsonOutput')" class="ax-btn">
-        Charger Dataset fusionné (JSON)
+      <button type="button" onclick="showDictPreview('travail')" class="ax-btn">
+        Aperçu Module Travail
       </button>
-      <a class="ax-btn" href="final_axiora.json" download>Télécharger dataset fusionné (JSON)</a>
+      <a class="ax-btn" href="hcpdata.py" download>Télécharger hcpdata.py</a>
     </div>
 
-    <pre id="jsonOutput" class="ax-json">Clique sur un bouton pour afficher l’aperçu.</pre>
+    <pre id="dictOutput" class="ax-code">Cliquez sur un bouton pour afficher l'arborescence du dictionnaire.</pre>
 
   </div>
 
   <script>
+    // Fonction pour afficher/masquer le code des étapes de nettoyage (déjà existante)
     function toggleCode(id, btn){
       const el = document.getElementById(id);
       if (!el) return;
 
       const isHidden = el.classList.toggle("hidden");
-
-      // Met à jour le texte du bouton
       if (btn){
         btn.textContent = isHidden ? "Afficher le code" : "Masquer le code";
       }
     }
 
-    async function loadJSON(file, targetId){
-      const target = document.getElementById(targetId);
-      if (!target) return;
-
-      try{
-        const res = await fetch(file, { cache: "no-store" });
-        if (!res.ok) throw new Error("Impossible de charger " + file);
-
-        const data = await res.json();
-
-        if (Array.isArray(data)){
-          target.textContent = JSON.stringify(data.slice(0, 20), null, 2);
-          return;
+    // -------------------------------------------------------------
+    // NOUVEAU : Simulation de l'affichage du dictionnaire Python
+    // On stocke des extraits de ton fichier hcpdata.py sous forme de texte
+    // -------------------------------------------------------------
+    const pythonSnippets = {
+      'pauvrete': `hcp_data = {
+    "pauvrete": {
+        "Chtouka- Ait Baha": {
+            "Commune": [
+                "Ait Baha (M)", "Biougra (M)", "Ait Mzal", 
+                "Ait Ouadrim", "Aouguenz", "Hilala", "..."
+            ],
+            "Taux de pauvreté 2004": [8.1, 9.0, 23.8, 31.0, 29.7, 27.4, "..."],
+            "Taux de pauvreté 2007": [2.8, 6.5, 12.8, 19.3, 16.8, 13.2, "..."],
+            "Taux de vulnérabilité 2014": [22.06, 7.9, 20.98, 25.51, 23.44, 27.44, "..."]
+        },
+        "Tiznit": {
+            // ... structure identique pour Tiznit
+        },
+        "Tata": {
+            // ... structure identique pour Tata
         }
-
-        if (data && typeof data === "object"){
-          const keys = Object.keys(data);
-          const preview = {};
-          keys.slice(0, 15).forEach(k => preview[k] = data[k]);
-          target.textContent = JSON.stringify(preview, null, 2);
-          return;
+    }
+    // ... autres modules
+}`,
+      'population': `hcp_data = {
+    // ... autres modules
+    "population": {
+        "population_legale": {
+            "Provinces": [
+                "Agadir Ida Outanane", "Inezgane-Aït Melloul", "Chtouka-Aït Baha",
+                "Taroudant", "Tiznit", "Tata", "Souss-Massa"
+            ],
+            "RGPH 2004 – Urbain": [384987, 385612, 239694, 186471, 58613, 39060, 1094437],
+            "RGPH 2014 – Urbain": [508155, 513706, 113531, 248640, 81044, 40820, 1505896],
+            "RGPH 2014 – Total": [600599, 541118, 371102, 838820, 207367, 117841, 2676847]
+        },
+        "estimations_population_milieu": {
+            // ...
         }
+    }
+}`,
+      'travail': `hcp_data = {
+    // ... autres modules
+    "marche_du_travail": {
+        "taux_chomage_par_province": {
+            "Province": ["Agadir Ida Outanane", "Inezgane Ait Melloul", "Taroudannt", "Région"],
+            "Taux_Activité_Urbain": [41.6, 42.2, 43.9, 41.5],
+            "Taux_Chômage_Urbain": [16.7, 11.8, 13.8, 13.9],
+            "Taux_Activité_Rural": [50.5, 47.0, 57.8, 52.1],
+            "Taux_Chômage_Total": [10.4, 12.0, 5.9, 9.0]
+        },
+        "population_active_occupee_statut": {
+            "Statut": ["Salariés", "Auto-emploi", "Emploi non rémunéré", "Autres", "Total"],
+            "Urbain": [251639, 111477, 12802, 856, 376774],
+            "Rural": [167635, 167668, 143696, 377, 479376]
+        }
+    }
+}`
+    };
 
-        target.textContent = String(data);
-
-      }catch(err){
-        target.textContent = "Erreur : " + err.message;
+    // Fonction qui injecte l'extrait Python dans la balise <pre>
+    function showDictPreview(moduleName){
+      const target = document.getElementById('dictOutput');
+      if(target && pythonSnippets[moduleName]) {
+        target.textContent = pythonSnippets[moduleName];
       }
     }
   </script>
+  
+     
 
 </section>
     <footer class="footer">
