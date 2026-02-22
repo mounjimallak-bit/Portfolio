@@ -673,6 +673,142 @@ data_clean_preview = {
   
      
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <section id="navigation" class="ax-section">
+  <div class="container">
+
+    <div class="section-head">
+      <h2>Navigation &amp; UI</h2>
+      <p>Architecture d’interface : navigation rapide, contrôles clairs et composants réutilisables</p>
+    </div>
+
+    <p class="ax-lead">
+      L’objectif n’était pas seulement de “faire un dashboard Streamlit”, mais de livrer une expérience proche d’une
+      application data en production : navigation stable, interactions fluides et interface lisible même quand les filtres
+      deviennent nombreux. J’ai donc structuré l’UI autour d’un routage interne, d’un menu hiérarchisé et de composants
+      réutilisables (cartes KPI, en-tête, blocs de contenu).
+    </p>
+
+    <!-- ========================================================= -->
+    <!-- ================= 1) MENU PRINCIPAL ===================== -->
+    <!-- ========================================================= -->
+    <h3 id="menu" class="ax-subtitle">1) Menu principal fixe : navigation sans rupture</h3>
+
+    <p class="ax-text">
+      Plutôt que d’empiler des pages séparées, la navigation est gérée via un état applicatif (session) afin de conserver
+      une barre latérale stable et d’éviter la sensation de “rechargement complet” à chaque clic. Concrètement, chaque entrée
+      du menu déclenche un changement d’état et rend uniquement la section correspondante. Résultat : passage immédiat entre
+      exploration, assistant et générateur de rapports, sans perdre le contexte utilisateur.
+    </p>
+
+    <div class="ax-frame ax-center">
+      <h4 class="ax-subtitle" style="margin-top:0;">Menu principal (barre latérale)</h4>
+      <img class="ax-img"
+           src="images/side_bare.png"
+           alt="Menu principal Axiora Data (sidebar fixe)">
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ================= 2) ACCORDEON ========================== -->
+    <!-- ========================================================= -->
+    <h3 id="accordeon" class="ax-subtitle">2) Accordéon “Exploration des Indices” : menu dense, mais lisible</h3>
+
+    <p class="ax-text">
+      La partie “Exploration des Indices” regroupe plusieurs familles (Population, Habitat, Finance, Enseignement, etc.).
+      Pour éviter un menu trop long, j’ai introduit un comportement type accordéon : un seul bloc s’ouvre/ se referme et
+      affiche uniquement les sous-sections pertinentes. Cette hiérarchie réduit la charge cognitive et rend la navigation
+      plus rapide sur desktop comme sur mobile.
+    </p>
+
+    <div class="ax-frame ax-center">
+      <h4 class="ax-subtitle" style="margin-top:0;">Accordéon déployé : sous-menus par thématique</h4>
+      <img class="ax-img"
+           src="images/side_bare2.png"
+           alt="Accordéon Exploration des Indices (déployé)">
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ================= 3) FILTRES & CONTROLES ================ -->
+    <!-- ========================================================= -->
+    <h3 id="filtres" class="ax-subtitle">3) Filtres &amp; contrôles : organisation “3 colonnes” pour guider l’analyse</h3>
+
+    <p class="ax-text">
+      Pour éviter un écran saturé, l’espace de travail est organisé en trois zones stables :
+    </p>
+
+    <ul class="ax-list">
+      <li><strong>Colonne gauche :</strong> filtres (année, catégories, options d’affichage). L’utilisateur sait toujours où agir.</li>
+      <li><strong>Zone centrale :</strong> visualisation principale (graphique). Priorité à la lecture et à la comparaison.</li>
+      <li><strong>Colonne droite :</strong> table de contrôle (valeurs brutes). Transparence : on peut vérifier les chiffres derrière le graphe.</li>
+    </ul>
+
+    <p class="ax-text">
+      Ce layout améliore la compréhension : les interactions sont localisées, la visualisation reste dominante, et la table
+      joue le rôle de “preuve” — très apprécié en contexte data.
+    </p>
+
+    <div class="ax-frame ax-center">
+      <h4 class="ax-subtitle" style="margin-top:0;">Disposition 3 colonnes : filtres → graphe → table</h4>
+      <img class="ax-img"
+           src="images/side_bare3.png"
+           alt="Filtres et contrôles interactifs (layout 3 colonnes)">
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ================= 4) UI REUTILISABLE ==================== -->
+    <!-- ========================================================= -->
+    <h3 id="components" class="ax-subtitle">4) Composants UI réutilisables : top bar &amp; cartes KPI</h3>
+
+    <p class="ax-text">
+      Pour donner une identité “produit” à l’application, j’ai standardisé des composants visuels réutilisables :
+      une barre d’en-tête (Top Bar) et des cartes KPI. L’en-tête structure l’écran et clarifie le contexte.
+      Les KPI synthétisent immédiatement l’information (min/max, total, tendances), ce qui accélère l’analyse avant même
+      d’ouvrir les graphiques.
+    </p>
+
+    <div class="ax-frame ax-center">
+      <h4 class="ax-subtitle" style="margin-top:0;">Top Bar (en-tête) : repères + cohérence visuelle</h4>
+      <img class="ax-img"
+           src="images/side_bare4.png"
+           alt="Top bar Axiora Data">
+    </div>
+
+    <div class="ax-frame ax-center">
+      <h4 class="ax-subtitle" style="margin-top:0;">Cartes KPI : lecture rapide des ordres de grandeur</h4>
+      <img class="ax-img"
+           src="images/side_bare5.png"
+           alt="Cartes KPI (dashboards) Axiora Data">
+    </div>
+
+    <div class="ax-frame ax-center">
+      <h4 class="ax-subtitle" style="margin-top:0;">Synthèse min / total / max : indicateurs clés en un coup d’œil</h4>
+      <img class="ax-img"
+           src="images/side_bare6.png"
+           alt="Bande KPI min total max Axiora Data">
+    </div>
+
+  </div>
+</section>
 </section>
     <footer class="footer">
       © 2026 — Malak Mounji
