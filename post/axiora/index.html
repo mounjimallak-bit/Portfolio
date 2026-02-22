@@ -523,14 +523,14 @@
       </div>
 
       <!--  même taille que RGPH -->
-      <div class="ax-table-full">
-        <iframe
-          src="chtouka pauvr.html"
-          class="ax-iframe-full"
-          title="Pauvreté - Données brutes (table)"
-          loading="lazy"
-        ></iframe>
-      </div>
+     <div class="ax-table-full">
+  <iframe
+    src="chtouka_pauvr.html"
+    class="ax-iframe-full ax-iframe-poverty"
+    title="Pauvreté - Données brutes (table)"
+    loading="lazy"
+  ></iframe>
+</div>
     </div>
 
     <!-- ========================================================= -->
@@ -810,6 +810,23 @@ data_clean_preview = {
     }
 
     .hidden{ display: none; }
+    /* ===== Pauvreté : agrandir le contenu dans l'iframe ===== */
+.ax-iframe-poverty{
+  height: 900px;      /* plus haut => plus lisible */
+  zoom: 1.45;         /* ✅ agrandit le contenu (Chrome/Edge) */
+  border: none;
+  background: transparent;
+}
+
+/* Fallback si zoom n'est pas supporté */
+@supports not (zoom: 1){
+  .ax-iframe-poverty{
+    transform: scale(1.25);
+    transform-origin: 0 0;
+    width: calc(100% / 1.25);
+    height: calc(900px / 1.25);
+  }
+}
   </style>
 </section>
     <footer class="footer">
