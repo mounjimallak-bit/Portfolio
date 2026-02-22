@@ -1,6 +1,6 @@
 /* =========================================
    Styles dédiés à la page Axiora Data
-========================================= */
+   ========================================= */
 
 .ax-list {
   font-size: 17px;
@@ -14,7 +14,8 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin: 10px 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .ax-step {
@@ -46,137 +47,132 @@
   border-color: rgba(255,255,255,.45);
 }
 
-/* =========================================================
-   CODE BLOCKS
-========================================================= */
-
-.ax-code {
+.ax-code,
+.ax-json {
   margin-top: 10px;
   padding: 14px 16px;
   background: rgba(0,0,0,.35);
+  border: none;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
-  max-height: 420px;
   overflow: auto;
   white-space: pre;
 }
 
-.ax-json {
-  margin-top: 14px;
-  padding: 16px;
-  background: rgba(0,0,0,.35);
-  border-radius: 12px;
-  font-size: 14px;
-  line-height: 1.6;
-  max-height: 560px;
-  overflow: auto;
-  white-space: pre;
-}
+.ax-code { max-height: 420px; }
+.ax-json { max-height: 560px; margin-top: 14px; padding: 16px; }
 
 .hidden {
   display: none;
 }
 
+
 /* =========================================================
-   TABLES RGPH & PAUVRETÉ — EXACTEMENT MÊME LARGEUR
+   Tables RGPH & Pauvreté — Largeur EXACTEMENT identique
 ========================================================= */
 
+/* Conteneurs de même taille */
 .ax-table-full,
 .ax-table-poverty {
   width: 100%;
-  max-width: 100%;
-  margin: 20px 0 36px;
+  height: 520px;
+  margin: 18px 0 34px;
   position: relative;
   overflow: hidden;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.1); /* Fond léger pour bien voir le cadre */
 }
 
-/* Iframes */
-.ax-iframe-full,
-.ax-iframe-poverty {
+/* Iframe RGPH normale (100% de la taille) */
+.ax-iframe-full {
   width: 100%;
-  height: 520px;
+  height: 100%;
   border: none;
   background: transparent;
 }
 
-/* Pauvreté légèrement agrandie MAIS largeur identique */
-.ax-table-poverty {
-  overflow: auto;
-}
-
+/* Iframe Pauvreté zoomée (L'astuce : 80% * 1.25 = 100%) */
 .ax-iframe-poverty {
+  width: 80%;
+  height: 80%;
+  border: none;
+  background: transparent;
   transform-origin: top left;
-  transform: scale(1.20);
+  transform: scale(1.25);
 }
 
-/* Responsive tables */
+/* Responsive Tableaux */
 @media (max-width: 980px){
-  .ax-iframe-full,
-  .ax-iframe-poverty {
+  .ax-table-full,
+  .ax-table-poverty {
     height: 460px;
   }
-
   .ax-iframe-poverty {
-    transform: scale(1.12);
+    width: 86.95%; /* Car 100 / 1.15 = 86.95% */
+    height: 86.95%;
+    transform: scale(1.15);
   }
 }
+
 
 /* =========================================================
-   NAVIGATION & UI (Sidebar image 1 & 2)
-   Image et code bien alignés + même hauteur visuelle
+   Navigation & UI — Image et Code parfaitement alignés
 ========================================================= */
 
-#navigation .ax-media{
+#navigation .ax-media {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 26px;
-  align-items: start;
-  margin: 20px 0 40px;
+  grid-template-columns: 1fr 1fr; /* Moitié code, moitié image */
+  gap: 24px;
+  align-items: stretch; /* FORCE les deux colonnes à faire la même hauteur */
+  margin: 16px 0 32px;
 }
 
-/* Colonnes */
-#navigation .ax-media-text{
-  min-width: 0;
-}
-
-#navigation .ax-media-figure{
+#navigation .ax-media-text,
+#navigation .ax-media-figure {
   min-width: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+  margin: 0;
 }
 
-/* IMAGE SIDEBAR (plus petite et propre) */
-#navigation .ax-media-figure .ax-img{
+/* Le bloc de code */
+#navigation .ax-media-text .ax-code {
+  flex-grow: 1; /* Remplit toute la hauteur disponible */
+  height: 100%; /* Force la hauteur */
+  margin: 0; /* Enlève la marge pour un alignement parfait au sommet */
+  padding: 16px;
+  background: rgba(0,0,0,.38);
+  border-radius: 14px;
+  font-size: 13px; /* Légèrement réduit pour être propre */
+  line-height: 1.55;
+  box-sizing: border-box;
+}
+
+/* L'image de la sidebar */
+#navigation .ax-media-figure .ax-img {
   width: 100%;
-  max-width: 320px;      /* ✔ taille plus petite */
-  height: auto;
-  object-fit: contain;
+  height: 100%; /* S'adapte exactement à la hauteur du code ! */
+  max-height: 380px; /* Force l'image à être plus petite globalement */
+  object-fit: contain; /* L'image rétrécit mais garde ses proportions sans déborder */
+  object-position: top left; /* Aligné en haut, parfaitement en face du code */
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.15);
-  box-shadow: 0 10px 26px rgba(0,0,0,.28);
+  box-shadow: 0 12px 30px rgba(0,0,0,.28);
+  box-sizing: border-box;
 }
 
-/* CODE navigation aligné à la taille visuelle image */
-#navigation .ax-media-text .ax-code{
-  max-height: none;      
-  min-height: 420px;     /* ✔ aligné visuellement */
-  font-size: 12.5px;
-  border-radius: 14px;
-}
-
-/* Responsive navigation */
+/* Responsive Navigation */
 @media (max-width: 980px){
-  #navigation .ax-media{
-    grid-template-columns: 1fr;
+  #navigation .ax-media {
+    grid-template-columns: 1fr; /* Empile le code et l'image sur téléphone */
   }
 
-  #navigation .ax-media-figure .ax-img{
-    max-width: 360px;
-  }
-
-  #navigation .ax-media-text .ax-code{
-    min-height: auto;
-    max-height: 420px;
+  #navigation .ax-media-text .ax-code,
+  #navigation .ax-media-figure .ax-img {
+    height: auto;
+    max-height: 400px;
+    object-position: center; /* Centre l'image sur petit écran */
   }
 }
