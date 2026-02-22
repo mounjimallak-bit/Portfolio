@@ -82,44 +82,48 @@
 }
 
 
+
+
+
+
 /* =========================================================
-   TABLES RGPH & PAUVRETÉ — mêmes dimensions + zoom propre
+   TABLES RGPH & PAUVRETÉ — VERSION FINALE STABLE
 ========================================================= */
 
-/* Les deux conteneurs ont EXACTEMENT la même taille */
+/* Conteneur commun */
 .ax-table-full,
 .ax-table-poverty{
   width: 100%;
   height: 520px;
-  margin: 18px 0 34px;
-  border-radius: 12px;
-  overflow: hidden;           /* coupe ce qui dépasse */
-  position: relative;         /* nécessaire pour l’iframe absolue */
-  background: transparent;    /* évite fond blanc */
+  margin: 20px 0 36px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  background: transparent;
 }
 
-/* Iframe “plein écran” dans son conteneur */
+/* Iframes positionnées proprement */
 .ax-iframe-full,
 .ax-iframe-poverty{
   position: absolute;
-  inset: 0;                   /* top:0; right:0; bottom:0; left:0 */
+  top: 0;
+  left: 0;
   border: none;
   background: transparent;
 }
 
-/* RGPH : normal */
+/* RGPH normal */
 .ax-iframe-full{
   width: 100%;
   height: 100%;
 }
 
-/* Pauvreté : zoom + compensation => AUCUN vide blanc */
+/* PAUVRETÉ zoomée sans vide blanc */
 .ax-iframe-poverty{
-  --zoom: 1.25;               /* ✅ change ici si tu veux plus/moins */
+  --zoom: 1.30;                  /* ajuste ici si besoin */
   transform-origin: top left;
   transform: scale(var(--zoom));
 
-  /* ✅ compensation du zoom */
   width: calc(100% / var(--zoom));
   height: calc(100% / var(--zoom));
 }
@@ -132,12 +136,11 @@
   }
 
   .ax-iframe-poverty{
-    --zoom: 1.12;             /* zoom plus léger sur mobile */
+    --zoom: 1.12;
     width: calc(100% / var(--zoom));
     height: calc(100% / var(--zoom));
   }
 }
-
 /* =========================================================
    Navigation & UI — SOLUTION FINALE (force taille image + code)
    IMPORTANT: on cible UNIQUEMENT la section navigation
