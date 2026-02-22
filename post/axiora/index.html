@@ -897,42 +897,53 @@ with col_table:
       <img class="ax-img-wide" src="images/side_bare6.png" alt="KPI min total max Axiora Data">
 
       <button type="button" class="ax-btn" onclick="toggleCode('codeNavKpiCss', this)">Masquer le code</button>
-      <pre id="codeNavKpiCss" class="ax-code"><code>
-# Streamlit — Composants UI via HTML/CSS (extrait)
+    <pre id="codeNavKpiCss" class="ax-code"><code>
+# Streamlit — KPI "data-driven" (valeurs calculées depuis le DataFrame)
 import streamlit as st
 
-st.markdown("""
+# df_kpi contient les données après application des filtres (année, province, etc.)
+# Colonnes attendues : ["Province", "Valeur"]
+min_value = df_kpi["Valeur"].min()
+max_value = df_kpi["Valeur"].max()
+total_value = df_kpi["Valeur"].sum()
+
+min_region = df_kpi.loc[df_kpi["Valeur"].idxmin(), "Province"]
+max_region = df_kpi.loc[df_kpi["Valeur"].idxmax(), "Province"]
+
+st.markdown(f"""
 &lt;style&gt;
-.kpi-wrap{ display:flex; gap:16px; justify-content:space-between; }
-.kpi{
+.kpi-wrap{{ display:flex; gap:16px; justify-content:space-between; }}
+.kpi{{
   flex:1; padding:18px 16px; border-radius:16px;
   background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
   border:1px solid rgba(255,255,255,.12);
-}
-.kpi h4{ margin:0; opacity:.8; font-weight:700; font-size:14px; }
-.kpi .value{ font-size:30px; font-weight:900; margin-top:6px; }
-.kpi .sub{ opacity:.75; margin-top:2px; font-size:13px; }
+}}
+.kpi h4{{ margin:0; opacity:.8; font-weight:700; font-size:14px; }}
+.kpi .value{{ font-size:30px; font-weight:900; margin-top:6px; }}
+.kpi .sub{{ opacity:.75; margin-top:2px; font-size:13px; }}
 &lt;/style&gt;
 
 &lt;div class="kpi-wrap"&gt;
   &lt;div class="kpi"&gt;
     &lt;h4&gt;Minimum&lt;/h4&gt;
-    &lt;div class="value"&gt;261&lt;/div&gt;
-    &lt;div class="sub"&gt;Taroudant&lt;/div&gt;
+    &lt;div class="value"&gt;{min_value:,.0f}&lt;/div&gt;
+    &lt;div class="sub"&gt;{min_region}&lt;/div&gt;
   &lt;/div&gt;
+
   &lt;div class="kpi"&gt;
     &lt;h4&gt;Total Régional&lt;/h4&gt;
-    &lt;div class="value"&gt;15,337&lt;/div&gt;
-    &lt;div class="sub"&gt;Nbre d’unités&lt;/div&gt;
+    &lt;div class="value"&gt;{total_value:,.0f}&lt;/div&gt;
+    &lt;div class="sub"&gt;Calculé depuis les données filtrées&lt;/div&gt;
   &lt;/div&gt;
+
   &lt;div class="kpi"&gt;
     &lt;h4&gt;Maximum&lt;/h4&gt;
-    &lt;div class="value"&gt;9,439&lt;/div&gt;
-    &lt;div class="sub"&gt;Agadir Ida Outanane&lt;/div&gt;
+    &lt;div class="value"&gt;{max_value:,.0f}&lt;/div&gt;
+    &lt;div class="sub"&gt;{max_region}&lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;
 """, unsafe_allow_html=True)
-      </code></pre>
+</code></pre>
     </div>
 
   </div>
