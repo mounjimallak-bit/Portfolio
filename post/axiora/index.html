@@ -928,8 +928,314 @@ st.markdown(f"""
 </code></pre>
     </div>
 
+    
   </div>
   </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   <!-- ========================================================= -->
+<!-- EXPLORATION DES INDICES — POPULATION -->
+<!-- ========================================================= -->
+<section id="population" class="ax-section">
+  <div class="container">
+
+    <div class="section-head">
+      <h1>Population</h1>
+    </div>
+
+    <p class="ax-lead">
+      Le module <strong>Population</strong> est conçu pour éviter une simple “lecture de tableaux”.
+      L’objectif est de produire des <strong>visualisations analytiques</strong> (comparaison multi-recensements,
+      dynamique urbaine/rurale, structure par âge) et une <strong>prévision</strong> exploitable pour l’aide à la décision.
+    </p>
+
+    <!-- ========================================================= -->
+    <!-- 1) Area miroir -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">1) Area miroir (2004 vs 2014) — pression urbaine & contraste territorial</h3>
+
+    <div class="ax-media">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Cette visualisation est volontairement <strong>sur-mesure</strong> : au lieu d’un bar chart classique,
+          l’Area miroir met en symétrie deux recensements pour rendre la lecture immédiate.
+          La partie inférieure est construite avec des <strong>valeurs négatives</strong> afin de créer l’effet “miroir”.
+        </p>
+
+        <ul class="ax-list">
+          <li><strong>Pourquoi c’est utile :</strong> comparaison instantanée 2004 ↔ 2014 par province.</li>
+          <li><strong>Insight :</strong> on identifie rapidement les zones où l’urbain “absorbe” la croissance (pression démographique + exode rural).</li>
+          <li><strong>Ce que ça montre au recruteur :</strong> tu sais fabriquer une visu “produit” (pas juste un graphique par défaut).</li>
+        </ul>
+
+        <div class="card" style="margin-top:10px;">
+          <h3 style="margin-top:0;">Analyse à afficher dans ton portfolio</h3>
+          <p class="ax-text" style="margin-bottom:0;">
+            <strong>L’Area Miroir</strong> permet de visualiser instantanément l’évolution démographique et
+            l’absorption urbaine entre deux recensements (2004 vs 2014), en mettant en évidence les provinces
+            qui subissent la plus forte pression de croissance et de concentration urbaine.
+          </p>
+        </div>
+
+        <button type="button" class="ax-btn" onclick="toggleCode('codePopMirror', this)">Masquer le code</button>
+        <pre id="codePopMirror" class="ax-code"><code>
+import plotly.graph_objects as go
+
+def area_miroir(df):
+    # df attendu: colonnes ["Province", "RGPH 2004 – Urbain", "RGPH 2014 – Urbain"]
+    x = df["Province"]
+
+    y_2004 = df["RGPH 2004 – Urbain"]
+    y_2014 = df["RGPH 2014 – Urbain"]
+
+    fig = go.Figure()
+
+    # ✅ 2014 (au-dessus)
+    fig.add_trace(go.Scatter(
+        x=x, y=y_2014,
+        mode="lines",
+        fill="tozeroy",
+        name="2014 Urbain"
+    ))
+
+    # ✅ 2004 (miroir en-dessous via valeurs négatives)
+    fig.add_trace(go.Scatter(
+        x=x, y=[-v for v in y_2004],
+        mode="lines",
+        fill="tozeroy",
+        name="2004 Urbain"
+    ))
+
+    fig.update_layout(
+        title="Area miroir — Urbain 2004 vs 2014",
+        xaxis_title="Provinces",
+        yaxis_title="Population",
+        hovermode="x unified"
+    )
+
+    return fig
+        </code></pre>
+      </div>
+
+      <div class="ax-media-figure">
+        <img class="ax-img" src="images/popparprov.png" alt="Area miroir 2004 vs 2014 (urbain) — Population">
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- 2) Evolution par provinces -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">2) Évolution de la population par province — tendance & comparaison</h3>
+
+    <div class="ax-media">
+      <div class="ax-media-figure">
+        <img class="ax-img" src="images/population_pr.png" alt="Évolution de la population par province — série temporelle">
+      </div>
+
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Ce graphique met en évidence la <strong>dynamique temporelle</strong> et permet de comparer les provinces
+          sur la même échelle. L’idée ici n’est pas “dessiner une courbe”, mais faciliter une lecture métier :
+          <strong>quelles provinces accélèrent</strong>, <strong>lesquelles stagnent</strong>, et comment la région se positionne.
+        </p>
+
+        <ul class="ax-list">
+          <li><strong>Comparaison multi-provinciale :</strong> même axe, lecture immédiate.</li>
+          <li><strong>Lecture décisionnelle :</strong> croissance soutenue → besoins (habitat, écoles, santé).</li>
+          <li><strong>Base parfaite pour la prévision :</strong> séries structurées par province.</li>
+        </ul>
+
+        <button type="button" class="ax-btn" onclick="toggleCode('codePopTrend', this)">Masquer le code</button>
+        <pre id="codePopTrend" class="ax-code"><code>
+import plotly.express as px
+
+def courbe_population_provinces(df_long):
+    """
+    df_long attendu: colonnes ["Année", "Province", "Population"]
+    (format long pour plotly)
+    """
+    fig = px.line(
+        df_long,
+        x="Année",
+        y="Population",
+        color="Province",
+        markers=True,
+        title="Évolution de la population par province"
+    )
+    fig.update_layout(hovermode="x unified")
+    return fig
+        </code></pre>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- 3) Structure par âge -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">3) Structure par âge — lecture démographique (tendances générationnelles)</h3>
+
+    <div class="ax-media">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Cette vue répond à une question clé : <strong>comment la population se structure</strong> ?
+          En suivant les <strong>groupes d’âge</strong> dans le temps, on détecte des signaux :
+          montée des 15–29 (pression sur emploi/formation), vieillissement progressif, etc.
+        </p>
+
+        <ul class="ax-list">
+          <li><strong>Lecture “policy” :</strong> jeunesse ↔ besoins formation/emploi.</li>
+          <li><strong>Lecture “services” :</strong> vieillissement ↔ santé, dépendance.</li>
+          <li><strong>Valeur produit :</strong> filtre par groupe d’âge + comparaison année.</li>
+        </ul>
+
+        <button type="button" class="ax-btn" onclick="toggleCode('codePopAge', this)">Masquer le code</button>
+        <pre id="codePopAge" class="ax-code"><code>
+import plotly.express as px
+
+def population_par_age(df_long_age):
+    """
+    df_long_age attendu: colonnes ["Année", "Groupe_age", "Population"]
+    """
+    fig = px.line(
+        df_long_age,
+        x="Année",
+        y="Population",
+        color="Groupe_age",
+        markers=True,
+        title="Population par groupe d’âge"
+    )
+    fig.update_layout(
+        legend_title="Groupe d’âge",
+        hovermode="x unified"
+    )
+    return fig
+        </code></pre>
+      </div>
+
+      <div class="ax-media-figure">
+        <img class="ax-img" src="images/popannee_pr.png" alt="Population par groupe d’âge — évolution">
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- 4) Prévision (ML) -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">4) Prévision (ML) — projection de l’évolution</h3>
+
+    <p class="ax-text">
+      Ici, l’objectif est de transformer l’exploration en <strong>capacité prédictive</strong>.
+      Le pipeline entraîne un modèle simple (régression) sur l’historique et génère une projection
+      (par province ou global), puis affiche <strong>réel vs prédit</strong>.
+    </p>
+
+    <ul class="ax-list">
+      <li><strong>Pipeline :</strong> préparation → split temporel → entraînement → prédiction → courbes.</li>
+      <li><strong>Transparence :</strong> on garde l’historique visible pour comparer.</li>
+      <li><strong>Extension :</strong> Prophet / RandomForest / XGBoost si données plus riches.</li>
+    </ul>
+
+    <button type="button" class="ax-btn" onclick="toggleCode('codePopForecast', this)">Masquer le code</button>
+    <pre id="codePopForecast" class="ax-code"><code>
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import plotly.graph_objects as go
+
+def forecast_population(df_hist, horizon=3):
+    """
+    df_hist attendu: colonnes ["Année", "Population"]
+    Ex: Année = [2014, 2015, ...]
+    """
+    X = df_hist["Année"].values.reshape(-1, 1)
+    y = df_hist["Population"].values
+
+    model = LinearRegression()
+    model.fit(X, y)
+
+    last_year = int(df_hist["Année"].max())
+    future_years = np.arange(last_year + 1, last_year + 1 + horizon)
+    y_pred = model.predict(future_years.reshape(-1, 1))
+
+    df_future = pd.DataFrame({"Année": future_years, "Population_pred": y_pred})
+
+    fig = go.Figure()
+
+    # Historique
+    fig.add_trace(go.Scatter(
+        x=df_hist["Année"],
+        y=df_hist["Population"],
+        mode="lines+markers",
+        name="Réel"
+    ))
+
+    # Prédiction
+    fig.add_trace(go.Scatter(
+        x=df_future["Année"],
+        y=df_future["Population_pred"],
+        mode="lines+markers",
+        name="Prévision"
+    ))
+
+    fig.update_layout(
+        title="Prévision de la population — Réel vs Prédit",
+        xaxis_title="Année",
+        yaxis_title="Population",
+        hovermode="x unified"
+    )
+
+    return fig, df_future
+    </code></pre>
+
+    <div class="card" style="margin-top:14px;">
+      <h3 style="margin-top:0;">Ce que tu écris pour impressionner</h3>
+      <p class="ax-text" style="margin-bottom:0;">
+        Plutôt que d’explorer les indicateurs de manière statique, le module Population intègre un
+        <strong>pipeline de prévision</strong> qui projette la tendance future (réel vs prédit).
+        Cette fonctionnalité permet de passer d’un tableau descriptif à une logique
+        <strong>d’aide à la décision</strong> (anticipation des besoins en services, logement et infrastructures).
+      </p>
+    </div>
+
+  </div>
+</section>
      </main>
     <footer class="footer">
       © 2026 — Malak Mounji
