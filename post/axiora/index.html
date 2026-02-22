@@ -960,199 +960,356 @@ st.markdown(f"""
 
 
 
-
-
-<style>
-  .ax-prediction-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 colonnes de même taille */
-    gap: 24px;
-    margin: 30px 0;
-  }
-  .ax-prediction-grid img {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    border: 1px solid rgba(0,0,0,0.1);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease;
-  }
-  .ax-prediction-grid img:hover {
-    transform: translateY(-5px); /* Petit effet au survol */
-  }
-  .full-width-img {
-    width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    margin: 20px 0;
-  }
-  @media (max-width: 768px) {
-    .ax-prediction-grid {
-      grid-template-columns: 1fr; /* Passe à 1 colonne sur mobile */
-    }
-  }
-</style>
-
+<!-- ========================================================= -->
+<!-- EXPLORATION DES INDICES — POPULATION -->
+<!-- ========================================================= -->
 <section id="population" class="ax-section">
   <div class="container">
 
     <div class="section-head">
-      <h1>Population & Démographie</h1>
+      <h1>Population</h1>
     </div>
 
     <p class="ax-lead">
-      Le module <strong>Population</strong> a été conçu pour dépasser le simple stade du reporting descriptif. L'objectif est de produire des <strong>visualisations analytiques complexes</strong> (comparaison multi-recensements, dynamique de la fracture urbaine/rurale) et d'y intégrer un moteur de <strong>Machine Learning</strong> pour anticiper les trajectoires démographiques.
+      Le module <strong>Population</strong> ne se limite pas à “afficher des courbes”.
+      Il est conçu comme un <strong>outil d’analyse</strong> : comparaison multi-recensements, lecture urbain/rural,
+      structure par âge, puis <strong>projection</strong> (prévision) pour passer du descriptif à l’anticipation.
     </p>
 
-    <h3 class="ax-subtitle">1) Area miroir (2004 vs 2014) — Pression urbaine & contraste territorial</h3>
+    <!-- ========================================================= -->
+    <!-- 1) Area miroir -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">1) Area miroir (2004 vs 2014) — pression urbaine & contraste territorial</h3>
 
-    <p class="ax-text">
-      Pour comparer l'évolution démographique entre deux recensements de manière frappante, j'ai écarté les graphiques en barres classiques pour développer un graphique <strong>sur-mesure</strong>. En utilisant <code>Plotly Graph Objects</code>, l'axe inférieur a été inversé mathématiquement pour créer un effet de "miroir" parfait.
-    </p>
+    <!-- ✅ layout égal : image = largeur de la colonne code -->
+    <div class="ax-media ax-media-equal">
 
-    <div class="card" style="margin: 15px 0;">
-      <h3 style="margin-top:0; color:#3b82f6;">💡 L'Insight Métier</h3>
-      <p class="ax-text" style="margin-bottom:0;">
-        Cette symétrie visuelle permet de repérer instantanément la "fracture territoriale". On y observe clairement quelles provinces absorbent le choc de l'exode rural (gonflement de la partie supérieure) et lesquelles voient leur démographie stagner.
-      </p>
-    </div>
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Cette visualisation est volontairement <strong>sur-mesure</strong> : au lieu d’un bar chart “standard”,
+          l’Area miroir met en symétrie deux recensements pour rendre la lecture immédiate.
+          La partie inférieure est construite via des <strong>valeurs négatives</strong> afin de produire l’effet miroir
+          (lecture visuelle instantanée).
+        </p>
 
-    <img class="full-width-img" src="images/popparprov.png" alt="Area miroir 2004 vs 2014 (urbain) — Population">
+        <ul class="ax-list">
+          <li><strong>Valeur analytique :</strong> comparaison 2004 ↔ 2014 en un coup d’œil (même axe, même ordre).</li>
+          <li><strong>Lecture décisionnelle :</strong> repérer les provinces où la croissance urbaine “absorbe” la dynamique démographique.</li>
+          <li><strong>Signal recruteur :</strong> capacité à concevoir une visu orientée produit (pas uniquement une librairie par défaut).</li>
+        </ul>
 
-    <button type="button" class="ax-btn" onclick="toggleCode('codePopMirror', this)">Afficher le code Plotly</button>
-    <pre id="codePopMirror" class="ax-code hidden"><code>
+        <div class="card" style="margin-top:10px;">
+          <h3 style="margin-top:0;">Insight (texte portfolio)</h3>
+          <p class="ax-text" style="margin-bottom:0;">
+            <strong>L’Area Miroir</strong> permet de visualiser instantanément l’évolution démographique et l’absorption urbaine
+            entre deux recensements (2004 vs 2014), en mettant en évidence les provinces où la concentration urbaine progresse le plus
+            (pression sur infrastructures, habitat, services publics).
+          </p>
+        </div>
+
+        <!-- ✅ code caché par défaut -->
+        <button type="button" class="ax-btn" onclick="toggleCode('codePopMirror', this)">Afficher le code</button>
+        <pre id="codePopMirror" class="ax-code hidden"><code>
 import plotly.graph_objects as go
 
 def area_miroir(df):
-    # L'astuce mathématique : Inverser les valeurs de 2004 pour l'effet miroir
+    # df attendu: colonnes ["Province", "RGPH 2004 – Urbain", "RGPH 2014 – Urbain"]
     x = df["Province"]
     y_2004 = df["RGPH 2004 – Urbain"]
     y_2014 = df["RGPH 2014 – Urbain"]
 
     fig = go.Figure()
 
-    # Trace 2014 (au-dessus de l'axe 0)
+    # ✅ 2014 (au-dessus)
     fig.add_trace(go.Scatter(
         x=x, y=y_2014,
-        mode="lines", fill="tozeroy", name="2014 Urbain"
+        mode="lines",
+        fill="tozeroy",
+        name="2014 Urbain"
     ))
 
-    # Trace 2004 (en-dessous de l'axe 0 via compréhension de liste)
+    # ✅ 2004 (miroir en-dessous via valeurs négatives)
     fig.add_trace(go.Scatter(
         x=x, y=[-v for v in y_2004],
-        mode="lines", fill="tozeroy", name="2004 Urbain"
+        mode="lines",
+        fill="tozeroy",
+        name="2004 Urbain"
     ))
 
     fig.update_layout(
-        title="Pression urbaine : Area miroir 2004 vs 2014",
+        title="Area miroir — Urbain 2004 vs 2014",
         xaxis_title="Provinces",
-        yaxis_title="Volume de Population",
+        yaxis_title="Population",
         hovermode="x unified"
     )
     return fig
-    </code></pre>
+        </code></pre>
+      </div>
 
-    <br><br>
+      <div class="ax-media-figure">
+        <!-- ✅ image non coupée + largeur = colonne -->
+        <img class="ax-img ax-img-nocrop" src="images/popparprov.png"
+             alt="Area miroir 2004 vs 2014 (urbain) — Population">
+      </div>
 
-    <h3 class="ax-subtitle">2) Évolution temporelle & Structure générationnelle</h3>
+    </div>
 
-    <div class="ax-media" style="margin-top: 20px;">
+    <!-- ========================================================= -->
+    <!-- 2) Evolution par provinces -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">2) Évolution de la population par province — tendance & comparaison</h3>
+
+    <div class="ax-media">
+      <div class="ax-media-figure">
+        <img class="ax-img" src="images/population_pr.png"
+             alt="Évolution de la population par province — série temporelle">
+      </div>
+
       <div class="ax-media-text">
         <p class="ax-text">
-          La lecture temporelle permet de dégager les macro-tendances. Les données ont été normalisées pour suivre <strong>l'évolution de la population par province</strong> et décortiquer la <strong>pyramide des âges</strong>. 
+          Cette courbe met en évidence la <strong>dynamique temporelle</strong> et facilite la comparaison sur une même échelle.
+          Le but n’est pas “dessiner une courbe”, mais répondre à une question de pilotage :
+          <strong>quelles provinces accélèrent</strong>, <strong>lesquelles stagnent</strong>, et comment la région se positionne.
         </p>
+
         <ul class="ax-list">
-          <li><strong>Lecture "Politique Publique" :</strong> L'augmentation de la tranche 15-29 ans indique un besoin imminent en création d'emplois et d'infrastructures universitaires.</li>
-          <li><strong>Outil analytique :</strong> L'interface Streamlit permet de croiser ces courbes avec le milieu (Urbain/Rural) pour affiner l'analyse.</li>
+          <li><strong>Comparaison multi-provinces :</strong> lecture immédiate des écarts de croissance.</li>
+          <li><strong>Impact :</strong> croissance soutenue → besoins en habitat, mobilité, écoles, santé.</li>
+          <li><strong>Base ML :</strong> séries structurées → entrée propre pour un forecasting par province.</li>
         </ul>
 
-        <button type="button" class="ax-btn" onclick="toggleCode('codePopAge', this)">Afficher le code</button>
-        <pre id="codePopAge" class="ax-code hidden"><code>
+        <!-- ✅ code caché par défaut -->
+        <button type="button" class="ax-btn" onclick="toggleCode('codePopTrend', this)">Afficher le code</button>
+        <pre id="codePopTrend" class="ax-code hidden"><code>
 import plotly.express as px
 
-def population_par_age(df_long_age):
-    # Transformation préalable avec pd.melt() pour format long
+def courbe_population_provinces(df_long):
+    """
+    df_long attendu: colonnes ["Année", "Province", "Population"]
+    (format long pour plotly)
+    """
     fig = px.line(
-        df_long_age,
-        x="Année", y="Population",
-        color="Groupe_age",
+        df_long,
+        x="Année",
+        y="Population",
+        color="Province",
         markers=True,
-        title="Dynamique générationnelle"
+        title="Évolution de la population par province"
     )
     fig.update_layout(hovermode="x unified")
     return fig
         </code></pre>
       </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- 3) Structure par âge -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">3) Structure par âge — lecture démographique (tendances générationnelles)</h3>
+
+    <div class="ax-media">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Cette vue répond à une question clé : <strong>comment la population se structure</strong> ?
+          En suivant les <strong>groupes d’âge</strong> dans le temps, on détecte des signaux utiles :
+          hausse des 15–29 (pression emploi/formation), transitions démographiques, vieillissement progressif, etc.
+        </p>
+
+        <ul class="ax-list">
+          <li><strong>Lecture “policy” :</strong> jeunesse ↔ besoins formation / insertion.</li>
+          <li><strong>Lecture “services” :</strong> vieillissement ↔ santé / dépendance.</li>
+          <li><strong>Valeur produit :</strong> filtres par âge + comparaison temporelle.</li>
+        </ul>
+
+        <!-- ✅ code caché par défaut -->
+        <button type="button" class="ax-btn" onclick="toggleCode('codePopAge', this)">Afficher le code</button>
+        <pre id="codePopAge" class="ax-code hidden"><code>
+import plotly.express as px
+
+def population_par_age(df_long_age):
+    """
+    df_long_age attendu: colonnes ["Année", "Groupe_age", "Population"]
+    """
+    fig = px.line(
+        df_long_age,
+        x="Année",
+        y="Population",
+        color="Groupe_age",
+        markers=True,
+        title="Population par groupe d’âge"
+    )
+    fig.update_layout(
+        legend_title="Groupe d’âge",
+        hovermode="x unified"
+    )
+    return fig
+        </code></pre>
+      </div>
+
       <div class="ax-media-figure">
-        <img class="ax-img" src="images/population_pr.png" alt="Évolution de la population par province" style="margin-bottom: 15px;">
-        <img class="ax-img" src="images/popannee_pr.png" alt="Population par groupe d’âge">
+        <img class="ax-img" src="images/popannee_pr.png"
+             alt="Population par groupe d’âge — évolution">
       </div>
     </div>
 
-    <br><br>
-
-    <h3 class="ax-subtitle">3) Modélisation & Prévision (Machine Learning) — De l'observation à l'anticipation</h3>
+    <!-- ========================================================= -->
+    <!-- 4) Prévision (ML) — images regroupées + explication pro -->
+    <!-- ========================================================= -->
+    <h3 class="ax-subtitle">4) Prévision (ML) — projection & aide à la décision</h3>
 
     <p class="ax-text">
-      La véritable valeur ajoutée d'un Data Analyst réside dans sa capacité à faire parler le futur. J'ai enrichi le module d'un <strong>pipeline de Machine Learning</strong> basé sur la librairie <code>Scikit-learn</code>. Le système n'affiche plus seulement le passé, il modélise la trajectoire des prochaines années.
+      Ici, on passe de l’exploration à une <strong>capacité prédictive</strong>.
+      Le module entraîne un modèle de régression sur l’historique (par province ou global),
+      puis produit une projection <strong>réel vs prédit</strong>.
+      L’objectif produit : <strong>anticiper</strong> (services, logement, équipements) plutôt que constater.
     </p>
 
-    <div class="card" style="margin: 15px 0;">
-      <h3 style="margin-top:0; color:#3b82f6;">⚙️ L'approche algorithmique</h3>
-      <p class="ax-text" style="margin-bottom:0;">
-        Le choix s'est porté sur un modèle de <strong>Régression Linéaire</strong> pour chaque sous-catégorie (Province, Sexe, Milieu). Le modèle est entraîné dynamiquement sur l'historique de l'utilisateur pour projeter les 3 à 5 prochaines années. L'interface superpose les courbes <strong>"Réel vs Prédit"</strong>, offrant aux décideurs régionaux un outil concret pour l'anticipation budgétaire.
-      </p>
+    <div class="card" style="margin-top:12px;">
+      <h3 style="margin-top:0;">Méthode (ce qui “impressionne” un recruteur)</h3>
+      <ul class="ax-list" style="margin-bottom:0;">
+        <li><strong>Approche temporelle :</strong> séparation <em>train/test</em> dans le temps (pas de shuffle) pour éviter la fuite d’information.</li>
+        <li><strong>Modélisation :</strong> régression sur la tendance (feature “Année”), extensible vers modèles plus robustes si séries plus longues.</li>
+        <li><strong>Évaluation :</strong> suivi de métriques (MAE/MAPE) + comparaison visuelle réel vs prédit.</li>
+        <li><strong>Interprétation :</strong> la prévision n’est pas un “score”, c’est une base d’anticipation et de scénarisation.</li>
+      </ul>
     </div>
 
-    <div class="ax-prediction-grid">
-      <img src="images/prediction_pop_1.png" alt="Prédiction Régression Linéaire par Province">
-      <img src="images/prediction_pop_2.png" alt="Prédiction Évolution Urbain/Rural">
+    <!-- ✅ GALLERY: 2 images par ligne comme ton exemple -->
+    <div class="ax-pred-grid" style="margin-top:18px;">
+      <figure class="ax-pred-card">
+        <img class="ax-pred-img" src="images/tot_pr.png" alt="Prévision — Total (réel vs prédit)">
+        <figcaption class="ax-pred-cap">Projection — <strong>Total</strong> (réel vs prédit)</figcaption>
+      </figure>
+
+      <figure class="ax-pred-card">
+        <img class="ax-pred-img" src="images/urb_pr.png" alt="Prévision — Urbain (réel vs prédit)">
+        <figcaption class="ax-pred-cap">Projection — <strong>Urbain</strong> (réel vs prédit)</figcaption>
+      </figure>
+
+      <figure class="ax-pred-card">
+        <img class="ax-pred-img" src="images/rurale_pr.png" alt="Prévision — Rural (réel vs prédit)">
+        <figcaption class="ax-pred-cap">Projection — <strong>Rural</strong> (réel vs prédit)</figcaption>
+      </figure>
+
+      <figure class="ax-pred-card">
+        <img class="ax-pred-img" src="images/cercle_pr.png" alt="Prévision — Cercles (réel vs prédit)">
+        <figcaption class="ax-pred-cap">Projection — <strong>Cercles</strong> (réel vs prédit)</figcaption>
+      </figure>
+
+      <figure class="ax-pred-card">
+        <img class="ax-pred-img" src="images/cercle_ev.png" alt="Évolution — Cercles (lecture structurelle)">
+        <figcaption class="ax-pred-cap">Évolution — <strong>Cercles</strong> (lecture structurelle)</figcaption>
+      </figure>
     </div>
 
-    <button type="button" class="ax-btn" onclick="toggleCode('codePopForecast', this)">Afficher le code d'entraînement ML</button>
+    <!-- ✅ code prédiction caché + explication plus claire -->
+    <button type="button" class="ax-btn" onclick="toggleCode('codePopForecast', this)" style="margin-top:14px;">
+      Afficher le code
+    </button>
+
     <pre id="codePopForecast" class="ax-code hidden"><code>
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
 import plotly.graph_objects as go
 
 def forecast_population(df_hist, horizon=3):
-    # 1. Préparation des features (X) et de la target (y)
-    X = df_hist["Année"].values.reshape(-1, 1)
-    y = df_hist["Population"].values
+    """
+    df_hist attendu: colonnes ["Année", "Population"]
+    - Split temporel: on garde la fin pour tester (pas de shuffle)
+    - Modèle: LinearRegression sur la tendance (Année -> Population)
+    """
 
-    # 2. Entraînement du modèle de régression
+    df_hist = df_hist.sort_values("Année").copy()
+
+    # -------------------------
+    # 1) Split temporel
+    # -------------------------
+    if len(df_hist) >= 6:
+        split = int(len(df_hist) * 0.8)
+    else:
+        split = max(len(df_hist) - 1, 1)
+
+    train = df_hist.iloc[:split]
+    test  = df_hist.iloc[split:]
+
+    X_train = train["Année"].values.reshape(-1, 1)
+    y_train = train["Population"].values
+
+    X_test  = test["Année"].values.reshape(-1, 1)
+    y_test  = test["Population"].values
+
+    # -------------------------
+    # 2) Entraînement
+    # -------------------------
     model = LinearRegression()
-    model.fit(X, y)
+    model.fit(X_train, y_train)
 
-    # 3. Création des années futures et prédiction
+    # -------------------------
+    # 3) Validation (MAE)
+    # -------------------------
+    if len(test) > 0:
+        y_test_pred = model.predict(X_test)
+        mae = mean_absolute_error(y_test, y_test_pred)
+    else:
+        mae = None
+
+    # -------------------------
+    # 4) Projection future
+    # -------------------------
     last_year = int(df_hist["Année"].max())
     future_years = np.arange(last_year + 1, last_year + 1 + horizon)
-    y_pred = model.predict(future_years.reshape(-1, 1))
+    y_future = model.predict(future_years.reshape(-1, 1))
 
-    df_future = pd.DataFrame({"Année": future_years, "Population_pred": y_pred})
+    df_future = pd.DataFrame({
+        "Année": future_years,
+        "Population_pred": y_future
+    })
 
-    # 4. Visualisation combinée (Données réelles + Données Prédites)
+    # -------------------------
+    # 5) Visualisation (réel vs prédit)
+    # -------------------------
     fig = go.Figure()
-    
+
     fig.add_trace(go.Scatter(
         x=df_hist["Année"], y=df_hist["Population"],
-        mode="lines+markers", name="Historique Réel", line=dict(color='#1c354f')
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=df_future["Année"], y=df_future["Population_pred"],
-        mode="lines+markers", name="Prévision ML", line=dict(dash='dot', color='#7a3d2c')
+        mode="lines+markers",
+        name="Réel"
     ))
 
-    fig.update_layout(title="Modélisation Prédictive de la Population", hovermode="x unified")
+    fig.add_trace(go.Scatter(
+        x=df_future["Année"], y=df_future["Population_pred"],
+        mode="lines+markers",
+        name="Prévision"
+    ))
+
+    title = "Prévision de la population — Réel vs Prédit"
+    if mae is not None:
+        title += f" (MAE={mae:,.0f})"
+
+    fig.update_layout(
+        title=title,
+        xaxis_title="Année",
+        yaxis_title="Population",
+        hovermode="x unified"
+    )
+
     return fig, df_future
     </code></pre>
 
+    <div class="card" style="margin-top:14px;">
+      <h3 style="margin-top:0;">Insight (texte portfolio)</h3>
+      <p class="ax-text" style="margin-bottom:0;">
+        Le module Population intègre un <strong>pipeline de prévision</strong> (split temporel + régression),
+        permettant de comparer <strong>réel vs prédit</strong> et de projeter la tendance à court terme.
+        Cette approche transforme la plateforme en outil d’<strong>aide à la décision</strong> : anticiper les besoins
+        en services, logement et infrastructures selon la trajectoire démographique observée.
+      </p>
+    </div>
+
   </div>
 </section>
-
-
 
 
 
