@@ -403,114 +403,87 @@
 
 
 
-
 <section id="data-preparation" class="ax-section">
   <div class="container">
 
     <!-- ================= TITRE ================= -->
-  
-    <!-- ================= SOMMAIRE (FORMAT IMAGE) ================= -->
-     <div class="section-head">
-    <h1>Données &amp; préparation</h1>
-    <p></p>
-   
-  </div>
-    <p></p>
-     <p class="ax-lead">
+    <div class="section-head">
+      <h1>Données &amp; préparation</h1>
+      <p></p>
+    </div>
+
+    <p class="ax-lead">
       AXIORA s’appuie sur des données statistiques officielles (HCP) : <strong>RGPH</strong> (structure démographique)
       et <strong>indicateurs de pauvreté</strong>. Avant toute analyse, cartographie, IA (Q&amp;A) ou génération de rapports,
       un pipeline de préparation est appliqué pour garantir <strong>cohérence</strong>, <strong>fiabilité</strong> et
-   
+      <strong>compatibilité</strong> entre sources.
+    </p>
 
     <!-- ========================================================= -->
     <!-- ================= 1) SOURCES ============================ -->
     <!-- ========================================================= -->
     <h3 id="sources" class="ax-subtitle">Sources des données (HCP)</h3>
 
-
     <ul class="ax-list">
-  <li><strong>RGPH2014.xlsx</strong> : structure démographique par territoire (codes, populations totales, répartition urbain/rural, tranches d’âge, ménages).</li>
-
-  <li><strong>RGPH2024 - Indicateurs démographiques et socioéconomiques.xlsx</strong> : indicateurs actualisés (population, activité, éducation, habitat) hiérarchisés par région et province.</li>
-
-  <li><strong>chtouka pauvr.xlsx</strong> : indicateurs socio-économiques et taux de pauvreté par territoire (taux, intensité, vulnérabilité).</li>
-
-  <li><strong>Cartographie de la pauvreté régionale 2004–2014.xlsx</strong> : évolution temporelle des indicateurs de pauvreté multidimensionnelle par région.</li>
-
-  <li><strong>IPC BASE 100 2017 (2017–2024).xlsx</strong> : séries mensuelles et annuelles de l’indice des prix à la consommation (inflation, variations %, pondérations).</li>
-
-  <li><strong>pondérations.xlsx</strong> : structure des pondérations par catégorie de produits utilisée pour le calcul de l’IPC.</li>
-
-  <li><strong>Activité, emploi et chômage 2016.xlsx</strong> : taux d’activité, emploi et chômage par territoire et caractéristiques démographiques.</li>
-
-  <li><strong>Travail 2017–2020.xlsx</strong> : évolution des indicateurs du marché du travail (emploi sectoriel, chômage, participation).</li>
-
-  <li><strong>M.E17.xlsx / M.E18.xlsx</strong> : indicateurs sectoriels énergie & mines (production, consommation, indices annuels).</li>
-
-  <li><strong>enseignementprimaire17.xlsx / enseig18.xlsx</strong> : effectifs scolaires, taux de scolarisation et répartition par niveau et genre.</li>
-
-  <li><strong>finance17.xlsx / finance18.xlsx</strong> : indicateurs budgétaires et financiers (recettes, dépenses, investissements publics).</li>
-
-  <li><strong>Habitat17.xlsx / habitat.xlsx</strong> : caractéristiques du logement (type d’habitat, accès aux services de base, densité).</li>
-
-  <li><strong>sante17.xlsx / sante18.xlsx</strong> : infrastructures sanitaires et indicateurs de santé démographique.</li>
-
-  <li><strong>population17.xlsx / pop2018.xlsx</strong> : effectifs démographiques, croissance, densité et structure par âge et sexe.</li>
-
-  <li><strong>tourisme17.xlsx</strong> : indicateurs touristiques (arrivées, nuitées, capacité hôtelière).</li>
-</ul>
-    <p></p>
-
-   
+      <li><strong>RGPH2014.xlsx</strong> : structure démographique par territoire (codes, populations totales, répartition urbain/rural, tranches d’âge, ménages).</li>
+      <li><strong>RGPH2024 - Indicateurs démographiques et socioéconomiques.xlsx</strong> : indicateurs actualisés (population, activité, éducation, habitat) hiérarchisés par région et province.</li>
+      <li><strong>chtouka pauvr.xlsx</strong> : indicateurs socio-économiques et taux de pauvreté par territoire (taux, intensité, vulnérabilité).</li>
+      <li><strong>Cartographie de la pauvreté régionale 2004–2014.xlsx</strong> : évolution temporelle des indicateurs de pauvreté multidimensionnelle par région.</li>
+      <li><strong>IPC BASE 100 2017 (2017–2024).xlsx</strong> : séries mensuelles et annuelles de l’indice des prix à la consommation.</li>
+      <li><strong>pondérations.xlsx</strong> : structure des pondérations par catégorie de produits.</li>
+      <li><strong>Activité, emploi et chômage 2016.xlsx</strong> : taux d’activité, emploi et chômage par territoire.</li>
+      <li><strong>Travail 2017–2020.xlsx</strong> : évolution des indicateurs du marché du travail.</li>
+      <li><strong>M.E17.xlsx / M.E18.xlsx</strong> : indicateurs sectoriels énergie & mines.</li>
+      <li><strong>enseignementprimaire17.xlsx / enseig18.xlsx</strong> : effectifs scolaires et taux de scolarisation.</li>
+      <li><strong>finance17.xlsx / finance18.xlsx</strong> : indicateurs budgétaires et financiers.</li>
+      <li><strong>Habitat17.xlsx / habitat.xlsx</strong> : caractéristiques du logement.</li>
+      <li><strong>sante17.xlsx / sante18.xlsx</strong> : infrastructures sanitaires.</li>
+      <li><strong>population17.xlsx / pop2018.xlsx</strong> : effectifs démographiques et structure par âge.</li>
+      <li><strong>tourisme17.xlsx</strong> : arrivées/nuitées/capacité hôtelière.</li>
+    </ul>
 
     <!-- ========================================================= -->
     <!-- ================= 2) STRUCTURE ========================== -->
     <!-- ========================================================= -->
-    <p></p>
     <h3 id="structure-donnees" class="ax-subtitle">Structure des données</h3>
-    <p></p>
 
     <p class="ax-text">
-      <strong>RGPH</strong> : données hiérarchisées (Région → Préfecture/Province → Cercle/Commune → Centre/Rural),
-      avec des colonnes mixtes (<em>texte + nombres</em>) : populations, parts (%) et âges (0-4, 5-9, …).
+      <strong>RGPH</strong> : données hiérarchisées (Région → Province → Cercle/Commune → Centre/Rural),
+      avec colonnes mixtes (<em>texte + nombres</em>) : populations, parts (%) et âges.
       <br/>
       <strong>Pauvreté</strong> : indicateurs chiffrés (taux, parts, niveaux, agrégats) souvent exportés avec
       formats hétérogènes (espaces, virgules, symboles).
     </p>
-    <p></p>
 
     <!-- ========================================================= -->
     <!-- ================= RGPH BRUT (FULL WIDTH) ================ -->
     <!-- ========================================================= -->
-    <p></p>
     <div class="ax-frame">
+      <h3 class="ax-subtitle">1- Données brutes — RGPH (Structure démographique)</h3>
 
-  <h3 class="ax-subtitle">1- Données brutes — RGPH (Structure démographique)</h3>
+      <p class="ax-text">
+        Le RGPH contient des informations démographiques détaillées par territoire :
+        <strong>codes administratifs</strong>, <strong>superficie</strong>,
+        <strong>population légale</strong>, <strong>population municipale</strong>,
+        <strong>répartition par sexe</strong> et <strong>classes d’âge</strong>.
+      </p>
 
-  <p class="ax-text">
-    Le RGPH contient des informations démographiques détaillées par territoire :
-    <strong>codes administratifs</strong>, <strong>superficie</strong>, 
-    <strong>population légale</strong>, <strong>population municipale</strong>, 
-    <strong>répartition par sexe</strong> et <strong>classes d’âge</strong>.
-  </p>
+      <div class="ax-actions">
+        <a class="ax-btn" href="RGPH2014.html" target="_blank" rel="noopener">Ouvrir RGPH (HTML)</a>
+        <a class="ax-btn" href="RGPH2014.html" download>Télécharger RGPH (HTML)</a>
+      </div>
 
- 
-
-  <!-- 🔹 Table affichée -->
-  <div class="ax-table-full">
-    <iframe
-      src="RGPH2014.html"
-      class="ax-iframe-full"
-      title="RGPH2014 - Données brutes (table)"
-      loading="lazy"
-    ></iframe>
-  </div>
-
-</div>
-    <p></p>
+      <div class="ax-table-full">
+        <iframe
+          src="RGPH2014.html"
+          class="ax-iframe-full"
+          title="RGPH2014 - Données brutes (table)"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
 
     <!-- ================= ANALYSE BRUT RGPH ================= -->
-    <p></p>
     <h3 class="ax-subtitle">Analyse des données brutes (RGPH) — pourquoi nettoyer ?</h3>
 
     <p class="ax-text">
@@ -520,7 +493,7 @@
     </p>
 
     <ul class="ax-list">
-      <li><strong>Espaces</strong> dans les nombres (ex : <em>421 844</em> / <em>33 610 084</em>) → empêche la conversion numérique.</li>
+      <li><strong>Espaces</strong> dans les nombres (ex : <em>421 844</em>) → empêche la conversion numérique.</li>
       <li><strong>Pourcentages</strong> avec symbole <code>%</code> → nécessite extraction/normalisation.</li>
       <li><strong>Décimales</strong> avec virgule (format FR) → conversion contrôlée en <code>float</code>.</li>
       <li><strong>Lignes hiérarchiques</strong> (Rural/Centre) parfois partielles → valeurs manquantes à filtrer ou compléter.</li>
@@ -534,23 +507,31 @@
     </p>
 
     <!-- ========================================================= -->
-    <!-- ================= PAUVRETE BRUT ========================= -->
+    <!-- ================= PAUVRETE BRUT (FULL WIDTH) ============ -->
     <!-- ========================================================= -->
-<h3 class="ax-subtitle">2) Données brutes — Indicateurs de pauvreté</h3>
+    <div class="ax-frame">
+      <h3 class="ax-subtitle">2- Données brutes — Indicateurs de pauvreté</h3>
 
-<p class="ax-text">
-  Le fichier “pauvreté” regroupe des indicateurs socio-économiques par territoire. On y retrouve les mêmes
-  problématiques de format (virgules, espaces, symboles) et parfois des valeurs manquantes selon le niveau territorial.
-</p>
+      <p class="ax-text">
+        Le fichier “pauvreté” regroupe des indicateurs socio-économiques par territoire. On y retrouve les mêmes
+        problématiques de format (virgules, espaces, symboles) et parfois des valeurs manquantes selon le niveau territorial.
+      </p>
 
-<div class="ax-table-wide">
-  <iframe
-    src="chtouka_pauvr.html"
-    class="ax-iframe-zoom"
-    title="Pauvreté - Données brutes (table)"
-    loading="lazy"
-  ></iframe>
-</div>
+      <div class="ax-actions">
+        <a class="ax-btn" href="chtouka_pauvr.html" target="_blank" rel="noopener">Ouvrir Pauvreté (HTML)</a>
+        <a class="ax-btn" href="chtouka_pauvr.html" download>Télécharger Pauvreté (HTML)</a>
+      </div>
+
+      <!--  même taille que RGPH -->
+      <div class="ax-table-full">
+        <iframe
+          src="chtouka_pauvr.html"
+          class="ax-iframe-full"
+          title="Pauvreté - Données brutes (table)"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
 
     <!-- ========================================================= -->
     <!-- ================= 3) CLEANING =========================== -->
@@ -558,8 +539,8 @@
     <h3 id="nettoyage-validation" class="ax-subtitle">Nettoyage &amp; validation</h3>
 
     <p class="ax-text">
-      Ci-dessous : un pipeline de préparation (extrait) présenté par étapes. Chaque étape a un bouton
-      “Afficher le code” pour garder la page lisible.
+      Ci-dessous : un pipeline de préparation (extrait) présenté par étapes.
+      Le code est <strong>affiché par défaut</strong> et tu peux le masquer avec le bouton.
     </p>
 
     <!-- A -->
@@ -569,8 +550,8 @@
         Objectif : obtenir des noms de colonnes <strong>stables</strong> (trim, espaces multiples, caractères invisibles),
         afin d’éviter des erreurs lors des jointures et transformations.
       </p>
-      <button type="button" onclick="toggleCode('codeA')" class="ax-btn">Afficher le code</button>
-      <pre id="codeA" class="ax-code hidden"><code>
+      <button type="button" onclick="toggleCode('codeA', this)" class="ax-btn">Masquer le code</button>
+      <pre id="codeA" class="ax-code"><code>
 import re
 
 def normalize_colname(c: str) -> str:
@@ -590,8 +571,8 @@ df.columns = [normalize_colname(c) for c in df.columns]
         Objectif : transformer les champs “visuels” (ex : <em>33 610 084</em>, <em>49,8%</em>) en valeurs numériques
         exploitables (<code>int</code>/<code>float</code>) avec une conversion <strong>robuste</strong>.
       </p>
-      <button type="button" onclick="toggleCode('codeB')" class="ax-btn">Afficher le code</button>
-      <pre id="codeB" class="ax-code hidden"><code>
+      <button type="button" onclick="toggleCode('codeB', this)" class="ax-btn">Masquer le code</button>
+      <pre id="codeB" class="ax-code"><code>
 import re
 import pandas as pd
 import numpy as np
@@ -600,19 +581,11 @@ def to_number(x):
     if pd.isna(x):
         return np.nan
     s = str(x)
-    # enlève espaces standards + insécables
-    s = s.replace(" ", "").replace("\u202f", "").replace("\xa0", "")
-    # enlève %
-    s = s.replace("%", "")
-    # virgule française -> point
-    s = s.replace(",", ".")
-    # garde uniquement chiffres / . / -
-    s = re.sub(r"[^0-9\.\-]", "", s)
+    s = s.replace(" ", "").replace("\u202f", "").replace("\xa0", "")  # espaces
+    s = s.replace("%", "")                                           # %
+    s = s.replace(",", ".")                                          # virgule FR -> point
+    s = re.sub(r"[^0-9\.\-]", "", s)                                 # garde chiffres/. /-
     return pd.to_numeric(s, errors="coerce")
-
-# Exemple :
-# numeric_cols = ["Superficie Km²", "Population légale", "Part Mas", ...]
-# df[numeric_cols] = df[numeric_cols].applymap(to_number)
       </code></pre>
     </div>
 
@@ -621,10 +594,10 @@ def to_number(x):
       <div class="ax-step-title">C — Gestion des valeurs manquantes &amp; lignes hiérarchiques</div>
       <p class="ax-text">
         Certains niveaux territoriaux (ex : “Rural”, “Centre”) peuvent apparaître avec des lignes partiellement vides.
-        On identifie et traite ces cas pour éviter de fausser les statistiques (moyennes, corrélations) et la cartographie.
+        On identifie et traite ces cas pour éviter de fausser les statistiques et la cartographie.
       </p>
-      <button type="button" onclick="toggleCode('codeC')" class="ax-btn">Afficher le code</button>
-      <pre id="codeC" class="ax-code hidden"><code>
+      <button type="button" onclick="toggleCode('codeC', this)" class="ax-btn">Masquer le code</button>
+      <pre id="codeC" class="ax-code"><code>
 # Exemple : supprimer les lignes où toutes les colonnes numériques sont vides
 numeric_cols = [c for c in df.columns if c not in ["CONC", "Localités"]]
 
@@ -638,23 +611,48 @@ df_clean["Localités"] = df_clean["Localités"].ffill()
 
     <!-- D -->
     <div class="ax-step">
-      <div class="ax-step-title">D — Standardisation des clés territoriales (pour fusion RGPH + pauvreté)</div>
+      <div class="ax-step-title">D — Standardisation des clés territoriales (fusion RGPH + pauvreté)</div>
       <p class="ax-text">
-        Pour fusionner les deux sources, on normalise la clé (ex : code <code>CONC</code> ou identifiant territorial)
-        afin de garantir une correspondance exacte et éviter les doublons.
+        Pour fusionner les deux sources, on normalise la clé (ex : <code>CONC</code>) afin de garantir une correspondance exacte.
       </p>
-      <button type="button" onclick="toggleCode('codeD')" class="ax-btn">Afficher le code</button>
-      <pre id="codeD" class="ax-code hidden"><code>
+      <button type="button" onclick="toggleCode('codeD', this)" class="ax-btn">Masquer le code</button>
+      <pre id="codeD" class="ax-code"><code>
 def normalize_code(x):
-    # garde uniquement chiffres et force en string
     s = "".join(ch for ch in str(x) if ch.isdigit())
     return s if s else None
 
 rgph["CONC"]  = rgph["CONC"].apply(normalize_code)
 pauvr["CONC"] = pauvr["CONC"].apply(normalize_code)
 
-# Exemple de fusion
 df_merged = rgph.merge(pauvr, on="CONC", how="left")
+      </code></pre>
+    </div>
+
+    <!--  NOUVEAU : extrait "data clean" basé sur ton fichier python -->
+    <div class="ax-step">
+      <div class="ax-step-title">E — Aperçu des données clean (extrait du dictionnaire)</div>
+      <p class="ax-text">
+        Exemple d’un format “clean” prêt pour l’IA Q&amp;A et le générateur de rapports : dictionnaire par province,
+        avec listes alignées (<em>communes</em> + indicateurs).
+      </p>
+      <button type="button" onclick="toggleCode('codeE', this)" class="ax-btn">Masquer le code</button>
+      <pre id="codeE" class="ax-code"><code>
+# Exemple (aperçu) — Province : Agadir-Ida -Ou-Tanane
+# (format prêt pour JSON / API)
+
+data_clean_preview = {
+  "Province": "Agadir-Ida -Ou-Tanane",
+  "Commune_head": [
+    "Agadir (M)",
+    "Amskroud",
+    "Drargua",
+    "Drargua centre (AC)",
+    "Idmine"
+  ],
+  "Taux_pauvrete_2004_head": [3.7, 23.0, 0, 0, 18.8],
+  "Taux_pauvrete_2007_head": [1.5, 12.6, 18.86, 0.5, 13.6],
+  "Taux_pauvrete_2014_head": [0.39, 10.09, 26.2, 6.84, 6.91]
+}
       </code></pre>
     </div>
 
@@ -688,6 +686,7 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
       <button type="button" onclick="loadJSON('final_axiora.json','jsonOutput')" class="ax-btn">
         Charger Dataset fusionné (JSON)
       </button>
+      <a class="ax-btn" href="final_axiora.json" download>Télécharger dataset fusionné (JSON)</a>
     </div>
 
     <pre id="jsonOutput" class="ax-json">Clique sur un bouton pour afficher l’aperçu.</pre>
@@ -696,10 +695,16 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
 
   <!-- ================= JS ================= -->
   <script>
-    function toggleCode(id){
+    function toggleCode(id, btn){
       const el = document.getElementById(id);
       if (!el) return;
-      el.classList.toggle("hidden");
+
+      const isHidden = el.classList.toggle("hidden");
+
+      // Met à jour le texte du bouton
+      if (btn){
+        btn.textContent = isHidden ? "Afficher le code" : "Masquer le code";
+      }
     }
 
     async function loadJSON(file, targetId){
@@ -712,13 +717,11 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
 
         const data = await res.json();
 
-        // Cas 1 : tableau -> affiche un extrait
         if (Array.isArray(data)){
           target.textContent = JSON.stringify(data.slice(0, 20), null, 2);
           return;
         }
 
-        // Cas 2 : objet -> affiche quelques clés
         if (data && typeof data === "object"){
           const keys = Object.keys(data);
           const preview = {};
@@ -727,7 +730,6 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
           return;
         }
 
-        // Autre
         target.textContent = String(data);
 
       }catch(err){
@@ -736,11 +738,8 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
     }
   </script>
 
-  <!-- ================= STYLE (SANS CADRES / SANS BLOCS BLANCS) ================= -->
+  <!-- ================= STYLE ================= -->
   <style>
-   
-
-    /* Listes */
     .ax-list{
       font-size: 17px;
       line-height: 2.0;
@@ -748,32 +747,6 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
       margin: 0 0 18px 18px;
       max-width: 980px;
     }
-
-    /* Iframe tables (grand + lisible) */
-    .ax-table-full{ margin: 18px 0 34px; }
-    .ax-iframe-full{
-      width: 100%;
-      height: 500px;          /* plus grand */
-      border: none;           /* pas de cadre blanc */
-      background: transparent;
-    }
-
-    /* Étapes (sans cadres) */
-    .ax-step{ margin: 26px 0 34px; }
-    .ax-step-title{ font-weight: 800; margin: 0 0 6px; font-size: 18px; }
-
-    /* Boutons (discrets) */
-    .ax-btn{
-      margin-top: 8px;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.06);
-      color: inherit;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-    }
-    .ax-btn:hover{ border-color: rgba(255,255,255,.45); }
 
     .ax-actions{
       display: flex;
@@ -783,7 +756,35 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
       margin-bottom: 10px;
     }
 
-    /* Code (sans bloc blanc, affiché seulement si bouton) */
+    /* Iframe tables (RGPH + Pauvreté même taille) */
+    .ax-table-full{ margin: 18px 0 34px; }
+    .ax-iframe-full{
+      width: 100%;
+      height: 500px;          
+      border: none;
+      background: transparent;
+    }
+
+    .ax-step{ margin: 26px 0 34px; }
+    .ax-step-title{ font-weight: 800; margin: 0 0 6px; font-size: 18px; }
+
+    .ax-btn{
+      margin-top: 8px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.06);
+      color: inherit;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ax-btn:hover{ border-color: rgba(255,255,255,.45); }
+
+    /* Code affiché par défaut */
     .ax-code{
       margin-top: 10px;
       padding: 14px 16px;
@@ -811,32 +812,6 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
     }
 
     .hidden{ display: none; }
-    /* ======= TABLEAU LARGE (prend plus que la largeur texte) ======= */
-.ax-table-wide{
-  width: min(1400px, 96vw);   /* plus large que le container */
-  margin: 18px auto 34px;     /* centré */
-}
-
-/* ======= IFRAME : plus haut + zoom (agrandit le contenu) ======= */
-.ax-iframe-zoom{
-  width: 100%;
-  height: 900px;              /* augmente la hauteur => moins d'espace vide */
-  border: none;
-  background: transparent;
-
-  /* Zoom efficace sur Chrome/Edge */
-  zoom: 1.25;                 /* 1.15 → 1.35 selon ton goût */
-}
-
-/* Fallback si zoom n'est pas supporté */
-@supports not (zoom: 1){
-  .ax-iframe-zoom{
-    transform: scale(1.15);
-    transform-origin: 0 0;
-    width: calc(100% / 1.15);
-    height: calc(900px / 1.15);
-  }
-}
   </style>
 </section>
     <footer class="footer">
