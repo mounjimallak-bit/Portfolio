@@ -811,35 +811,48 @@ data_clean_preview = {
 
     .hidden{ display: none; }
    /* Container: enlève le vide inutile */
-.ax-table-poverty{
-  margin: 14px 0 22px;
+/* Container : définit l'encombrement final réel sur la page */
+.ax-table-poverty {
+  margin: 14px auto 22px; /* 'auto' aide à centrer si besoin */
+  width: 100%;
+  
+  /* 👇 La hauteur VISIBLE finale souhaitée se met sur le conteneur */
+  height: 620px; 
+  
+  /* 👇 Gère les débordements liés au scale de l'iframe */
+  overflow: auto; 
+  position: relative;
 }
 
-/* Iframe pauvreté : on agrandit et on "compense" width/height */
-.ax-iframe-poverty{
+/* Iframe pauvreté : on agrandit et on compense */
+.ax-iframe-poverty {
   border: none;
   background: transparent;
-
-  /* 👇 Taille visible finale (tu peux ajuster) */
-  height: 620px;           /* réduit le gros vide en bas */
+  
+  /* Positionnement absolu dans le conteneur pour éviter les bugs de flux */
+  position: absolute;
+  top: 0;
+  left: 0;
 
   /* 👇 Scale : agrandit la table */
+  transform-origin: top left;
   transform: scale(1.35);
-  transform-origin: 0 0;
 
-  /* 👇 Compense le scale pour que ça remplisse toute la largeur */
+  /* 👇 Compense le scale pour que l'iframe remplisse exactement le conteneur */
   width: calc(100% / 1.35);
-
-  /* 👇 Compense aussi la hauteur pour éviter que ça soit coupé */
-  height: calc(620px / 1.35);
+  height: calc(100% / 1.35); /* S'adapte à la hauteur du conteneur divisée par le scale */
 }
 
-/* ✅ Optionnel: sur grands écrans, on peut augmenter encore un peu */
-@media (min-width: 1100px){
-  .ax-iframe-poverty{
+/* ✅ Optionnel: sur grands écrans, on augmente encore un peu */
+@media (min-width: 1100px) {
+  .ax-table-poverty {
+    height: 640px; /* On ajuste la hauteur du conteneur pour le nouvel affichage */
+  }
+  
+  .ax-iframe-poverty {
     transform: scale(1.45);
     width: calc(100% / 1.45);
-    height: calc(640px / 1.45);
+    height: calc(100% / 1.45);
   }
 }
   </style>
