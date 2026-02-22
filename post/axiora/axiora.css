@@ -18,15 +18,8 @@
   margin-bottom: 10px;
 }
 
-.ax-step {
-  margin: 26px 0 34px;
-}
-
-.ax-step-title {
-  font-weight: 800;
-  margin: 0 0 6px;
-  font-size: 18px;
-}
+.ax-step { margin: 26px 0 34px; }
+.ax-step-title { font-weight: 800; margin: 0 0 6px; font-size: 18px; }
 
 .ax-btn {
   margin-top: 8px;
@@ -43,10 +36,9 @@
   gap: 6px;
 }
 
-.ax-btn:hover {
-  border-color: rgba(255,255,255,.45);
-}
+.ax-btn:hover { border-color: rgba(255,255,255,.45); }
 
+/* Code affiché par défaut */
 .ax-code,
 .ax-json {
   margin-top: 10px;
@@ -62,117 +54,88 @@
 
 .ax-code { max-height: 420px; }
 .ax-json { max-height: 560px; margin-top: 14px; padding: 16px; }
-
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 
 /* =========================================================
-   Tables RGPH & Pauvreté — Largeur EXACTEMENT identique
+   1. Tables RGPH & Pauvreté — Zéro vide, zoom parfait
 ========================================================= */
 
-/* Conteneurs de même taille */
 .ax-table-full,
 .ax-table-poverty {
   width: 100%;
-  height: 520px;
+  height: 520px; /* Même hauteur pour les deux */
   margin: 18px 0 34px;
-  position: relative;
-  overflow: hidden;
   border-radius: 12px;
-  background: rgba(0,0,0,0.1); /* Fond léger pour bien voir le cadre */
+  overflow: hidden; /* Côté sécurité : cache tout dépassement */
+  background: #fff; /* Évite les fonds vides si le tableau est court */
 }
 
-/* Iframe RGPH normale (100% de la taille) */
 .ax-iframe-full {
   width: 100%;
   height: 100%;
   border: none;
-  background: transparent;
 }
 
-/* Iframe Pauvreté zoomée (L'astuce : 80% * 1.25 = 100%) */
 .ax-iframe-poverty {
-  width: 80%;
-  height: 80%;
+  width: 100%; /* Prend toute la largeur de son conteneur */
+  height: 100%; /* Prend toute la hauteur */
   border: none;
-  background: transparent;
-  transform-origin: top left;
-  transform: scale(1.25);
+  zoom: 1.25; /* LE VRAI FIX : Le zoom natif du navigateur, aucun vide possible ! */
 }
 
-/* Responsive Tableaux */
 @media (max-width: 980px){
-  .ax-table-full,
-  .ax-table-poverty {
-    height: 460px;
-  }
-  .ax-iframe-poverty {
-    width: 86.95%; /* Car 100 / 1.15 = 86.95% */
-    height: 86.95%;
-    transform: scale(1.15);
-  }
+  .ax-table-full, .ax-table-poverty { height: 460px; }
 }
 
 
 /* =========================================================
-   Navigation & UI — Image et Code parfaitement alignés
+   2. Navigation & UI — Images plus petites et parfaitement alignées
 ========================================================= */
 
 #navigation .ax-media {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* Moitié code, moitié image */
+  display: flex;
+  align-items: stretch; /* FORCE l'image et le code à avoir la MÊME hauteur */
   gap: 24px;
-  align-items: stretch; /* FORCE les deux colonnes à faire la même hauteur */
   margin: 16px 0 32px;
 }
 
-#navigation .ax-media-text,
-#navigation .ax-media-figure {
-  min-width: 0;
+#navigation .ax-media-text {
+  flex: 60%; /* Le code prend 60% de l'espace */
   display: flex;
   flex-direction: column;
-  height: 100%;
-  margin: 0;
 }
 
-/* Le bloc de code */
+#navigation .ax-media-figure {
+  flex: 40%; /* L'image prend 40% (elle est donc physiquement plus petite) */
+  display: flex;
+  flex-direction: column;
+}
+
 #navigation .ax-media-text .ax-code {
-  flex-grow: 1; /* Remplit toute la hauteur disponible */
-  height: 100%; /* Force la hauteur */
-  margin: 0; /* Enlève la marge pour un alignement parfait au sommet */
+  flex-grow: 1; /* S'étire pour remplir toute la hauteur */
+  margin: 0; 
   padding: 16px;
   background: rgba(0,0,0,.38);
   border-radius: 14px;
-  font-size: 13px; /* Légèrement réduit pour être propre */
+  font-size: 13px; 
   line-height: 1.55;
-  box-sizing: border-box;
+  max-height: none; /* Enlève la limite de hauteur ici */
 }
 
-/* L'image de la sidebar */
 #navigation .ax-media-figure .ax-img {
   width: 100%;
-  height: 100%; /* S'adapte exactement à la hauteur du code ! */
-  max-height: 380px; /* Force l'image à être plus petite globalement */
-  object-fit: contain; /* L'image rétrécit mais garde ses proportions sans déborder */
-  object-position: top left; /* Aligné en haut, parfaitement en face du code */
+  height: 100%; /* S'adapte au millimètre près à la hauteur du code */
+  object-fit: cover; /* L'astuce magique : l'image remplit la zone sans aucun blanc/vide */
+  object-position: left top; /* Aligné proprement en haut à gauche */
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.15);
   box-shadow: 0 12px 30px rgba(0,0,0,.28);
-  box-sizing: border-box;
 }
 
-/* Responsive Navigation */
+/* Responsive pour téléphone */
 @media (max-width: 980px){
-  #navigation .ax-media {
-    grid-template-columns: 1fr; /* Empile le code et l'image sur téléphone */
-  }
-
-  #navigation .ax-media-text .ax-code,
-  #navigation .ax-media-figure .ax-img {
-    height: auto;
-    max-height: 400px;
-    object-position: center; /* Centre l'image sur petit écran */
-  }
+  #navigation .ax-media { flex-direction: column; }
+  #navigation .ax-media-text, #navigation .ax-media-figure { flex: 100%; }
+  #navigation .ax-media-figure .ax-img { height: auto; object-fit: contain; }
 }
