@@ -410,7 +410,12 @@
     <!-- ================= TITRE ================= -->
   
     <!-- ================= SOMMAIRE (FORMAT IMAGE) ================= -->
-    <h3 class="ax-subtitle ax-subtitle-tight">Données &amp; préparation</h3>
+     <div class="section-head">
+    <h1>Données &amp; préparation</h1>
+    <p></p>
+   
+  </div>
+    <p></p>
      <p class="ax-lead">
       AXIORA s’appuie sur des données statistiques officielles (HCP) : <strong>RGPH</strong> (structure démographique)
       et <strong>indicateurs de pauvreté</strong>. Avant toute analyse, cartographie, IA (Q&amp;A) ou génération de rapports,
@@ -422,23 +427,48 @@
     <!-- ========================================================= -->
     <h3 id="sources" class="ax-subtitle">Sources des données (HCP)</h3>
 
-    <p class="ax-text">
-      Deux fichiers Excel ont été téléchargés au même endroit que cette page (dossier <code>post/axiora/</code>) :
-    </p>
 
     <ul class="ax-list">
-      <li><strong>RGPH2014.xlsx</strong> : structure démographique par territoire (codes, populations, tranches d’âge, etc.).</li>
-      <li><strong>chtouka pauvr.xlsx</strong> : indicateurs socio-économiques / pauvreté par territoire.</li>
-    </ul>
+  <li><strong>RGPH2014.xlsx</strong> : structure démographique par territoire (codes, populations totales, répartition urbain/rural, tranches d’âge, ménages).</li>
 
-    <p class="ax-note">
-      Pour affichage dans le portfolio, chaque fichier Excel est exporté en HTML (table) et intégré ci-dessous via <code>&lt;iframe&gt;</code>.
-    </p>
+  <li><strong>RGPH2024 - Indicateurs démographiques et socioéconomiques.xlsx</strong> : indicateurs actualisés (population, activité, éducation, habitat) hiérarchisés par région et province.</li>
+
+  <li><strong>chtouka pauvr.xlsx</strong> : indicateurs socio-économiques et taux de pauvreté par territoire (taux, intensité, vulnérabilité).</li>
+
+  <li><strong>Cartographie de la pauvreté régionale 2004–2014.xlsx</strong> : évolution temporelle des indicateurs de pauvreté multidimensionnelle par région.</li>
+
+  <li><strong>IPC BASE 100 2017 (2017–2024).xlsx</strong> : séries mensuelles et annuelles de l’indice des prix à la consommation (inflation, variations %, pondérations).</li>
+
+  <li><strong>pondérations.xlsx</strong> : structure des pondérations par catégorie de produits utilisée pour le calcul de l’IPC.</li>
+
+  <li><strong>Activité, emploi et chômage 2016.xlsx</strong> : taux d’activité, emploi et chômage par territoire et caractéristiques démographiques.</li>
+
+  <li><strong>Travail 2017–2020.xlsx</strong> : évolution des indicateurs du marché du travail (emploi sectoriel, chômage, participation).</li>
+
+  <li><strong>M.E17.xlsx / M.E18.xlsx</strong> : indicateurs sectoriels énergie & mines (production, consommation, indices annuels).</li>
+
+  <li><strong>enseignementprimaire17.xlsx / enseig18.xlsx</strong> : effectifs scolaires, taux de scolarisation et répartition par niveau et genre.</li>
+
+  <li><strong>finance17.xlsx / finance18.xlsx</strong> : indicateurs budgétaires et financiers (recettes, dépenses, investissements publics).</li>
+
+  <li><strong>Habitat17.xlsx / habitat.xlsx</strong> : caractéristiques du logement (type d’habitat, accès aux services de base, densité).</li>
+
+  <li><strong>sante17.xlsx / sante18.xlsx</strong> : infrastructures sanitaires et indicateurs de santé démographique.</li>
+
+  <li><strong>population17.xlsx / pop2018.xlsx</strong> : effectifs démographiques, croissance, densité et structure par âge et sexe.</li>
+
+  <li><strong>tourisme17.xlsx</strong> : indicateurs touristiques (arrivées, nuitées, capacité hôtelière).</li>
+</ul>
+    <p></p>
+
+   
 
     <!-- ========================================================= -->
     <!-- ================= 2) STRUCTURE ========================== -->
     <!-- ========================================================= -->
+    <p></p>
     <h3 id="structure-donnees" class="ax-subtitle">Structure des données</h3>
+    <p></p>
 
     <p class="ax-text">
       <strong>RGPH</strong> : données hiérarchisées (Région → Préfecture/Province → Cercle/Commune → Centre/Rural),
@@ -447,28 +477,45 @@
       <strong>Pauvreté</strong> : indicateurs chiffrés (taux, parts, niveaux, agrégats) souvent exportés avec
       formats hétérogènes (espaces, virgules, symboles).
     </p>
+    <p></p>
 
     <!-- ========================================================= -->
     <!-- ================= RGPH BRUT (FULL WIDTH) ================ -->
     <!-- ========================================================= -->
-    <h3 class="ax-subtitle">1) Données brutes — RGPH (Structure démographique)</h3>
+    <p></p>
+    <div class="ax-frame">
 
-    <p class="ax-text">
-      Le RGPH contient des informations démographiques détaillées par territoire :
-      <strong>codes administratifs</strong>, <strong>superficie</strong>, <strong>population légale</strong>,
-      <strong>population municipale</strong>, <strong>répartition par sexe</strong> et <strong>classes d’âge</strong>.
-    </p>
+  <h3 class="ax-subtitle">1- Données brutes — RGPH (Structure démographique)</h3>
 
-    <div class="ax-table-full">
-      <iframe
-        src="RGPH2014.html"
-        class="ax-iframe-full"
-        title="RGPH2014 - Données brutes (table)"
-        loading="lazy"
-      ></iframe>
-    </div>
+  <p class="ax-text">
+    Le RGPH contient des informations démographiques détaillées par territoire :
+    <strong>codes administratifs</strong>, <strong>superficie</strong>, 
+    <strong>population légale</strong>, <strong>population municipale</strong>, 
+    <strong>répartition par sexe</strong> et <strong>classes d’âge</strong>.
+  </p>
+
+  <!--  Boutons téléchargement -->
+  <div class="ax-download-buttons">
+    <a href="files/RGPH2014.xlsx" download class="ax-btn">
+       Télécharger fichier brut (.xlsx)
+    </a>
+  </div>
+
+  <!-- 🔹 Table affichée -->
+  <div class="ax-table-full">
+    <iframe
+      src="RGPH2014.html"
+      class="ax-iframe-full"
+      title="RGPH2014 - Données brutes (table)"
+      loading="lazy"
+    ></iframe>
+  </div>
+
+</div>
+    <p></p>
 
     <!-- ================= ANALYSE BRUT RGPH ================= -->
+    <p></p>
     <h3 class="ax-subtitle">Analyse des données brutes (RGPH) — pourquoi nettoyer ?</h3>
 
     <p class="ax-text">
