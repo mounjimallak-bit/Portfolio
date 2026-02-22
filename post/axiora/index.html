@@ -386,16 +386,10 @@
 
     <h3 id="structure-donnees" class="ax-subtitle">Structure des données</h3>
 
-    <p class="ax-text">
-      <strong>RGPH</strong> : données hiérarchisées (Région → Province → Cercle/Commune → Centre/Rural),
-      avec colonnes mixtes (<em>texte + nombres</em>) : populations, parts (%) et âges.
-      <br/>
-      <strong>Pauvreté</strong> : indicateurs chiffrés (taux, parts, niveaux, agrégats) souvent exportés avec
-      formats hétérogènes (espaces, virgules, symboles).
-    </p>
+   
 
     <div class="ax-frame">
-      <h3 class="ax-subtitle">1- Données brutes — RGPH (Structure démographique)</h3>
+      <h3 class="ax-subtitle">1- Extrait des données brutes — RGPH (Structure démographique)</h3>
 
       <p class="ax-text">
         Le RGPH contient des informations démographiques détaillées par territoire :
@@ -465,12 +459,6 @@
     </div>
 
     <h3 id="nettoyage" class="ax-subtitle">Nettoyage &amp; validation</h3>
-
-    <p class="ax-text">
-      Ci-dessous : un pipeline de préparation (extrait) présenté par étapes.
-      
-    </p>
-
     <div class="ax-step">
       <div class="ax-step-title">A — Normalisation des colonnes</div>
       <p class="ax-text">
@@ -554,10 +542,7 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
 
     <div class="ax-step">
       <div class="ax-step-title">E — Aperçu des données clean (extrait du dictionnaire)</div>
-      <p class="ax-text">
-        Exemple d’un format “clean” prêt pour l’IA Q&amp;A et le générateur de rapports : dictionnaire par province,
-        avec listes alignées (<em>communes</em> + indicateurs).
-      </p>
+     
       <button type="button" onclick="toggleCode('codeE', this)" class="ax-btn">Masquer le code</button>
       <pre id="codeE" class="ax-code"><code>
 
