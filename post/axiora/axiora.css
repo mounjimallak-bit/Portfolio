@@ -90,42 +90,74 @@
   display: none;
 }
 
-/* Container : définit l'encombrement final réel sur la page */
+
+
+
+/* =========================================================
+   Tables RGPH & Pauvreté — largeur identique
+========================================================= */
+
+/* Les deux utilisent maintenant la même base */
+.ax-table-full,
 .ax-table-poverty {
-  margin: 14px auto 22px;
   width: 100%;
-  height: 620px;
-  overflow: auto;
+  max-width: 100%;
+  margin: 18px 0 34px;
   position: relative;
+  overflow: hidden;
 }
 
-/* Iframe pauvreté : on agrandit et on compense */
-.ax-iframe-poverty {
+/* Iframe RGPH normale */
+.ax-iframe-full {
+  width: 100%;
+  height: 520px;
   border: none;
   background: transparent;
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  transform-origin: top left;
-  transform: scale(1.35);
-
-  width: calc(100% / 1.35);
-  height: calc(100% / 1.35);
 }
 
-/*  Optionnel: sur grands écrans, on augmente encore un peu */
-@media (min-width: 1100px) {
-  .ax-table-poverty {
-    height: 640px;
+/* Iframe Pauvreté agrandie mais largeur conservée */
+.ax-iframe-poverty {
+  width: 100%;
+  height: 520px;
+  border: none;
+  background: transparent;
+
+  transform-origin: top left;
+  transform: scale(1.25);   /* agrandissement propre */
+}
+
+/* On compense le scale sans casser la largeur */
+.ax-table-poverty {
+  height: 520px;
+  overflow: auto;
+}
+
+/* Responsive */
+@media (max-width: 980px){
+  .ax-iframe-full,
+  .ax-iframe-poverty {
+    height: 460px;
   }
 
   .ax-iframe-poverty {
-    transform: scale(1.45);
-    width: calc(100% / 1.45);
-    height: calc(100% / 1.45);
+    transform: scale(1.15);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
