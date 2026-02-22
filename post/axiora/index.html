@@ -494,12 +494,7 @@
     <strong>répartition par sexe</strong> et <strong>classes d’âge</strong>.
   </p>
 
-  <!--  Boutons téléchargement -->
-  <div class="ax-download-buttons">
-    <a href="files/RGPH2014.xlsx" download class="ax-btn">
-       Télécharger fichier brut (.xlsx)
-    </a>
-  </div>
+ 
 
   <!-- 🔹 Table affichée -->
   <div class="ax-table-full">
@@ -541,7 +536,7 @@
     <!-- ========================================================= -->
     <!-- ================= PAUVRETE BRUT ========================= -->
     <!-- ========================================================= -->
-  <h3 class="ax-subtitle">2) Données brutes — Indicateurs de pauvreté</h3>
+<h3 class="ax-subtitle">2) Données brutes — Indicateurs de pauvreté</h3>
 
 <p class="ax-text">
   Le fichier “pauvreté” regroupe des indicateurs socio-économiques par territoire. On y retrouve les mêmes
@@ -550,7 +545,7 @@
 
 <div class="ax-table-wide">
   <iframe
-    src="chtouka pauvr.html"
+    src="chtouka_pauvr.html"
     class="ax-iframe-zoom"
     title="Pauvreté - Données brutes (table)"
     loading="lazy"
@@ -816,6 +811,32 @@ df_merged = rgph.merge(pauvr, on="CONC", how="left")
     }
 
     .hidden{ display: none; }
+    /* ======= TABLEAU LARGE (prend plus que la largeur texte) ======= */
+.ax-table-wide{
+  width: min(1400px, 96vw);   /* plus large que le container */
+  margin: 18px auto 34px;     /* centré */
+}
+
+/* ======= IFRAME : plus haut + zoom (agrandit le contenu) ======= */
+.ax-iframe-zoom{
+  width: 100%;
+  height: 900px;              /* augmente la hauteur => moins d'espace vide */
+  border: none;
+  background: transparent;
+
+  /* Zoom efficace sur Chrome/Edge */
+  zoom: 1.25;                 /* 1.15 → 1.35 selon ton goût */
+}
+
+/* Fallback si zoom n'est pas supporté */
+@supports not (zoom: 1){
+  .ax-iframe-zoom{
+    transform: scale(1.15);
+    transform-origin: 0 0;
+    width: calc(100% / 1.15);
+    height: calc(900px / 1.15);
+  }
+}
   </style>
 </section>
     <footer class="footer">
