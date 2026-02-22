@@ -120,7 +120,7 @@
 
 /* PAUVRETÉ zoomée sans vide blanc */
 .ax-iframe-poverty{
-  --zoom: 1.30;                  /* ajuste ici si besoin */
+  --zoom: 2.5;                  /* ajuste ici si besoin */
   transform-origin: top left;
   transform: scale(var(--zoom));
 
