@@ -127,92 +127,73 @@
   }
 }
 
+
+
+
+
+
 /* =========================================================
-   Navigation & UI — SOLUTION FINALE (force taille image + code)
-   IMPORTANT: on cible UNIQUEMENT la section navigation
+   Navigation & UI — version compacte (image + code réduits)
 ========================================================= */
 
-/* 1) On verrouille la zone navigation pour éviter conflits */
 #navigation .ax-media{
-  display: grid !important;
-  grid-template-columns: 1.2fr 1fr !important;
-  gap: 24px !important;
-  align-items: start !important;
-  margin: 20px 0 40px !important;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;  /* un peu plus compact */
+  gap: 22px;
+  align-items: start;
+  margin: 16px 0 32px;
 }
 
-/* 2) colonnes */
+/* Colonnes */
 #navigation .ax-media-text{
-  min-width: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 #navigation .ax-media-figure{
-  min-width: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* 3) IMAGE — on force une vraie taille visible */
+/* ✅ IMAGE plus petite */
 #navigation .ax-media-figure .ax-img{
-  display: block !important;
-
-  width: 100% !important;
-  max-width: 560px !important;     /* ✅ image plus grande */
-  min-width: 420px !important;     /* ✅ évite “petit” */
-  height: auto !important;         /* ✅ pas de crop */
-  object-fit: contain !important;  /* ✅ conserve la capture entière */
-
-  border-radius: 16px !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
-  box-shadow: 0 15px 40px rgba(0,0,0,.3) !important;
-}
-
-/* 4) CODE — annule max-height global seulement dans navigation */
-#navigation .ax-media-text .ax-code{
-  max-height: none !important;     /* ✅ annule 420px */
-  min-height: 560px !important;    /* ✅ “même présence” que l’image */
-  overflow: auto !important;
-
-  padding: 16px !important;
-  background: rgba(0,0,0,.40) !important;
-  border-radius: 16px !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  white-space: pre !important;
-}
-
-/* 5) Images wide ne changent pas */
-#navigation .ax-img-wide{
   width: 100%;
+  max-width: 440px;       /* ↓ réduite (avant 560) */
   height: auto;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: 0 10px 30px rgba(0,0,0,.22);
+  object-fit: contain;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.15);
+  box-shadow: 0 12px 30px rgba(0,0,0,.28);
 }
 
-/* 6) Responsive */
+/* ✅ CODE plus compact */
+#navigation .ax-media-text .ax-code{
+  max-height: none;       
+  min-height: 460px;      /* ↓ réduit (avant 560) */
+  padding: 14px;
+  background: rgba(0,0,0,.38);
+  border-radius: 14px;
+  font-size: 13.5px;      /* ↓ légèrement plus petit */
+  line-height: 1.55;
+  overflow: auto;
+  white-space: pre;
+}
+
+/* Responsive */
 @media (max-width: 980px){
   #navigation .ax-media{
-    grid-template-columns: 1fr !important;
-  }
-
-  #navigation .ax-media-figure .ax-img{
-    min-width: 0 !important;
-    max-width: 520px !important;
+    grid-template-columns: 1fr;
   }
 
   #navigation .ax-media-text .ax-code{
-    min-height: auto !important;
-    max-height: 450px !important;
+    min-height: auto;
+    max-height: 420px;
+  }
+
+  #navigation .ax-media-figure .ax-img{
+    max-width: 420px;
   }
 }
-
-/* =========================================================
-   Anti-cache helper (optionnel)
-   -> Si rien ne change sur GitHub Pages, renomme le fichier
-   axiora.css -> axiora.v2.css puis change le <link> dans HTML.
-========================================================= */
