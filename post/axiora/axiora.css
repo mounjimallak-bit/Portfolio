@@ -23,12 +23,7 @@
   margin: 18px 0 34px;
 }
 
-.ax-iframe-full {
-  width: 100%;
-  height: 500px;
-  border: none;
-  background: transparent;
-}
+
 
 .ax-step {
   margin: 26px 0 34px;
@@ -92,40 +87,32 @@
 
 /* Container : définit l'encombrement final réel sur la page */
 .ax-table-poverty {
-  margin: 14px auto 26px;
   width: 100%;
-  height: 620px;
-  overflow: auto;
-  position: relative;
+  height: 520px; /* Même hauteur pour les deux */
+  margin: 18px 0 34px;
+  border-radius: 12px;
+  overflow: hidden; /* Côté sécurité : cache tout dépassement */
+  background: #fff; /* Évite les fonds vides si le tableau est court */
 }
 
+.ax-iframe-full {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
 /* Iframe pauvreté : on agrandit et on compense */
 .ax-iframe-poverty {
+  width: 100%; /* Prend toute la largeur de son conteneur */
+  height: 100%; /* Prend toute la hauteur */
   border: none;
-  background: transparent;
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  transform-origin: top left;
-  transform: scale(1.35);
-
-  width: calc(100% / 1.35);
-  height: calc(100% / 1.35);
+  zoom: 1.25; /* LE VRAI FIX : Le zoom natif du navigateur, aucun vide possible ! */
 }
 
-/*  Optionnel: sur grands écrans, on augmente encore un peu */
-@media (min-width: 1100px) {
-  .ax-table-poverty {
-    height: 640px;
-  }
-
-  .ax-iframe-poverty {
-    transform: scale(1.45);
-    width: calc(100% / 1.45);
-    height: calc(100% / 1.45);
-  }
+@media (max-width: 980px){
+  .ax-table-full, .ax-table-poverty { height: 460px; }
 }
+
+ 
 
 /* =========================================================
    Navigation & UI — SOLUTION FINALE (force taille image + code)
