@@ -987,29 +987,18 @@ st.markdown(f"""
           <li><strong>Signal recruteur :</strong> tu conçois une visualisation orientée produit, pas juste un graphique “par défaut”.</li>
         </ul>
 
-        <div class="card" style="margin-top:10px;">
-          <h3 style="margin-top:0;">Insight (texte portfolio)</h3>
-          <p class="ax-text" style="margin-bottom:0;">
-            <strong>L’Area Miroir</strong> met en évidence l’évolution et la concentration urbaine entre 2004 et 2014,
-            en révélant les territoires où l’urbanisation absorbe le plus la dynamique démographique
-            (pression sur infrastructures, logement, équipements publics).
-          </p>
-        </div>
-
-        <!-- Code uniquement pour miroir -->
         <button type="button" class="ax-btn" onclick="toggleCode('codePopMirror', this)">Afficher le code</button>
         <pre id="codePopMirror" class="ax-code hidden"><code>
 import plotly.graph_objects as go
 
 def area_miroir(df):
-    # df attendu: colonnes ["Province", "RGPH 2004 – Urbain", "RGPH 2014 – Urbain"]
     x = df["Province"]
     y_2004 = df["RGPH 2004 – Urbain"]
     y_2014 = df["RGPH 2014 – Urbain"]
 
     fig = go.Figure()
 
-    # 2014 (au-dessus)
+   
     fig.add_trace(go.Scatter(
         x=x, y=y_2014,
         mode="lines",
@@ -1017,7 +1006,7 @@ def area_miroir(df):
         name="2014 Urbain"
     ))
 
-    # 2004 (miroir en-dessous via valeurs négatives)
+   
     fig.add_trace(go.Scatter(
         x=x, y=[-v for v in y_2004],
         mode="lines",
