@@ -1390,42 +1390,35 @@ with col3:
 
 
 
+<h3 class="ax-subtitle">Habitat & Infrastructure</h3>
 
-   <section id="habitat" class="ax-section">
-  <div class="container">
-    <h3 class="ax-subtitle">Habitat & Infrastructure</h3>
+<p class="ax-lead">
+  L’habitat est un indicateur direct de <strong>pression urbaine</strong> et de <strong>capacité d’équipement</strong>.
+  L’objectif est d’identifier les écarts territoriaux et les zones atypiques (outliers).
+</p>
 
-    <p class="ax-lead">
-      L’habitat est un indicateur direct de <strong>pression urbaine</strong> et de <strong>capacité d’équipement</strong>.
-      Ici, l’objectif est d’identifier les écarts territoriaux et les zones atypiques (outliers).
-    </p>
-
-
-
-
-    <div class="ax-fullwidth" style="margin-top:12px;">
-  <img class="ax-img-wide"
-       src="images/newplot (5).png"
-       alt="Habitat — distribution par classe et année">
+<div class="ax-figure-full">
+  <figure class="ax-figure-card-full">
+    <h4 class="ax-figure-title">Distribution des indicateurs Habitat (2017–2018) — dispersion & outliers</h4>
+    <img class="ax-figure-img-full" src="images/newplot (5)" alt="Habitat — boxplot">
+  </figure>
 </div>
 
+<div class="card" style="margin-top:14px;">
+  <h3 style="margin-top:0;">Insights</h3>
+  <ul class="ax-list" style="margin-bottom:0;">
+    <li><strong>Dispersion :</strong> inégalité entre territoires (zones stables vs zones en tension).</li>
+    <li><strong>Outliers :</strong> signal de pression foncière / projets / urbanisation rapide.</li>
+    <li><strong>Décision :</strong> prioriser infrastructures selon la variabilité observée.</li>
+  </ul>
+</div>
 
-    
-    <div class="card" style="margin-top:14px;">
-      <h3 style="margin-top:0;">Insights</h3>
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Dispersion :</strong> mesure l’inégalité entre territoires (zones stables vs zones en tension).</li>
-        <li><strong>Outliers :</strong> signalent des communes/provinces atypiques (pression foncière, programmes, croissance rapide).</li>
-        <li><strong>Décision :</strong> prioriser infrastructure/lotissements/logements selon la variabilité observée.</li>
-      </ul>
-    </div>
-  </div>
-</section>
+<div class="ax-code-actions">
+  <button type="button" class="ax-btn" onclick="toggleCode('codeHabitat', this)">Afficher le code</button>
+</div>
 
-
-
-
-
+<pre id="codeHabitat" class="ax-code hidden"><code>
+</code></pre>
 
 
 
@@ -1434,74 +1427,90 @@ with col3:
 
 
 
+   <h3 class="ax-subtitle">Finance & Économie locale</h3>
 
+<p class="ax-lead">
+  Ce module compare la structure économique de <strong>Souss-Massa</strong> à l’échelle <strong>nationale</strong>,
+  pour situer le poids sectoriel et détecter les déséquilibres.
+</p>
 
+<div class="ax-figure-full">
+  <figure class="ax-figure-card-full">
+    <h4 class="ax-figure-title">Structure sectorielle — Souss-Massa vs Maroc (2015–2016)</h4>
+    <img class="ax-figure-img-full" src="images/newplot (6).png" alt="Finance — heatmap secteurs">
+  </figure>
+</div>
 
-   <section id="finance" class="ax-section">
-  <div class="container">
-    <h3 class="ax-subtitle">Finance & Économie locale</h3>
+<div class="card" style="margin-top:14px;">
+  <h3 style="margin-top:0;">Lecture</h3>
+  <ul class="ax-list" style="margin-bottom:0;">
+    <li><strong>Comparaison :</strong> vérifier si la région suit la structure nationale ou s’en démarque.</li>
+    <li><strong>Poids sectoriel :</strong> repérer les secteurs dominants / sous-représentés.</li>
+    <li><strong>Évolution :</strong> lire la dynamique 2015→2016 (croissance/ralentissement).</li>
+  </ul>
+</div>
 
-    <p class="ax-lead">
-      Ce module compare la structure économique de <strong>Souss-Massa</strong> à l’échelle <strong>nationale</strong>,
-      pour situer le poids sectoriel et détecter les déséquilibres.
-    </p>
+<div class="ax-code-actions">
+  <button type="button" class="ax-btn" onclick="toggleCode('codeFinance', this)">Afficher le code</button>
+</div>
 
+<pre id="codeFinance" class="ax-code hidden"><code>
 
-    
-    <div class="ax-fullwidth" style="margin-top:12px;">
-      <img class="ax-img-wide" src="images/newplot (6).png" alt="Heatmap secteurs — Souss-Massa vs Maroc">
-    </div>
-
-    <div class="card" style="margin-top:14px;">
-      <h3 style="margin-top:0;">Lecture</h3>
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Comparaison région/national :</strong> voir si Souss-Massa suit la structure du Maroc ou s’en démarque.</li>
-        <li><strong>Poids sectoriel :</strong> identifier les secteurs dominants et ceux sous-représentés.</li>
-        <li><strong>Évolution :</strong> 2015→2016 permet de repérer une dynamique (croissance/ralentissement) par secteur.</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-
-
-
-
-
+</code></pre>
 
 
 
 
 
+<h3 class="ax-subtitle">Enseignement & Capital Humain</h3>
+
+<p class="ax-lead">
+  Le capital humain conditionne l’emploi, la productivité et l’attractivité territoriale.
+  Cette vue compare les <strong>profils</strong> entre provinces sur plusieurs indicateurs.
+</p>
+
+<div class="ax-figure-full">
+  <figure class="ax-figure-card-full">
+    <h4 class="ax-figure-title">Profil multi-indicateurs — comparaison territoriale</h4>
+    <img class="ax-figure-img-full" src="images/newplot (7).png" alt="Enseignement — radar">
+  </figure>
+</div>
+
+<div class="card" style="margin-top:14px;">
+  <h3 style="margin-top:0;">Insights</h3>
+  <ul class="ax-list" style="margin-bottom:0;">
+    <li><strong>Lecture multi-dimensions :</strong> repérer rapidement provinces fortes/faibles.</li>
+    <li><strong>Écarts structurels :</strong> zones avec déficit d’accès/capacité.</li>
+    <li><strong>Décision :</strong> prioriser investissement & actions (infrastructure, soutien, qualité).</li>
+  </ul>
+</div>
+
+<div class="ax-code-actions">
+  <button type="button" class="ax-btn" onclick="toggleCode('codeEdu', this)">Afficher le code</button>
+</div>
+
+<pre id="codeEdu" class="ax-code hidden"><code>
+
+</code></pre>
 
 
 
-   <section id="enseignement" class="ax-section">
-  <div class="container">
-    <h3 class="ax-subtitle">Enseignement & Capital Humain</h3>
-
-    <p class="ax-lead">
-      Le capital humain conditionne l’emploi, la productivité et l’attractivité territoriale.
-      L’objectif ici est de comparer rapidement les <strong>profils éducatifs</strong> entre provinces.
-    </p>
-
-    <div class="ax-fullwidth" style="margin-top:12px;">
-      <img class="ax-img-wide" src="images/newplot (7).png" alt="Radar — indicateurs enseignement par province">
-    </div>
-
-    <div class="card" style="margin-top:14px;">
-      <h3 style="margin-top:0;">Ce que cette vue apporte</h3>
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Lecture multi-indicateurs :</strong> repérer rapidement les provinces fortes/faibles sur plusieurs dimensions.</li>
-        <li><strong>Profil territorial :</strong> mettre en évidence des écarts structurels (accès, capacité, effort public).</li>
-        <li><strong>Action :</strong> prioriser les leviers (infrastructure scolaire, soutien, qualité) par zone.</li>
-      </ul>
-    </div>
-  </div>
-</section>
+   
 
 
 
+
+
+
+
+
+
+
+
+
+   
+
+   
      </main>
     <footer class="footer">
       © 2026 — Malak Mounji
