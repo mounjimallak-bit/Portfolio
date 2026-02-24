@@ -1119,13 +1119,13 @@ def area_miroir(df):
   <button type="button"
           class="ax-btn"
           onclick="toggleCode('codeForecastApp', this)">
-    Afficher le code de prévision (app.py)
+    Afficher le code 
   </button>
 </div>
 
 <!--  CODE CACHE PAR DEFAUT -->
 <pre id="codeForecastApp" class="ax-code hidden"><code>
-# ===== EXEMPLE EXTRAIT app.py =====
+
 
 import numpy as np
 import pandas as pd
@@ -1137,7 +1137,7 @@ def forecast_population(df_hist, horizon=3):
 
     df_hist = df_hist.sort_values("Année").copy()
 
-    # Split temporel (pas de shuffle)
+ 
     split = int(len(df_hist) * 0.8)
     train = df_hist.iloc[:split]
     test  = df_hist.iloc[split:]
@@ -1148,7 +1148,7 @@ def forecast_population(df_hist, horizon=3):
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    # Projection future
+   
     last_year = int(df_hist["Année"].max())
     future_years = np.arange(last_year + 1, last_year + 1 + horizon)
     y_future = model.predict(future_years.reshape(-1, 1))
