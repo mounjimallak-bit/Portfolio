@@ -990,9 +990,8 @@ st.markdown(f"""
 
         <ul class="ax-list">
           <li><strong>Lecture immédiate :</strong> 2004 ↔ 2014 sur un même axe.</li>
-          <li><strong>Insight :</strong> repérer où la croissance se concentre dans l’urbain (pression sur habitat et services).</li>
-          <li><strong>Signal recruteur :</strong> tu conçois une visualisation orientée produit, pas juste un graphique “par défaut”.</li>
-        </ul>
+          <li><strong>connaissances :</strong> repérer où la croissance se concentre dans l’urbain (pression sur habitat et services).</li>
+            </ul>
 
         <button type="button" class="ax-btn" onclick="toggleCode('codePopMirror', this)">Afficher le code</button>
         <pre id="codePopMirror" class="ax-code hidden"><code>
@@ -1037,176 +1036,6 @@ def area_miroir(df):
       </div>
 
     </div>
-
-  <!-- ========================================================= -->
-<!-- 4) Prévision (ML) — grille 3x3 + analyse globale -->
-<!-- ========================================================= -->
-<h3 class="ax-subtitle">2) Prévision (ML) — projection démographique & aide à la décision</h3>
-
-<p class="ax-text">
-  L’objectif ici n’est pas seulement de “prédire une courbe”, mais de transformer l’exploration en
-  <strong>capacité d’anticipation</strong> : identifier les provinces qui accélèrent, mesurer l’écart
-  <strong>réel vs prédit</strong>, et disposer d’un signal exploitable pour planifier
-  infrastructures, services publics et besoins urbains.
-</p>
-
-<div class="card" style="margin-top:12px;">
- 
-  <ul class="ax-list" style="margin-bottom:0;">
-    <li><strong>Split temporel strict</strong> (pas de shuffle) : on teste sur la fin de série pour éviter toute fuite d’information.</li>
-    <li><strong>Baseline solide</strong> (régression) : modèle simple, interprétable, parfait pour un premier forecasting + comparaison.</li>
-    <li><strong>Validation</strong> : métriques (ex. MAE/MAPE) + lecture visuelle des écarts pour juger la stabilité.</li>
-    <li><strong>Scénarios</strong> : urbain / rural / total → lecture opérationnelle (pression urbaine, exode rural, besoins équipements).</li>
-  </ul>
-</div>
-
-<!--  9 visuels (3 par ligne) -->
-<div class="ax-pred-grid-3">
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Total (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/tot_pr.png" alt="Prévision Total">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Urbain (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/urb_pr.png" alt="Prévision Urbain">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Rural (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/rurale_pr.png" alt="Prévision Rural">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Cercles (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/cercle_pr.png" alt="Prévision Cercles">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Évolution structurelle — Cercles</h4>
-    <img class="ax-pred-img" src="images/cercle_ev.png" alt="Évolution Cercles">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Population — comparaison multi-provinces</h4>
-    <img class="ax-pred-img" src="images/pop.png" alt="Population multi-provinces">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Population — focus tendance (provinces)</h4>
-    <img class="ax-pred-img" src="images/pop-pro.png" alt="Population provinces trend">
-  </figure>
-
-  <!--  (8/9) Mets ici ta prochaine capture (garde le nom, ou change-le si tu veux) -->
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Comparatif (option)</h4>
-    <img class="ax-pred-img" src="images/popannee_pr.png" alt="Prévision comparatif">
-  </figure>
-
-  <!--  (9/9) Mets ici ta prochaine capture -->
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Erreurs / stabilité (option)</h4>
-    <img class="ax-pred-img" src="images/population_pr.png" alt="Prévision par annees">
-  </figure>
-
-</div>
-
-
-<div class="card" style="margin-top:14px;">
-  <p class="ax-text" style="margin-bottom:0;">
-    La lecture croisée des trajectoires (<strong>Total / Urbain / Rural</strong>) met en évidence la dynamique de
-    concentration et ses effets : certaines provinces absorbent la croissance plus rapidement, ce qui se traduit par
-    une pression sur l’habitat, la mobilité et les équipements. Le bloc “prévision” apporte une dimension
-    <strong>pilotage</strong> : comparer le réel au prédit, quantifier l’écart et produire une projection court terme
-    pour orienter priorisation et scénarios (urbanisation vs maintien rural).
-  </p>
-</div>
-    <div style="margin: 12px 0 18px 0;">
-  <button type="button"
-          class="ax-btn"
-          onclick="toggleCode('codeForecastApp', this)">
-    Afficher le code 
-  </button>
-</div>
-
-<!--  CODE CACHE PAR DEFAUT -->
-<pre id="codeForecastApp" class="ax-code hidden"><code>
-
-
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error
-import plotly.graph_objects as go
-
-def forecast_population(df_hist, horizon=3):
-
-    df_hist = df_hist.sort_values("Année").copy()
-
- 
-    split = int(len(df_hist) * 0.8)
-    train = df_hist.iloc[:split]
-    test  = df_hist.iloc[split:]
-
-    X_train = train["Année"].values.reshape(-1, 1)
-    y_train = train["Population"].values
-
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-
-   
-    last_year = int(df_hist["Année"].max())
-    future_years = np.arange(last_year + 1, last_year + 1 + horizon)
-    y_future = model.predict(future_years.reshape(-1, 1))
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=df_hist["Année"],
-        y=df_hist["Population"],
-        mode="lines+markers",
-        name="Réel"
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=future_years,
-        y=y_future,
-        mode="lines+markers",
-        name="Prévision"
-    ))
-
-    return fig
-</code></pre>
-  </div>
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1812,7 +1641,334 @@ def render_choropleth(df_indic):
 
    
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section id="ml" class="ax-section">
+  <div class="container">
+
+    <div class="section-head">
+      <h1>Prévision & Machine Learning</h1>
+    </div>
+
+    <p class="ax-lead">
+      L'exploration des données permet de comprendre le passé, mais la véritable valeur de la Data Science réside dans sa capacité à <strong>éclairer l'avenir</strong>. Pour faire d'AXIORA un véritable outil d'aide à la décision, j'ai implémenté un module de prévision (Forecasting) basé sur <code>Scikit-Learn</code> pour anticiper les trajectoires socio-économiques de la région Souss-Massa.
+    </p>
+
+    <h3 id="objectif-prevision" class="ax-subtitle" style="margin-top: 40px;"> Objectifs des prévisions</h3>
+    
+    <div class="card" style="margin-top:15px; border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.05);">
+      <p class="ax-text" style="margin-top: 0;">
+        <strong>Passer d'une posture réactive à une posture proactive.</strong> 
+        Au lieu de constater l'exode rural ou le vieillissement de la population après coup, les modèles prédictifs permettent aux décideurs publics de :
+      </p>
+      <ul class="ax-list" style="margin-bottom: 0;">
+        <li><strong>Anticiper les besoins en infrastructures :</strong> Prévoir le dimensionnement des écoles, hôpitaux ou réseaux d'eau pour les 5 à 10 prochaines années.</li>
+        <li><strong>Allouer les budgets efficacement :</strong> Cibler de manière préventive les communes où le modèle détecte une trajectoire d'appauvrissement.</li>
+        <li><strong>Scénariser l'avenir :</strong> Fixer des objectifs quantifiables pour les politiques de développement régional.</li>
+      </ul>
+    </div>
+
+    <br>
+
+    <h3 id="modele" class="ax-subtitle"> Modèle utilisé (Régression linéaire)</h3>
+
+    <div class="ax-media" style="align-items: center; gap: 30px;">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Face à la tentation d'utiliser des modèles "boîtes noires" complexes, j'ai délibérément choisi un modèle de <strong>Régression Linéaire</strong>. C'est un choix d'ingénierie assumé, dicté par la nature des données du HCP :
+        </p>
+        <ul class="ax-list">
+          <li><strong>Prévention de l'Overfitting :</strong> Les données de recensement sont historiquement espacées (10 ans). Un modèle complexe sur-apprendrait sur un si petit nombre de points temporels. La régression linéaire capture parfaitement la tendance macro-économique de fond.</li>
+          <li><strong>Interprétabilité totale :</strong> Les décideurs publics doivent comprendre <em>pourquoi</em> un modèle prédit un chiffre. Les coefficients linéaires offrent une transparence absolue.</li>
+          <li><strong>Stabilité démographique :</strong> Les phénomènes de population ont une forte inertie. La modélisation linéaire est mathématiquement très robuste pour prolonger ces trajectoires.</li>
+        </ul>
+      </div>
+    </div>
+
+    <br><br>
+
+    <h3 id="pipeline" class="ax-subtitle"> Pipeline de prévision</h3>
+
+    <p class="ax-text">
+      Pour automatiser les prédictions à la volée selon les filtres choisis par l'utilisateur, j'ai architecturé un pipeline de Machine Learning complet garantissant l'intégrité des résultats :
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 20px;">
+      
+      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="color: #3b82f6; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Data Prep</h4>
+        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
+          Nettoyage des séries temporelles et transformation des formats (<code>pd.melt</code>) pour isoler la variable indépendante (Année) de la cible.
+        </p>
+      </div>
+
+      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="color: #3b82f6; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Split Temporel</h4>
+        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
+          Séparation Train/Test <strong>sans mélange aléatoire (No Shuffle)</strong> pour respecter la chronologie et éviter la fuite de données (<em>Data Leakage</em>).
+        </p>
+      </div>
+
+      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="color: #3b82f6; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Entraînement</h4>
+        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
+          Apprentissage du modèle sur les données passées et évaluation via la métrique <strong>MAE (Mean Absolute Error)</strong> sur le jeu de test.
+        </p>
+      </div>
+
+      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
+        <h4 style="color: #3b82f6; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Inférence</h4>
+        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
+          Génération des horizons temporels futurs (tableaux NumPy) et projection du modèle pour alimenter l'interface utilisateur.
+        </p>
+      </div>
+
+    </div>
+
+    <br><br>
+
+    <h3 id="visualisation-pred" class="ax-subtitle"> Visualisation des prédictions</h3>
+
+
+  <!-- ========================================================= -->
+<!-- 4) Prévision (ML) — grille 3x3 + analyse globale -->
+<!-- ========================================================= -->
+
+<p class="ax-text">
+  L’objectif ici n’est pas seulement de “prédire une courbe”, mais de transformer l’exploration en
+  <strong>capacité d’anticipation</strong> : identifier les provinces qui accélèrent, mesurer l’écart
+  <strong>réel vs prédit</strong>, et disposer d’un signal exploitable pour planifier
+  infrastructures, services publics et besoins urbains.
+</p>
+
+<div class="card" style="margin-top:12px;">
+ 
+  <ul class="ax-list" style="margin-bottom:0;">
+    <li><strong>Split temporel strict</strong> (pas de shuffle) : on teste sur la fin de série pour éviter toute fuite d’information.</li>
+    <li><strong>Baseline solide</strong> (régression) : modèle simple, interprétable, parfait pour un premier forecasting + comparaison.</li>
+    <li><strong>Validation</strong> : métriques (ex. MAE/MAPE) + lecture visuelle des écarts pour juger la stabilité.</li>
+    <li><strong>Scénarios</strong> : urbain / rural / total → lecture opérationnelle (pression urbaine, exode rural, besoins équipements).</li>
+  </ul>
+</div>
+
+<!--  9 visuels (3 par ligne) -->
+<div class="ax-pred-grid-3">
+
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Total (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/tot_pr.png" alt="Prévision Total">
+  </figure>
+
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Urbain (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/urb_pr.png" alt="Prévision Urbain">
+  </figure>
+
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Rural (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/rurale_pr.png" alt="Prévision Rural">
+  </figure>
+
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Cercles (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/cercle_pr.png" alt="Prévision Cercles">
+  </figure>
+
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Évolution structurelle — Cercles</h4>
+    <img class="ax-pred-img" src="images/cercle_ev.png" alt="Évolution Cercles">
+  </figure>
+
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Population — comparaison multi-provinces</h4>
+    <img class="ax-pred-img" src="images/pop.png" alt="Population multi-provinces">
+  </figure>
+
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Population — focus tendance (provinces)</h4>
+    <img class="ax-pred-img" src="images/pop-pro.png" alt="Population provinces trend">
+  </figure>
+
+  <!--  (8/9) Mets ici ta prochaine capture (garde le nom, ou change-le si tu veux) -->
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Comparatif (option)</h4>
+    <img class="ax-pred-img" src="images/popannee_pr.png" alt="Prévision comparatif">
+  </figure>
+
+  <!--  (9/9) Mets ici ta prochaine capture -->
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Erreurs / stabilité (option)</h4>
+    <img class="ax-pred-img" src="images/population_pr.png" alt="Prévision par annees">
+  </figure>
+
+</div>
+
+
+<div class="card" style="margin-top:14px;">
+  <p class="ax-text" style="margin-bottom:0;">
+    La lecture croisée des trajectoires (<strong>Total / Urbain / Rural</strong>) met en évidence la dynamique de
+    concentration et ses effets : certaines provinces absorbent la croissance plus rapidement, ce qui se traduit par
+    une pression sur l’habitat, la mobilité et les équipements. Le bloc “prévision” apporte une dimension
+    <strong>pilotage</strong> : comparer le réel au prédit, quantifier l’écart et produire une projection court terme
+    pour orienter priorisation et scénarios (urbanisation vs maintien rural).
+  </p>
+</div>
+    <div style="margin: 12px 0 18px 0;">
+  <button type="button"
+          class="ax-btn"
+          onclick="toggleCode('codeForecastApp', this)">
+    Afficher le code 
+  </button>
+</div>
+
+<!--  CODE CACHE PAR DEFAUT -->
+<pre id="codeForecastApp" class="ax-code hidden"><code>
+
+
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+import plotly.graph_objects as go
+
+def forecast_population(df_hist, horizon=3):
+
+    df_hist = df_hist.sort_values("Année").copy()
+
+ 
+    split = int(len(df_hist) * 0.8)
+    train = df_hist.iloc[:split]
+    test  = df_hist.iloc[split:]
+
+    X_train = train["Année"].values.reshape(-1, 1)
+    y_train = train["Population"].values
+
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
    
+    last_year = int(df_hist["Année"].max())
+    future_years = np.arange(last_year + 1, last_year + 1 + horizon)
+    y_future = model.predict(future_years.reshape(-1, 1))
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=df_hist["Année"],
+        y=df_hist["Population"],
+        mode="lines+markers",
+        name="Réel"
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=future_years,
+        y=y_future,
+        mode="lines+markers",
+        name="Prévision"
+    ))
+
+    return fig
+</code></pre>
+  </div>
+</section>
+
+
+    
+    <br><br>
+
+    <h3 id="extensions" class="ax-subtitle"> Extensions possibles</h3>
+
+    <p class="ax-text">
+      L'architecture analytique d'AXIORA a été conçue de manière modulaire. Bien que la régression linéaire réponde parfaitement au besoin actuel, voici la <em>roadmap</em> technique pour enrichir la capacité prédictive du système :
+    </p>
+
+    <div class="card" style="margin-top: 15px;">
+      <ul class="ax-list" style="margin-bottom: 0;">
+        <li><strong>Séries temporelles avancées (Prophet) :</strong> Si le HCP publie des données à fréquence mensuelle, l'intégration de Prophet (Meta) permettra de modéliser les effets de saisonnalité intra-annuelle.</li>
+        <li><strong>Machine Learning Non-Linéaire (XGBoost) :</strong> Pour modéliser des indicateurs complexes (comme l'indice de pauvreté) en intégrant de multiples variables croisées (multivarié) plutôt qu'une simple série temporelle univariée.</li>
+        <li><strong>Variables Exogènes :</strong> Améliorer la précision des prévisions en injectant des données géospatiales ou externes (données climatiques, investissements publics INDH) comme nouvelles <em>Features</em> dans le modèle d'apprentissage.</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
      </main>
     <footer class="footer">
       © 2026 — Malak Mounji
