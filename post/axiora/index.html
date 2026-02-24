@@ -1318,28 +1318,69 @@ def forecast_population(df_hist, horizon=3):
 </div>
 
 <pre id="codeWorkCorr" class="ax-code hidden"><code>
-# Exemple (Plotly) : taux d'activité par niveau & milieu
-# df attendu (format long) : colonnes ["Année","Milieu","Niveau","Valeur"]
+df = pd.DataFrame(data)
 
-import plotly.express as px
+col1, col2, col3 = st.columns([1, 2, 1])
 
-fig = px.line(
-    df,
-    x="Niveau",
-    y="Valeur",
-    color="Année",
-    line_dash="Milieu",
-    markers=True,
-    title="Évolution du taux d'activité par niveau et milieu"
-)
 
-fig.update_layout(
-    xaxis_title="Niveau",
-    yaxis_title="Valeur",
-    legend_title="Année, Milieu"
-)
+with col1:
+    year_options = ["2016", "2017", "2018"]
+    selected_year = st.selectbox("Choisir l'année", year_options)
+    graph_options = ["scatter chart", "Line Plot", "Bar Plot"]
+    graph_type = st.selectbox("Type de graphique", graph_options, index=2)
 
-st.plotly_chart(fig, use_container_width=True)
+    show_urbain = st.checkbox("Urbain", True, key="chec7")
+    show_rural  = st.checkbox("Rural", True, key="chec8")
+    show_total  = st.checkbox("Total", True, key="chec9")
+
+
+columns_to_plot = []
+if show_urbain:
+    columns_to_plot.append(f"{selected_year} – Urbain")
+if show_rural:
+    columns_to_plot.append(f"{selected_year} – Rural")
+if show_total:
+    columns_to_plot.append(f"{selected_year} – Total")
+
+
+with col2:
+    if not columns_to_plot:
+        st.warning("⚠ Veuillez sélectionner au moins un indicateur !")
+    else:
+        # --- Graphiques ---
+        if graph_type == "Line Plot":
+            fig = px.line(
+                df, x="Provinces", y=columns_to_plot, markers=True,
+                color_discrete_sequence=custom_colors
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+        elif graph_type == "scatter chart":
+            if len(columns_to_plot) >= 2:
+                x_col = columns_to_plot[0]
+                y_col = columns_to_plot[1]
+            else:
+                # si un seul indicateur choisi → x = Provinces, y = colonne
+                x_col = "Provinces"
+                y_col = columns_to_plot[0]
+
+            fig = px.scatter(
+                df, x=x_col, y=y_col, text="Provinces",
+                size_max=20, color_discrete_sequence=custom_colors
+            )
+            fig.update_traces(textposition="top center")
+            st.plotly_chart(fig, use_container_width=True)
+
+        else:  # Bar Plot
+            fig = px.bar(
+                df, x="Provinces", y=columns_to_plot, barmode="group",
+                color_discrete_sequence=custom_colors
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
+
+with col3:
+    st.dataframe(df[["Provinces"] + columns_to_plot], use_container_width=True)
 </code></pre>
   </div>
 </section>
