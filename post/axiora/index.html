@@ -1400,7 +1400,7 @@ with col3:
 <div class="ax-figure-full">
   <figure class="ax-figure-card-full">
     <h4 class="ax-figure-title">Distribution des indicateurs Habitat (2017–2018) — dispersion & outliers</h4>
-    <img class="ax-figure-img-full" src="images/newplot (5)" alt="Habitat — boxplot">
+    <img class="ax-figure-img-full" src="images/newplot (5).png" alt="Habitat — boxplot">
   </figure>
 </div>
 
@@ -1418,6 +1418,31 @@ with col3:
 </div>
 
 <pre id="codeHabitat" class="ax-code hidden"><code>
+  import plotly.express as px
+import pandas as pd
+import streamlit as st
+
+def render_habitat(df_habitat):
+
+    st.subheader("Habitat & Infrastructure")
+
+    fig = px.box(
+        df_habitat,
+        x="Classe_Annee",
+        y="Effectifs",
+        color="Classe_Annee",
+        points="outliers",
+        title="Distribution des indicateurs Habitat (2017–2018)"
+    )
+
+    fig.update_layout(
+        template="plotly_white",
+        title_x=0.5,
+        xaxis_title="Classe / Année",
+        yaxis_title="Effectifs"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 </code></pre>
 
 
@@ -1455,7 +1480,30 @@ with col3:
 </div>
 
 <pre id="codeFinance" class="ax-code hidden"><code>
+import plotly.express as px
+import pandas as pd
+import streamlit as st
 
+def render_finance(df_finance):
+
+    st.subheader("Finance & Économie locale")
+
+    fig = px.imshow(
+        df_finance,
+        text_auto=True,
+        color_continuous_scale="YlGnBu",
+        aspect="auto",
+        title="Structure sectorielle — Souss-Massa vs Maroc"
+    )
+
+    fig.update_layout(
+        template="plotly_white",
+        title_x=0.5,
+        xaxis_title="Territoire / Année",
+        yaxis_title="Secteurs"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 </code></pre>
 
 
@@ -1490,7 +1538,32 @@ with col3:
 </div>
 
 <pre id="codeEdu" class="ax-code hidden"><code>
+import plotly.graph_objects as go
+import streamlit as st
 
+def render_enseignement(categories, values_dict):
+
+    st.subheader("Enseignement & Capital Humain")
+
+    fig = go.Figure()
+
+    for province, values in values_dict.items():
+        fig.add_trace(go.Scatterpolar(
+            r=values,
+            theta=categories,
+            fill='toself',
+            name=province
+        ))
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(visible=True)
+        ),
+        showlegend=True,
+        title="Profil multi-indicateurs — Comparaison territoriale"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 </code></pre>
 
 
