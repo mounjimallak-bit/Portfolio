@@ -1107,7 +1107,6 @@ def area_miroir(df):
 
 <!-- Analyse globale (pas de texte pour 2 images seules) -->
 <div class="card" style="margin-top:14px;">
- 
   <p class="ax-text" style="margin-bottom:0;">
     La lecture croisée des trajectoires (<strong>Total / Urbain / Rural</strong>) met en évidence la dynamique de
     concentration et ses effets : certaines provinces absorbent la croissance plus rapidement, ce qui se traduit par
@@ -1116,6 +1115,62 @@ def area_miroir(df):
     pour orienter priorisation et scénarios (urbanisation vs maintien rural).
   </p>
 </div>
+    <div style="margin: 12px 0 18px 0;">
+  <button type="button"
+          class="ax-btn"
+          onclick="toggleCode('codeForecastApp', this)">
+    Afficher le code de prévision (app.py)
+  </button>
+</div>
+
+<!--  CODE CACHE PAR DEFAUT -->
+<pre id="codeForecastApp" class="ax-code hidden"><code>
+# ===== EXEMPLE EXTRAIT app.py =====
+
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+import plotly.graph_objects as go
+
+def forecast_population(df_hist, horizon=3):
+
+    df_hist = df_hist.sort_values("Année").copy()
+
+    # Split temporel (pas de shuffle)
+    split = int(len(df_hist) * 0.8)
+    train = df_hist.iloc[:split]
+    test  = df_hist.iloc[split:]
+
+    X_train = train["Année"].values.reshape(-1, 1)
+    y_train = train["Population"].values
+
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    # Projection future
+    last_year = int(df_hist["Année"].max())
+    future_years = np.arange(last_year + 1, last_year + 1 + horizon)
+    y_future = model.predict(future_years.reshape(-1, 1))
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=df_hist["Année"],
+        y=df_hist["Population"],
+        mode="lines+markers",
+        name="Réel"
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=future_years,
+        y=y_future,
+        mode="lines+markers",
+        name="Prévision"
+    ))
+
+    return fig
+</code></pre>
   </div>
 </section>
 
