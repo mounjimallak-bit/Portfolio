@@ -1595,7 +1595,145 @@ def render_enseignement(categories, values_dict):
 
 
 
+<section id="cartes" class="ax-section">
+  <div class="container">
 
+    <div class="section-head">
+      <h1>Cartes géographiques</h1>
+    </div>
+
+    <p class="ax-lead">
+      Dans l'analyse des données publiques, la cartographie ne doit pas être simplement décorative. Elle est le meilleur outil pour <strong>localiser les disparités territoriales</strong>. Pour Axiora Data, j'ai mis en place un pipeline géospatial complet transformant des tableaux de données brutes en cartes choroplèthes interactives.
+    </p>
+
+    <div class="card" style="margin-top:20px; background: rgba(59, 130, 246, 0.05); border-left: 4px solid #3b82f6;">
+      <h3 style="margin-top:0; color:#3b82f6;">💡 Le Défi : Réconcilier deux mondes de données</h3>
+      <p class="ax-text" style="margin-bottom:0;">
+        La complexité de ce module réside dans la fusion de données structurellement incompatibles : les tableaux statistiques (HCP) et les polygones géométriques (Shapefiles). Une simple jointure SQL échoue souvent à cause des différences de nommage. Il a fallu développer un algorithme de nettoyage pour garantir une jointure spatiale parfaite.
+      </p>
+    </div>
+
+    <div class="ax-compare-grid">
+      <div class="ax-compare-card">
+        <h4>📊 Données Statistiques (HCP)</h4>
+        <pre class="ax-code"><code># Fichier tabulaire classique
+Province                 | Taux_Pauvreté
+----------------------------------------
+Agadir Ida Outanane (M)  | 0.39         
+Chtouka- Ait Baha        | 7.9          
+Taroudannt               | 12.5         </code></pre>
+      </div>
+
+      <div class="ax-compare-card">
+        <h4>🌍 Données Spatiales (Shapefile / XML)</h4>
+        <pre class="ax-code"><code>&lt;!-- Extrait géométrique (mar_admbnda_adm2_hcp) --&gt;
+&lt;metadata xml:lang="en"&gt;
+  &lt;Esri&gt;
+    &lt;DataProperties&gt;
+      &lt;lineage&gt;
+        &lt;Process Name="Create Feature Class"&gt;
+          XXX_admbnda_adm2 POLYGON
+        &lt;/Process&gt;
+      &lt;/lineage&gt;
+    &lt;/DataProperties&gt;
+  &lt;/Esri&gt;
+&lt;/metadata&gt;</code></pre>
+      </div>
+    </div>
+
+    <br>
+
+    <h3 id="choropleth" class="ax-subtitle">1) Cartes choroplèthes</h3>
+
+    <div class="ax-media ax-media-equal">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Une fois les clés de jointure standardisées (retrait des accents, tirets, mentions "(M)"), j'utilise <code>GeoPandas</code> pour fusionner le <code>DataFrame</code> statistique avec le <code>GeoDataFrame</code>. Cette étape génère la <strong>carte choroplèthe</strong> où l'intensité de la couleur reflète directement la valeur de l'indicateur sélectionné.
+        </p>
+
+        <button type="button" class="ax-btn" onclick="toggleCode('codeMapBuild', this)">Afficher le pipeline GeoPandas</button>
+        <pre id="codeMapBuild" class="ax-code hidden"><code>
+import streamlit as st
+import pandas as pd
+import geopandas as gpd
+import plotly.express as px
+
+@st.cache_data
+def load_shapefile(path):
+    return gpd.read_file(path)
+
+def render_choropleth(df_indic):
+    gdf_provinces = load_shapefile("mar_admbnda_adm2_hcp_20230925.shp")
+
+    # Mapping et nettoyage pour la jointure spatiale
+    province_mapping = {
+        'Agadir Ida Outanane': 'Agadir Ida Ou Tanane',
+        'Chtouka Ait Baha': 'Chtouka- Ait Baha',
+        'Inezgane Ait Melloul': 'Inezgane-Ait Melloul',
+        'Taroudant': 'Taroudannt'
+    }
+    
+    df_indic = df_indic.copy()
+    df_indic["join_key"] = df_indic["Province"].replace(province_mapping)
+    gdf_provinces["join_key"] = gdf_provinces["ADM2_FR"]
+
+    # La Jointure : Fusion stats + géométrie
+    gdf_merged = gdf_provinces.merge(df_indic, on="join_key", how="inner")
+
+    # Rendu Plotly Mapbox
+    fig_map = px.choropleth_mapbox(
+        gdf_merged,
+        geojson=gdf_merged.geometry,
+        locations=gdf_merged.index,
+        color="Valeur",
+        mapbox_style="open-street-map",
+        color_continuous_scale="Blues"
+    )
+    return fig_map
+        </code></pre>
+      </div>
+
+      <div class="ax-media-figure" style="display: flex;">
+        <img class="ax-img ax-img-nocrop" src="images/capture_carte_choro.png" alt="Carte choroplèthe du Souss-Massa">
+      </div>
+    </div>
+
+    <br><br>
+
+    <h3 id="tooltips" class="ax-subtitle">2) Tooltips & zoom</h3>
+
+    <p class="ax-text">
+      Pour transformer cette carte en véritable outil d'exploration, j'ai exploité l'API de <code>Plotly Mapbox</code> afin d'optimiser l'expérience utilisateur (UX Spatiale) :
+    </p>
+
+    <div class="card" style="margin-top:12px;">
+      <ul class="ax-list" style="margin-bottom:0;">
+        <li><strong>Tooltips (Info-bulles) :</strong> Configurés via <code>hover_name</code>. Au survol d'une commune ou d'une province, la carte révèle instantanément le nom du territoire et la valeur exacte, évitant de devoir décrypter l'échelle de couleurs.</li>
+        <li><strong>Zoom automatique :</strong> Les coordonnées sont pré-centrées sur la région Souss-Massa (<code>lat: 30.2, lon: -9.0</code>) avec un zoom optimisé (<code>zoom=6.5</code>) dès le chargement de la page.</li>
+      </ul>
+    </div>
+
+    <br><br>
+
+    <h3 id="filtrage" class="ax-subtitle">3) Filtrage par année / zone</h3>
+
+    <div class="ax-media">
+      <div class="ax-media-figure" style="flex: 40%;">
+        <img class="ax-img" src="images/capture_filtres_carte.png" alt="Filtres interactifs pour la carte" style="max-height: 250px; object-fit: contain;">
+      </div>
+      
+      <div class="ax-media-text" style="flex: 60%;">
+        <p class="ax-text">
+          La carte n'est pas statique ; elle est entièrement réactive et pilotée par l'état global de l'application (<code>st.session_state</code>).
+        </p>
+        <p class="ax-text">
+          L'utilisateur interagit avec des filtres pour modifier dynamiquement <strong>l'Année étudiée</strong>, <strong>l'Indicateur</strong>, ou la <strong>Zone de granularité</strong> (Province vs Commune). À chaque interaction, le script Python recalcule le DataFrame, met à jour la jointure spatiale en arrière-plan, et redessine la carte instantanément avec la nouvelle échelle colorimétrique adaptée aux données filtrées.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
 
    
 
