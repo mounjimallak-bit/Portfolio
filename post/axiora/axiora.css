@@ -240,7 +240,7 @@
    POPULATION — Mirror + Prediction grid (3 par ligne)
 ========================================================= */
 
-/* ✅ Miroir: 2 colonnes égales */
+/* Miroir: 2 colonnes égales */
 .ax-media-equal{
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
@@ -248,7 +248,7 @@
   align-items: start !important;
 }
 
-/* ✅ Miroir: même “dimension visuelle” que le code (hauteur fixe) */
+/* Miroir: même “dimension visuelle” que le code (hauteur fixe) */
 .ax-mirror-sameheight .ax-media-figure{
   height: 360px;              /* ajuste si tu veux: 320 / 380 / 420 */
   border-radius: 14px;
@@ -261,14 +261,14 @@
   padding: 10px;
 }
 
-/* ✅ Image miroir: jamais coupée */
+/* Image miroir: jamais coupée */
 .ax-mirror-sameheight .ax-img{
   width: 100%;
   height: 100%;
   object-fit: contain;        /* clé: pas de crop */
 }
 
-/* ✅ Code: même hauteur que l’image miroir */
+/*  Code: même hauteur que l’image miroir */
 .ax-mirror-sameheight .ax-code{
   height: 360px;              /* doit matcher la hauteur ci-dessus */
   overflow: auto;
@@ -312,4 +312,99 @@
   .ax-pred-grid-3{
     grid-template-columns: 1fr;
   }
+}
+
+
+
+
+/* =========================================================
+   EXPLORATION DES INDICES — Design Textuel (Sans Images)
+========================================================= */
+
+.ax-index-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.ax-index-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border-left: 6px solid #3b82f6; /* Ligne bleue sur le côté */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ax-index-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.ax-index-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.ax-index-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1E293B;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ax-kpi-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ax-kpi-badge {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ax-index-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #4B5563;
+  margin-bottom: 20px;
+}
+
+.ax-insight-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+}
+
+.ax-insight-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.ax-insight-text {
+  font-size: 15px;
+  color: #334155;
+  margin: 0;
+  font-style: italic;
 }
