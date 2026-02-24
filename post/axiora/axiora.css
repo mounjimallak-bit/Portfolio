@@ -274,27 +274,29 @@
   overflow: auto;
 }
 
-/* ✅ Prediction: grid 3 par ligne */
+/* ===== POPULATION — PREDICTION GRID (3 colonnes) ===== */
 .ax-pred-grid-3{
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;                  /* “bien collé” */
+  gap: 14px;
   align-items: start;
+  margin-top: 14px;
 }
 
-/* Carte image prédiction (simple) */
-.ax-pred-item{
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.03);
+.ax-pred-card{
+  margin: 0;
   padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  box-shadow: 0 10px 28px rgba(0,0,0,.22);
 }
 
 .ax-pred-title{
   font-size: 13px;
   font-weight: 700;
   margin: 0 0 8px 0;
-  opacity: .9;
+  opacity: .92;
 }
 
 .ax-pred-img{
@@ -302,20 +304,12 @@
   height: auto;
   display: block;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
 }
 
-/* ✅ Responsive */
+/* Responsive */
 @media (max-width: 980px){
-  .ax-media-equal{
-    grid-template-columns: 1fr !important;
-  }
-  .ax-mirror-sameheight .ax-media-figure,
-  .ax-mirror-sameheight .ax-code{
-    height: auto;
-  }
   .ax-pred-grid-3{
     grid-template-columns: 1fr;
   }
 }
-
