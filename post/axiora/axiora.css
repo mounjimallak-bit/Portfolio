@@ -551,4 +551,49 @@
 
 
 
+/* =========================================================
+   FIX : Empêcher le conteneur de sortir de l'écran
+========================================================= */
 
+.ax-media-equal {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+  max-width: 100%; /* Sécurité globale */
+}
+
+/* LA MAGIE EST ICI : min-width: 0 empêche le texte/code de forcer la largeur */
+.ax-media-equal .ax-media-text,
+.ax-media-equal .ax-media-figure {
+  min-width: 0; 
+  display: flex;
+  flex-direction: column;
+}
+
+/* On encadre strictement le bloc de code pour qu'il reste dans la boîte */
+.ax-media-equal .ax-code {
+  max-width: 100%; /* Ne dépassera jamais de la colonne */
+  width: 100%; 
+  overflow-x: auto; /* Active le scroll horizontal si la ligne est trop longue */
+  overflow-y: auto; /* Active le scroll vertical si le code a trop de lignes */
+  max-height: 400px; /* Empêche le code de prendre 2 mètres de haut */
+  margin-top: 15px; /* Un peu d'espace avec le bouton */
+  box-sizing: border-box; /* Inclut le padding dans la largeur 100% */
+}
+
+/* On s'assure que l'image s'adapte correctement à côté */
+.ax-img-nocrop {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.22);
+}
+
+/* Responsive pour mobile : on passe sur 1 seule colonne */
+@media (max-width: 980px) {
+  .ax-media-equal {
+    grid-template-columns: 1fr !important;
+  }
+}
