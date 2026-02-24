@@ -1221,11 +1221,11 @@ def forecast_population(df_hist, horizon=3):
    <!-- ========================================================= -->
 <!-- EXPLORATION DES INDICES — MARCHE DU TRAVAIL -->
 <!-- ========================================================= -->
-<section id="marche-du-travail" class="ax-section">
+<section id="marche" class="ax-section">
   <div class="container">
 
     <div class="section-head">
-      <h1>Marché du travail</h1>
+      <h1>Marché du travail & Disparités</h1>
     </div>
 
     <p class="ax-lead">
@@ -1245,80 +1245,65 @@ def forecast_population(df_hist, horizon=3):
       </ul>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- 1) Lecture par sexe (Heatmap) + comparaison multi-milieux -->
-    <!-- ========================================================= -->
-    <h3 class="ax-subtitle">1) Participation à l’activité — lecture par sexe & milieu</h3>
+   <!-- ========================================================= -->
+<!-- 2) Corrélation / lecture croisée : diplôme vs activité -->
+<!-- ========================================================= -->
+<h3 class="ax-subtitle">2) Corrélation — niveau d’éducation & taux d’activité (selon milieu)</h3>
 
-    <!-- ✅ 2 images sur la même ligne -->
-    <div class="ax-two-img">
+<p class="ax-text">
+  Cette vue vérifie une relation structurante : <strong>l’éducation agit-elle comme levier d’accès à l’activité</strong>,
+  et <strong>de la même manière</strong> en urbain et en rural ? L’objectif est d’identifier où la formation
+  explique la participation — et où d’autres freins (opportunités locales, mobilité, contraintes sociales)
+  deviennent dominants.
+</p>
 
-      <figure class="ax-figure-card">
-        <h4 class="ax-figure-title">Heatmap — Taux d’activité par sexe (2017–2020)</h4>
-        <img class="ax-figure-img"
-             src="images/newplot (4).png"
-             alt="Heatmap taux d'activité par sexe (2017-2020)">
-      </figure>
+<!--  Image = même largeur que le texte -->
+<div class="ax-fullwidth" style="margin-top:12px;">
+  <img class="ax-img"
+       src="images/newplot (2).png"
+       alt="Évolution du taux d’activité par niveau et milieu">
+</div>
 
-      <figure class="ax-figure-card">
-        <h4 class="ax-figure-title">Comparaison — Urbain / Rural / Total (par sexe, multi-années)</h4>
-        <img class="ax-figure-img"
-             src="images/newplot (3).png"
-             alt="Comparaison urbain rural total par sexe et année">
-      </figure>
+<div class="card" style="margin-top:14px;">
+  <h3 style="margin-top:0;">Lecture analytique</h3>
+  <ul class="ax-list" style="margin-bottom:0;">
+    <li><strong>Effet diplôme :</strong> mesure l’écart “Sans diplôme” vs “Avec diplôme” (intensité du levier éducation).</li>
+    <li><strong>Effet milieu :</strong> compare urbain/rural pour repérer où le diplôme “paye” le plus en participation.</li>
+    <li><strong>Valeur décisionnelle :</strong> si l’écart se creuse, la formation est un levier prioritaire ; sinon, il faut traiter des contraintes structurelles (mobilité, tissu économique, etc.).</li>
+  </ul>
+</div>
 
-    </div>
+<!--  Bouton + code caché par défaut -->
+<div style="margin: 12px 0 0 0;">
+  <button type="button" class="ax-btn" onclick="toggleCode('codeWorkCorr', this)">
+    Afficher le code
+  </button>
+</div>
 
-    <div class="card" style="margin-top:14px;">
-      <h3 style="margin-top:0;">Analyse & insights</h3>
-      <p class="ax-text" style="margin-bottom:10px;">
-        Les deux vues se complètent : la <strong>heatmap</strong> donne une lecture rapide de l’écart de participation
-        entre <strong>hommes</strong> et <strong>femmes</strong> au fil des années, tandis que la courbe
-        <strong>Urbain/Rural/Total</strong> montre comment cet écart se manifeste selon le territoire.
-      </p>
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Écart structurel :</strong> la participation masculine reste nettement plus élevée, ce qui pointe un enjeu d’inclusion économique.</li>
-        <li><strong>Effet territorial :</strong> la segmentation <em>urbain vs rural</em> aide à distinguer contraintes d’accès à l’emploi, mobilité et opportunités locales.</li>
-        <li><strong>Lecture actionnable :</strong> ces écarts orientent des mesures ciblées (formation, soutien à l’emploi féminin, services facilitant l’activité).</li>
-      </ul>
-    </div>
+<pre id="codeWorkCorr" class="ax-code hidden"><code>
+# Exemple (Plotly) : taux d'activité par niveau & milieu
+# df attendu (format long) : colonnes ["Année","Milieu","Niveau","Valeur"]
 
-    <!-- ========================================================= -->
-    <!-- 2) Corrélation / lecture croisée : diplôme vs activité -->
-    <!-- ========================================================= -->
-    <h3 class="ax-subtitle">2) Corrélation — niveau d’éducation & taux d’activité (selon milieu)</h3>
+import plotly.express as px
 
-    <div class="ax-media" style="margin-top:10px;">
-      <div class="ax-media-figure">
-        <img class="ax-img"
-             src="images/newplot (2).png"
-             alt="Évolution taux d'activité selon diplôme et milieu">
-      </div>
+fig = px.line(
+    df,
+    x="Niveau",
+    y="Valeur",
+    color="Année",
+    line_dash="Milieu",
+    markers=True,
+    title="Évolution du taux d'activité par niveau et milieu"
+)
 
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Cette visualisation sert à tester une relation clé : <strong>le diplôme améliore-t-il la participation à l’activité</strong>,
-          et <strong>de la même manière</strong> en urbain et en rural ? On ne cherche pas une “jolie courbe”, mais un signal exploitable :
-          où la formation joue le rôle de levier le plus fort, et où d’autres freins dominent.
-        </p>
+fig.update_layout(
+    xaxis_title="Niveau",
+    yaxis_title="Valeur",
+    legend_title="Année, Milieu"
+)
 
-        <ul class="ax-list">
-          <li><strong>Lecture corrélationnelle :</strong> comparer “sans diplôme” vs “avec diplôme” sur plusieurs années.</li>
-          <li><strong>Segmentation par milieu :</strong> vérifier si l’effet du diplôme est plus marqué en urbain qu’en rural (ou inversement).</li>
-          <li><strong>Implication métier :</strong> si l’écart “avec diplôme” augmente, la politique de formation est un levier ; sinon, il faut traiter d’autres contraintes (mobilité, tissu économique local, normes sociales, etc.).</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:14px;">
-      <h3 style="margin-top:0;">Conclusion opérationnelle</h3>
-      <p class="ax-text" style="margin-bottom:0;">
-        En combinant <strong>genre</strong>, <strong>milieu</strong> et <strong>éducation</strong>, ce module transforme un indicateur “statistique”
-        en <strong>outil de diagnostic</strong>. Il met en évidence où se situent les principales ruptures de participation, et
-        aide à formuler des décisions : <strong>prioriser l’insertion</strong>, cibler les publics, et suivre l’impact des actions dans le temps.
-      </p>
-    </div>
-
+st.plotly_chart(fig, use_container_width=True)
+</code></pre>
   </div>
 </section>
 
