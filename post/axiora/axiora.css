@@ -383,3 +383,49 @@
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.10);
 }
+/* ====== Figure full width (comme le texte) ====== */
+.ax-figure-full{
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* Carte image (même style que tes cards) */
+.ax-figure-card-full{
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  box-shadow: 0 10px 28px rgba(0,0,0,.22);
+}
+
+/* Titre au-dessus de l’image */
+.ax-figure-title{
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 800;
+  opacity: .92;
+}
+
+/* Image = pleine largeur du texte */
+.ax-figure-img-full{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+}
+
+/* Bouton code aligné + spacing propre */
+.ax-code-actions{
+  margin: 12px 0 0 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Optionnel : code box un peu plus clean */
+.ax-code{
+  border-radius: 14px;
+}
