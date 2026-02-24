@@ -1031,107 +1031,91 @@ def area_miroir(df):
 
     </div>
 
-    <!-- ========================================================= -->
-    <!-- 2) Evolution par provinces -->
-    <!-- ========================================================= -->
-    <h3 class="ax-subtitle">2) Évolution de la population par province — tendance & comparaison</h3>
+  <!-- ========================================================= -->
+<!-- 4) Prévision (ML) — grille 3x3 + analyse globale -->
+<!-- ========================================================= -->
+<h3 class="ax-subtitle">4) Prévision (ML) — projection démographique & aide à la décision</h3>
 
-    <div class="ax-media">
-      <div class="ax-media-figure">
-        <img class="ax-img" src="images/population_pr.png"
-             alt="Évolution de la population par province — série temporelle">
-      </div>
+<p class="ax-text">
+  L’objectif ici n’est pas seulement de “prédire une courbe”, mais de transformer l’exploration en
+  <strong>capacité d’anticipation</strong> : identifier les provinces qui accélèrent, mesurer l’écart
+  <strong>réel vs prédit</strong>, et disposer d’un signal exploitable pour planifier
+  infrastructures, services publics et besoins urbains.
+</p>
 
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Cette vue met en évidence la <strong>dynamique temporelle</strong> et facilite la comparaison inter-provinces.
-          Elle sert surtout à identifier des trajectoires (accélération / stabilisation) et à justifier
-          des besoins futurs en <strong>services publics</strong> et <strong>infrastructures</strong>.
-        </p>
-      </div>
-    </div>
+<div class="card" style="margin-top:12px;">
+  <h3 style="margin-top:0;">Ce que le recruteur doit comprendre (approche professionnelle)</h3>
+  <ul class="ax-list" style="margin-bottom:0;">
+    <li><strong>Split temporel strict</strong> (pas de shuffle) : on teste sur la fin de série pour éviter toute fuite d’information.</li>
+    <li><strong>Baseline solide</strong> (régression) : modèle simple, interprétable, parfait pour un premier forecasting + comparaison.</li>
+    <li><strong>Validation</strong> : métriques (ex. MAE/MAPE) + lecture visuelle des écarts pour juger la stabilité.</li>
+    <li><strong>Scénarios</strong> : urbain / rural / total → lecture opérationnelle (pression urbaine, exode rural, besoins équipements).</li>
+  </ul>
+</div>
 
-    <!-- ========================================================= -->
-    <!-- 3) Structure par âge -->
-    <!-- ========================================================= -->
-    <h3 class="ax-subtitle">3) Structure par âge — lecture démographique (signaux générationnels)</h3>
+<!-- ✅ 9 visuels (3 par ligne) -->
+<div class="ax-pred-grid-3">
 
-    <div class="ax-media">
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Suivre la population par <strong>groupes d’âge</strong> permet d’anticiper des effets concrets :
-          pression sur l’emploi/formation (15–29), besoins en santé et dépendance (60+),
-          et évolution de la population active.
-        </p>
-      </div>
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Total (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/tot_pr.png" alt="Prévision Total">
+  </figure>
 
-      <div class="ax-media-figure">
-        <img class="ax-img" src="images/popannee_pr.png"
-             alt="Population par groupe d’âge — évolution">
-      </div>
-    </div>
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Urbain (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/urb_pr.png" alt="Prévision Urbain">
+  </figure>
 
-    <!-- ========================================================= -->
-    <!-- 4) Prévision (ML) — 3 images par ligne (sans descriptions) -->
-    <!-- ========================================================= -->
-    <h3 class="ax-subtitle">4) Prévision (ML) — projection opérationnelle</h3>
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Rural (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/rurale_pr.png" alt="Prévision Rural">
+  </figure>
 
-    <div class="card" style="margin-top:12px;">
-      <h3 style="margin-top:0;">Ce que démontre la partie “Forecasting”</h3>
-      <p class="ax-text" style="margin-bottom:10px;">
-        L’objectif n’est pas de “prédire pour prédire”, mais de fournir une <strong>projection actionnable</strong>.
-        La logique adoptée est volontairement <strong>transparent</strong> et <strong>auditable</strong> :
-        entraînement sur l’historique, validation sur la période la plus récente (split temporel),
-        puis extrapolation courte pour éclairer la planification (habitat, équipements, services).
-      </p>
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Cercles (réel vs prédit)</h4>
+    <img class="ax-pred-img" src="images/cercle_pr.png" alt="Prévision Cercles">
+  </figure>
 
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Validation temporelle :</strong> pas de shuffle → on respecte la causalité du temps.</li>
-        <li><strong>Comparaison visuelle :</strong> “réel vs prédit” pour détecter sur/sous-estimation.</li>
-        <li><strong>Extensible :</strong> Prophet / XGBoost / modèles multi-variables si séries plus riches (économie, habitat, emploi).</li>
-      </ul>
-    </div>
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Évolution structurelle — Cercles</h4>
+    <img class="ax-pred-img" src="images/cercle_ev.png" alt="Évolution Cercles">
+  </figure>
 
-    <!-- Ligne 1 : 3 -->
-    <div class="ax-pred-grid-3" style="margin-top:16px;">
-      <div class="ax-pred-item">
-        <div class="ax-pred-title">Total — Réel vs Prédit</div>
-        <img class="ax-pred-img" src="images/tot_pr.png" alt="Prévision Total">
-      </div>
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Population — comparaison multi-provinces</h4>
+    <img class="ax-pred-img" src="images/pop.png" alt="Population multi-provinces">
+  </figure>
 
-      <div class="ax-pred-item">
-        <div class="ax-pred-title">Urbain — Réel vs Prédit</div>
-        <img class="ax-pred-img" src="images/urb_pr.png" alt="Prévision Urbain">
-      </div>
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Population — focus tendance (provinces)</h4>
+    <img class="ax-pred-img" src="images/pop-pro.png" alt="Population provinces trend">
+  </figure>
 
-      <div class="ax-pred-item">
-        <div class="ax-pred-title">Rural — Réel vs Prédit</div>
-        <img class="ax-pred-img" src="images/rurale_pr.png" alt="Prévision Rural">
-      </div>
-    </div>
+  <!--  (8/9) Mets ici ta prochaine capture (garde le nom, ou change-le si tu veux) -->
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Comparatif (option)</h4>
+    <img class="ax-pred-img" src="images/popannee_pr.png" alt="Prévision comparatif">
+  </figure>
 
-    <!-- Ligne 2 : 3 -->
-    <div class="ax-pred-grid-3" style="margin-top:12px;">
-      <div class="ax-pred-item">
-        <div class="ax-pred-title">Cercles — Réel vs Prédit</div>
-        <img class="ax-pred-img" src="images/cercle_pr.png" alt="Prévision Cercles">
-      </div>
+  <!--  (9/9) Mets ici ta prochaine capture -->
+  <figure class="ax-pred-card">
+    <h4 class="ax-pred-title">Prévision — Erreurs / stabilité (option)</h4>
+    <img class="ax-pred-img" src="images/population_pr.png" alt="Prévision par annees">
+  </figure>
 
-      <div class="ax-pred-item">
-        <div class="ax-pred-title">Cercles — Évolution</div>
-        <img class="ax-pred-img" src="images/cercle_ev.png" alt="Évolution Cercles">
-      </div>
+</div>
 
-      <!-- ✅ Place vide si tu n’as pas une 6ème image
-           (ou mets ici une autre image si tu veux) -->
-      <div class="ax-pred-item">
-        <div class="ax-pred-title">—</div>
-        <div style="height:100%; border-radius:12px; border:1px dashed rgba(255,255,255,.18); padding:16px; opacity:.7;">
-          Ajoute une 6ème visualisation si tu veux compléter la grille.
-        </div>
-      </div>
-    </div>
-
+<!-- Analyse globale (pas de texte pour 2 images seules) -->
+<div class="card" style="margin-top:14px;">
+  <h3 style="margin-top:0;">Analyse globale (texte portfolio)</h3>
+  <p class="ax-text" style="margin-bottom:0;">
+    La lecture croisée des trajectoires (<strong>Total / Urbain / Rural</strong>) met en évidence la dynamique de
+    concentration et ses effets : certaines provinces absorbent la croissance plus rapidement, ce qui se traduit par
+    une pression sur l’habitat, la mobilité et les équipements. Le bloc “prévision” apporte une dimension
+    <strong>pilotage</strong> : comparer le réel au prédit, quantifier l’écart et produire une projection court terme
+    pour orienter priorisation et scénarios (urbanisation vs maintien rural).
+  </p>
+</div>
   </div>
 </section>
 
