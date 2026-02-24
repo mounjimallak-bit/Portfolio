@@ -1977,6 +1977,115 @@ def forecast_metric(df_hist, target_col="Population", horizon=3):
 
 
 
+
+   <section id="assistant" class="ax-section">
+  <div class="container">
+
+    <div class="section-head">
+      <h1>Assistant IA (Chatbot)</h1>
+    </div>
+
+    <p class="ax-lead">
+      La data visualisation a ses limites face à des décideurs non-techniques ou lorsqu'il s'agit d'obtenir une information précise instantanément. Pour combler ce fossé, j'ai intégré l'<strong>API Google Gemini</strong> pour créer un véritable analyste virtuel. L'objectif n'est pas de proposer un chatbot généraliste, mais un <strong>Agent Expert restreint (Data-Grounded)</strong>.
+    </p>
+
+    <h3 id="role-assistant" class="ax-subtitle" style="margin-top: 40px;">Rôle de l’assistant</h3>
+
+    <div class="ax-media ax-media-equal">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Le chatbot d'AXIORA a été conçu avec une approche stricte de <strong>Context Injection</strong> (Injection de contexte). Lors de chaque requête, l'intégralité du dictionnaire structuré contenant les indicateurs nettoyés (<code>hcpdata.py</code>) est fournie au modèle en arrière-plan.
+        </p>
+        <p class="ax-text">
+          <strong>L'impact métier :</strong> L'IA est "enfermée" dans le périmètre de la région Souss-Massa. Elle interprète les tableaux complexes, calcule des écarts à la volée, et rédige des synthèses fiables <strong>sans aucun risque d'hallucination</strong> (inventer de fausses statistiques).
+        </p>
+
+        <button type="button" class="ax-btn" onclick="toggleCode('codeSystemPrompt', this)">Afficher le code (Prompt Engineering & API)</button>
+        <pre id="codeSystemPrompt" class="ax-code hidden"><code>
+import streamlit as st
+import google.generativeai as genai
+from hcpdata import hcp_data
+
+# 1. Initialisation sécurisée de l'API Gemini
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+def ask_axiora_assistant(user_prompt):
+   
+    system_instruction = f"""
+    Tu es l'assistant expert en Data Analytics de la plateforme AXIORA.
+    Ton rôle est d'aider les décideurs publics de la région Souss-Massa.
+    
+    RÈGLE ABSOLUE : Tu ne dois répondre QU'EN TE BASANT sur le dictionnaire 
+    de données JSON suivant issu du Haut-Commissariat au Plan :
+    {hcp_data}
+    
+    Si une question sort de ce contexte socio-économique, refuse poliment d'y répondre.
+    Réponds toujours en Markdown avec des structures claires (tableaux, listes).
+    """
+    
+    
+    full_prompt = f"{system_instruction}\n\nQuestion de l'utilisateur : {user_prompt}"
+    response = model.generate_content(full_prompt)
+    
+    return response.text
+        </code></pre>
+      </div>
+
+     
+    </div>
+
+    <br><br>
+
+    <h3 id="questions" class="ax-subtitle">Types de questions supportées</h3>
+
+    <p class="ax-text">
+      Grâce à la structuration méticuleuse du contexte de données, l'assistant est capable de répondre à trois niveaux de complexité analytique :
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+      <div class="card">
+        <h4 style="color: #1E293B; margin-top: 0;"> 1. Interrogation directe</h4>
+        <p class="ax-text" style="font-size: 14px;"><em>"Quel est le taux de pauvreté dans la commune de Drargua en 2014 ?"</em></p>
+        <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">Le modèle parcourt l'arborescence du dictionnaire injecté et retourne la valeur exacte instantanément.</p>
+      </div>
+      
+      <div class="card">
+        <h4 style="color: #1E293B; margin-top: 0;"> 2. Calcul et Comparaison</h4>
+        <p class="ax-text" style="font-size: 14px;"><em>"Quelles sont les 3 provinces avec le taux de chômage urbain le plus élevé ?"</em></p>
+        <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">L'IA compare les données entre elles, effectue des tris logiques, et hiérarchise l'information.</p>
+      </div>
+
+      <div class="card">
+        <h4 style="color: #1E293B; margin-top: 0;"> 3. Synthèse et Insight</h4>
+        <p class="ax-text" style="font-size: 14px;"><em>"Fais-moi un résumé en 3 points de la situation de l'habitat rural à Tata."</em></p>
+        <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">Le modèle agrège plusieurs colonnes disparates pour rédiger un paragraphe d'aide à la décision stratégique.</p>
+      </div>
+    </div>
+
+    <br><br>
+
+    <h3 id="reponses" class="ax-subtitle">Réponses enrichies & Interface conversationnelle</h3>
+
+    <div class="card" style="border-left: 4px solid #71658c; background: rgba(139, 92, 246, 0.05);">
+      <p class="ax-text" style="margin-top:0;">
+        <strong>L'interface conversationnelle ne se contente pas d'afficher du texte brut.</strong> 
+        Elle a été développée en utilisant les composants natifs <code>st.chat_message</code> et <code>st.chat_input</code> de Streamlit pour offrir une expérience utilisateur fluide et moderne.
+      </p>
+      <ul class="ax-list" style="margin-bottom:0;">
+        <li><strong>Mémoire contextuelle :</strong> L'historique des échanges est stocké dans le <code>st.session_state</code>. L'IA se souvient de la conversation en cours, permettant à l'utilisateur de poser des questions de suivi (ex: <em>"Et comment cette valeur a-t-elle évolué par rapport à 2004 ?"</em>).</li>
+        <li><strong>Formatage Markdown natif :</strong> L'assistant est instruit via le prompt système pour renvoyer ses réponses pré-formatées (génération de tableaux Markdown, listes à puces, mise en gras des <em>KPIs</em>). Streamlit interprète nativement ce format.</li>
+      </ul>
+    </div>
+
+    <div style="margin-top: 25px; display: flex; justify-content: center;">
+      <a href="https://axiora-data.streamlit.app/" target="_blank" class="ax-btn" style="background-color: #626d80; color: white; padding: 12px 24px; font-size: 16px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
+         Interagir avec l'Assistant IA en direct
+      </a>
+    </div>
+
+  </div>
+</section>
   
      </main>
     <footer class="footer">
