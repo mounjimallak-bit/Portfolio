@@ -443,8 +443,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
 /* =========================================================
-   CARTES GÉOGRAPHIQUES — Comparaison des données
+   COMPARAISON DONNÉES — Style Excel Pro & XML
 ========================================================= */
 .ax-compare-grid {
   display: grid;
@@ -454,37 +463,92 @@
 }
 
 .ax-compare-card {
-  background: #ffffff;
+  background: rgba(0, 0, 0, 0.25);
   border-radius: 12px;
-  padding: 24px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .ax-compare-card h4 {
-  font-size: 18px;
-  color: #1E293B;
-  margin-top: 0;
-  margin-bottom: 15px;
+  font-size: 15px;
+  color: #ffffff;
+  margin: 0;
+  padding: 14px 18px;
+  background: rgba(59, 130, 246, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   gap: 8px;
-  border-bottom: 2px solid #f1f5f9;
-  padding-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.ax-compare-card .ax-code {
-  font-size: 11px;
-  padding: 12px;
-  margin-top: auto; /* Pousse le code vers le bas pour aligner les cartes */
-  max-height: 220px;
+/* Zone de scroll pour le tableau Excel */
+.ax-excel-wrap {
+  max-height: 380px;
   overflow-y: auto;
+  overflow-x: auto;
 }
+
+.ax-excel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: #e2e8f0;
+  text-align: left;
+}
+
+.ax-excel-table th {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 12px;
+  font-weight: 700;
+  color: #93c5fd;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 0; /* L'en-tête reste visible quand on scroll ! */
+  z-index: 10;
+}
+
+.ax-excel-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: "Courier New", Courier, monospace;
+}
+
+.ax-excel-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.08);
+  cursor: crosshair;
+}
+
+/* Zone de scroll pour le XML */
+.ax-xml-box {
+  margin: 0;
+  padding: 16px;
+  background: transparent;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #fca5a5;
+  max-height: 380px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.ax-xml-box .attr { color: #86efac; }
+.ax-xml-box .val { color: #f8fafc; }
+.ax-xml-box .comment { color: #64748b; font-style: italic; }
 
 @media (max-width: 980px) {
-  .ax-compare-grid {
-    grid-template-columns: 1fr;
-  }
+  .ax-compare-grid { grid-template-columns: 1fr; }
 }
+
+
+
+
+
+
+
