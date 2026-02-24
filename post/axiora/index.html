@@ -586,11 +586,7 @@ data_clean_preview = {
       }
     }
 
-    // -------------------------------------------------------------
-    // NOUVEAU : Simulation de l'affichage du dictionnaire Python
-    // On stocke des extraits de ton fichier hcpdata.py sous forme de texte
-    // -------------------------------------------------------------
-    const pythonSnippets = {
+     const pythonSnippets = {
       'pauvrete': `hcp_data = {
     "pauvrete": {
         "Chtouka- Ait Baha": {
@@ -1389,8 +1385,13 @@ with col3:
 
 
 
+<section id="habitat" class="ax-section">
+  <div class="container">
 
-<h3 class="ax-subtitle">Habitat & Infrastructure</h3>
+     <div class="section-head">
+      <h3>Habitat & Infrastructure</h3>
+    </div>
+
 
 <p class="ax-lead">
   L’habitat est un indicateur direct de <strong>pression urbaine</strong> et de <strong>capacité d’équipement</strong>.
@@ -1405,7 +1406,7 @@ with col3:
 </div>
 
 <div class="card" style="margin-top:14px;">
-  <h3 style="margin-top:0;">Insights</h3>
+ 
   <ul class="ax-list" style="margin-bottom:0;">
     <li><strong>Dispersion :</strong> inégalité entre territoires (zones stables vs zones en tension).</li>
     <li><strong>Outliers :</strong> signal de pression foncière / projets / urbanisation rapide.</li>
@@ -1451,8 +1452,13 @@ def render_habitat(df_habitat):
 
 
 
+<section id="finance" class="ax-section">
+  <div class="container">
 
-   <h3 class="ax-subtitle">Finance & Économie locale</h3>
+     <div class="section-head">
+      <h3>Finance & Économie locale</h3>
+    </div>
+  
 
 <p class="ax-lead">
   Ce module compare la structure économique de <strong>Souss-Massa</strong> à l’échelle <strong>nationale</strong>,
@@ -1467,7 +1473,7 @@ def render_habitat(df_habitat):
 </div>
 
 <div class="card" style="margin-top:14px;">
-  <h3 style="margin-top:0;">Lecture</h3>
+  
   <ul class="ax-list" style="margin-bottom:0;">
     <li><strong>Comparaison :</strong> vérifier si la région suit la structure nationale ou s’en démarque.</li>
     <li><strong>Poids sectoriel :</strong> repérer les secteurs dominants / sous-représentés.</li>
@@ -1510,7 +1516,14 @@ def render_finance(df_finance):
 
 
 
-<h3 class="ax-subtitle">Enseignement & Capital Humain</h3>
+<section id="enseignement" class="ax-section">
+  <div class="container">
+
+     <div class="section-head">
+      <h3>Enseignement & Capital Humain</h3>
+    </div>
+  
+
 
 <p class="ax-lead">
   Le capital humain conditionne l’emploi, la productivité et l’attractivité territoriale.
@@ -1525,7 +1538,7 @@ def render_finance(df_finance):
 </div>
 
 <div class="card" style="margin-top:14px;">
-  <h3 style="margin-top:0;">Insights</h3>
+  
   <ul class="ax-list" style="margin-bottom:0;">
     <li><strong>Lecture multi-dimensions :</strong> repérer rapidement provinces fortes/faibles.</li>
     <li><strong>Écarts structurels :</strong> zones avec déficit d’accès/capacité.</li>
