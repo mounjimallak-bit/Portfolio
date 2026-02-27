@@ -30,6 +30,7 @@
 
   <main class="container">
     <section class="section" style="border-top:none;">
+
       <div class="section-head">
         <h2>Bien Immobilier — Plateforme de Location</h2>
         <p>
@@ -72,108 +73,151 @@
             <li>Dashboard locataire</li>
             <li>Dashboard propriétaire</li>
           </ul>
-
-          <h3 style="margin-top:14px;">Couche Données (Oracle)</h3>
-          <p>
-            Base relationnelle normalisée contenant : utilisateurs, biens, réservations, locations, paiements et avis.
-          </p>
-
-          <img src="shema.png" alt="Schéma des tables" style="width:100%;border-radius:10px;margin-top:10px;">
         </div>
       </div>
 
-      <!-- ================= DEFIS TECHNIQUES ================= -->
-      <h3 style="margin-top:22px;">Problèmes techniques traités</h3>
-      <p class="section-text" style="max-width:none;">
-        Les règles critiques sont implémentées directement dans Oracle afin de garantir la cohérence et la sécurité des données,
-        indépendamment de l’application web.
-      </p>
+      <!-- ================= COUCHE DONNEES (FULL WIDTH) ================= -->
+      <div class="card" style="margin-top:16px;">
+        <h3>Couche Données (Oracle)</h3>
+        <p class="section-text" style="max-width:none;">
+          Base relationnelle normalisée : utilisateurs, biens, réservations, locations, paiements et avis.
+        </p>
 
-      <ul style="margin-top:10px;">
-        <li>
-          <strong>Gestion de l’Overbooking — <code>creerReservation</code> & <code>verifierDisponibilite</code></strong><br><br>
-          Le défi principal était d'assurer l'atomicité des réservations. La création d’une réservation passe par la procédure
-          <strong>creerReservation</strong> qui appelle la fonction <strong>verifierDisponibilite</strong> afin de détecter les chevauchements de dates.
-          Cela garantit qu’aucun bien ne peut être loué deux fois simultanément, même en cas de requêtes concurrentes.
-        </li>
+        <!-- IMPORTANT : on sort l'image du "petit" cadre => full width -->
+        <div style="margin-top:12px;">
+          <img
+            src="shema.png"
+            alt="Schéma relationnel des tables (Oracle)"
+            style="width:100%; border-radius:14px; display:block;"
+          />
+        </div>
+      </div>
 
-        <li style="margin-top:14px;">
-          <strong>Sécurité Anti-Fraude — <code>trg_no_update_paiement_if_reussi</code></strong><br><br>
-          Pour sécuriser les flux financiers, un verrou d’immuabilité a été implémenté via le trigger
-          <strong>trg_no_update_paiement_if_reussi</strong>. Une fois qu’un paiement est validé, toute tentative de modification est bloquée
-          directement par le moteur Oracle, rendant la plateforme résistante aux manipulations post-transaction.
-        </li>
+     
+      <!-- ================= DEFIS TECHNIQUES (FULL WIDTH) ================= -->
+      <div class="card" style="margin-top:16px;">
+        <h3>Problèmes techniques traités</h3>
+        <p class="section-text" style="max-width:none;">
+          Les règles critiques sont implémentées côté Oracle pour garantir cohérence, sécurité et robustesse,
+          indépendamment du frontend/backend.
+        </p>
 
-        <li style="margin-top:14px;">
-          <strong>Contrôle d'Accès de Données — <code>trg_secu_bien_owner</code></strong><br><br>
-          Le défi était de garantir que les biens immobiliers ne puissent être modifiés ou supprimés que par leurs propriétaires légitimes.
-          Le trigger <strong>trg_secu_bien_owner</strong> vérifie l’identité de l’utilisateur Oracle avant chaque modification ou suppression,
-          empêchant toute usurpation via l’interface web ou des requêtes directes.
-        </li>
+        <ul style="margin-top:10px;">
+          <li>
+            <strong>Gestion de l’Overbooking</strong> — <code>creerReservation</code> & <code>verifierDisponibilite</code><br><br>
+            Atomicité des réservations : la procédure centralise la création et appelle une fonction de vérification
+            des chevauchements. Résultat : un bien ne peut jamais être réservé deux fois sur la même période,
+            même en cas de requêtes concurrentes.
+          </li>
 
-        <li style="margin-top:14px;">
-          <strong>Automatisation des Métriques — <code>trg_maj_note_bien</code> & <code>majNoteMoyenne</code></strong><br><br>
-          Afin d’optimiser les performances, le recalcul des notes a été automatisé : à chaque nouvel avis, le trigger
-          <strong>trg_maj_note_bien</strong> déclenche la procédure <strong>majNoteMoyenne</strong> qui met à jour la note moyenne du bien.
-          Les scores restent toujours à jour sans calcul côté application.
-        </li>
+          <li style="margin-top:14px;">
+            <strong>Sécurité Anti-Fraude</strong> — <code>trg_no_update_paiement_if_reussi</code><br><br>
+            Verrou d’immuabilité : une fois le paiement validé, toute tentative de modification est refusée au niveau
+            du moteur Oracle. Résultat : résistance aux manipulations post-transaction.
+          </li>
 
-        <li style="margin-top:14px;">
-          <strong>Cohérence transactionnelle</strong><br><br>
-          Les opérations critiques comme la réservation et le paiement sont exécutées dans des transactions Oracle,
-          garantissant la cohérence des données même en cas d’erreur ou d’interruption.
-        </li>
+          <li style="margin-top:14px;">
+            <strong>Contrôle d’Accès de Données</strong> — <code>trg_secu_bien_owner</code><br><br>
+            Protection “owner-only” : le trigger vérifie l’utilisateur Oracle de la session avant modification/suppression.
+            Résultat : un bien est géré uniquement par son propriétaire légitime, impossible d’usurper via l’interface web.
+          </li>
 
-        <li style="margin-top:14px;">
-          <strong>Intégration Flask – Oracle</strong><br><br>
-          L’application utilise <code>python-oracledb</code> pour exécuter les requêtes SQL et les objets PL/SQL,
-          assurant une communication directe et fiable entre le backend et la base de données.
-        </li>
-      </ul>
+          <li style="margin-top:14px;">
+            <strong>Automatisation des Métriques</strong> — <code>trg_maj_note_bien</code> & <code>majNoteMoyenne</code><br><br>
+            Mise à jour automatique de la note moyenne : à chaque avis client, le trigger déclenche une procédure autonome
+            de recalcul. Résultat : notes toujours fraîches pour la recherche/tri sans charge côté application.
+          </li>
+        </ul>
+      </div>
 
       <!-- ================= CHOIX TECHNIQUES ================= -->
-      <h3 style="margin-top:22px;">Choix techniques</h3>
-      <ul>
-        <li>Oracle Database pour la fiabilité transactionnelle</li>
-        <li>Flask pour le backend</li>
-        <li>PL/SQL pour la logique métier</li>
-        <li>Architecture en couches</li>
-      </ul>
+      <div class="card" style="margin-top:16px;">
+        <h3>Choix techniques</h3>
+        <ul>
+          <li>Oracle Database pour la fiabilité transactionnelle</li>
+          <li>Flask pour le backend</li>
+          <li>PL/SQL pour la logique métier</li>
+          <li>Architecture en couches</li>
+        </ul>
+      </div>
 
       <!-- ================= RESULTATS ================= -->
-      <h3 style="margin-top:22px;">Résultats</h3>
-      <ul>
-        <li>Application web fonctionnelle</li>
-        <li>Base de données robuste</li>
-        <li>Système sécurisé</li>
-        <li>Gestion complète des locations</li>
-      </ul>
+      <div class="card" style="margin-top:16px;">
+        <h3>Résultats</h3>
+        <ul>
+          <li>Application web fonctionnelle</li>
+          <li>Base de données robuste</li>
+          <li>Système sécurisé</li>
+          <li>Gestion complète des locations</li>
+        </ul>
+      </div>
+       <!-- ================= SCREENSHOTS PLATEFORME ================= -->
+      <div class="card" style="margin-top:16px;">
+        <h3>Screenshots de la plateforme</h3>
 
-      <!-- ================= DEMONSTRATION ================= -->
-      <h3 style="margin-top:22px;">Démonstration</h3>
-      <p>Vidéo :</p>
-      <a
-        class="btn btn-primary"
-        href="https://youtu.be/xxOOS9JRwuo"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Voir la vidéo de démonstration
-      </a>
+        <div class="projects" style="grid-template-columns:1fr 1fr; margin-top:12px;">
+          <div class="project-card" style="pointer-events:none;">
+            <img src="propr.png" alt="Espace propriétaire" />
+            <div class="project-body">
+              <h3>Espace Propriétaire</h3>
+              <p>Gestion des biens + validation des demandes.</p>
+            </div>
+          </div>
 
-      <p style="margin-top:14px;">Code source GitHub :</p>
-      <a
-        class="btn btn-ghost"
-        href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Voir le code sur GitHub
-      </a>
+          <div class="project-card" style="pointer-events:none;">
+            <img src="ouve.png" alt="Espace ouvert" />
+            <div class="project-body">
+              <h3>Espace ouvert</h3>
+              <p>Recherche, réservation et historique.</p>
+            </div>
+          </div>
+
+          <div class="project-card" style="pointer-events:none;">
+            <img src="reserv.png" alt="Gestion des réservations" />
+            <div class="project-body">
+              <h3>Gestion des Réservations</h3>
+              <p>Demandes, statuts, annulation/confirmation.</p>
+            </div>
+          </div>
+
+          <div class="project-card" style="pointer-events:none;">
+            <img src="insc.png" alt="Inscription / Connexion" />
+            <div class="project-body">
+              <h3>Inscription / Connexion</h3>
+              <p>Création de compte + authentification.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= DEMONSTRATION (FULL WIDTH, LIENS OK) ================= -->
+      <div class="card" style="margin-top:16px;">
+        <h3>Démonstration</h3>
+
+        <p style="margin-bottom:10px;">Vidéo :</p>
+        <a
+          class="btn btn-primary"
+          href="https://youtu.be/xxOOS9JRwuo"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Voir la vidéo de démonstration
+        </a>
+
+        <p style="margin-top:16px; margin-bottom:10px;">Code source GitHub :</p>
+        <a
+          class="btn btn-ghost"
+          href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Voir le code sur GitHub
+        </a>
+      </div>
 
       <footer class="footer">© 2026 — Malak Mounji</footer>
+
     </section>
   </main>
-
 </body>
 </html>
