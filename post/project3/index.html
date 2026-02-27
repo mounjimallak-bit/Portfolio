@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bien Immobilier — Détails du projet</title>
+  <title>ImmoMarket — Détails du projet</title>
   <link rel="stylesheet" href="../../styles.css" />
+  <meta name="description" content="ImmoMarket : plateforme de location immobilière développée avec Flask & Oracle PL/SQL (réservation, paiement, avis, gestion propriétaire/locataire)." />
 </head>
 
 <body>
@@ -31,59 +32,110 @@
   <main class="container">
     <section class="section" style="border-top:none;">
 
+      <!-- ================= HERO ================= -->
       <div class="section-head">
-        <h2>Bien Immobilier — Plateforme de Location</h2>
-        <p>
-          Plateforme web de location développée avec Flask et Oracle permettant la gestion complète du cycle :
-          publication, réservation, paiement et avis clients.
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <h2 style="margin:0;">ImmoMarket — Plateforme de Location</h2>
+          <span class="badge" style="transform: translateY(2px);">Flask</span>
+          <span class="badge" style="transform: translateY(2px);">Oracle</span>
+          <span class="badge" style="transform: translateY(2px);">PL/SQL</span>
+          <span class="badge" style="transform: translateY(2px);">Tailwind</span>
+        </div>
+
+        <p style="max-width: 72ch;">
+          Application web de location immobilière permettant la gestion complète du cycle :
+          <strong>publication</strong>, <strong>réservation</strong>, <strong>validation</strong>, <strong>paiement</strong> et <strong>avis</strong>.
+          Le projet met l’accent sur la <strong>cohérence transactionnelle</strong>, la <strong>logique métier en PL/SQL</strong> et une
+          <strong>base Oracle</strong> structurée.
         </p>
       </div>
 
-      <!-- ================= VUE D'ENSEMBLE ================= -->
-      <div class="grid-2">
+      <!-- ================= QUICK LINKS ================= -->
+      <div class="grid-2" style="margin-top: 10px;">
+        <div class="card">
+          <h3 style="margin-bottom:8px;">Liens</h3>
+          <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            <a class="btn btn-primary" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener noreferrer">
+              Voir la démo vidéo
+            </a>
+            <a class="btn btn-ghost" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener noreferrer">
+              Code source GitHub
+            </a>
+          </div>
+
+          <p class="section-text" style="margin-top:12px; max-width:none;">
+            <strong>Rôle ciblé :</strong> Data/BI / Data Engineer junior / Backend<br>
+            <strong>Livrables :</strong> application Flask, scripts SQL/PLSQL, schéma BD, démo vidéo.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:8px;">Stack & concepts</h3>
+          <ul style="margin:0;">
+            <li><strong>Backend</strong> : Flask (sessions, auth, routes, guards)</li>
+            <li><strong>DB</strong> : Oracle SQL / PL/SQL (procédures, vues, triggers)</li>
+            <li><strong>UI</strong> : HTML / CSS / Tailwind + Jinja2</li>
+            <li><strong>Règles métier</strong> : statuts de réservation, anti-chevauchement, paiement, avis</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ================= OVERVIEW + FEATURES ================= -->
+      <div class="grid-2" style="margin-top:16px;">
         <div class="card">
           <h3>Vue d’ensemble</h3>
-          <p>
-            Cette application permet la gestion complète des locations immobilières : consultation des biens,
-            réservation, validation par le propriétaire, paiement et avis clients.
-          </p>
-          <p>
-            Le projet met l’accent sur la <strong>conception de base de données</strong>, la
-            <strong>cohérence transactionnelle</strong> et la <strong>sécurité des données</strong>.
+          <p class="section-text" style="max-width:none;">
+            ImmoMarket est conçu comme une application <strong>data-driven</strong> : l’interface consomme des vues Oracle et la logique critique
+            est centralisée dans la base via PL/SQL. L’objectif est d’obtenir une plateforme stable, cohérente et maintenable.
           </p>
 
-          <h3 style="margin-top:14px;">Architecture du système</h3>
+          <h3 style="margin-top:14px;">Architecture en couches</h3>
           <ul>
-            <li>Couche présentation : HTML / CSS / Tailwind</li>
-            <li>Couche applicative : Flask (authentification, sessions, routes)</li>
-            <li>Couche logique métier : PL/SQL</li>
-            <li>Couche données : Oracle Database</li>
+            <li><strong>Présentation</strong> : HTML/CSS/Tailwind (UI)</li>
+            <li><strong>Applicatif</strong> : Flask (auth, sessions, RBAC, endpoints)</li>
+            <li><strong>Logique métier</strong> : PL/SQL (procédures / fonctions / triggers)</li>
+            <li><strong>Données</strong> : Oracle (modèle relationnel, contraintes, vues)</li>
           </ul>
         </div>
 
         <div class="card">
           <h3>Fonctionnalités</h3>
-          <ul>
-            <li>Consultation des biens</li>
-            <li>Recherche interactive</li>
-            <li>Visualisation des disponibilités</li>
-            <li>Réservation de logements</li>
-            <li>Paiement</li>
-            <li>Avis clients</li>
-            <li>Dashboard locataire</li>
-            <li>Dashboard propriétaire</li>
-          </ul>
+
+          <div class="grid-2" style="gap:12px; margin-top:10px;">
+            <div class="card" style="padding:14px; margin:0;">
+              <h4 style="margin:0 0 6px 0;">Locataire</h4>
+              <ul style="margin:0;">
+                <li>Parcourir & rechercher des logements</li>
+                <li>Voir détail + périodes indisponibles</li>
+                <li>Envoyer une demande de réservation</li>
+                <li>Payer (workflow) + laisser un avis</li>
+              </ul>
+            </div>
+
+            <div class="card" style="padding:14px; margin:0;">
+              <h4 style="margin:0 0 6px 0;">Propriétaire</h4>
+              <ul style="margin:0;">
+                <li>Publier / modifier / supprimer des biens</li>
+                <li>Gérer les demandes (accepter/refuser)</li>
+                <li>Suivre l’état des réservations</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="section-text" style="margin-top:12px; max-width:none;">
+            <strong>Bonus</strong> : affichage des notes, photo principale, agrégations via vues SQL.
+          </p>
         </div>
       </div>
 
-      <!-- ================= COUCHE DONNEES (FULL WIDTH) ================= -->
+      <!-- ================= DB MODEL ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Couche Données (Oracle)</h3>
+        <h3>Modélisation & Couche Données (Oracle)</h3>
         <p class="section-text" style="max-width:none;">
-          Base relationnelle normalisée : utilisateurs, biens, réservations, locations, paiements et avis.
+          Modèle relationnel normalisé couvrant utilisateurs, biens, réservations, locations, paiements et avis.
+          La base utilise des <strong>contraintes d’intégrité</strong>, des <strong>vues</strong> et des <strong>procédures PL/SQL</strong>.
         </p>
 
-        <!-- IMPORTANT : on sort l'image du "petit" cadre => full width -->
         <div style="margin-top:12px;">
           <img
             src="shemasql.png"
@@ -91,69 +143,97 @@
             style="width:100%; border-radius:14px; display:block;"
           />
         </div>
+
+        <div class="grid-2" style="margin-top:14px;">
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Entités clés</h4>
+            <ul style="margin:0;">
+              <li>UTILISATEUR → (LOCATAIRE / PROPRIETAIRE)</li>
+              <li>BIEN, PHOTO_BIEN, AVIS_BIEN</li>
+              <li>RESERVATION → LOCATION → PAIEMENT</li>
+            </ul>
+          </div>
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Vues utilisées</h4>
+            <ul style="margin:0;">
+              <li><code>VUE_BIENS_PUBLICS</code> (photo principale, note, infos)</li>
+              <li>Vues/queries dashboard (propriétaire/locataire)</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-     
-      <!-- ================= DEFIS TECHNIQUES (FULL WIDTH) ================= -->
+      <!-- ================= TECHNICAL CHALLENGES ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Problèmes techniques traités</h3>
+        <h3>Défis techniques & solutions</h3>
         <p class="section-text" style="max-width:none;">
-          Les règles critiques sont implémentées côté Oracle pour garantir cohérence, sécurité et robustesse,
-          indépendamment du frontend/backend.
+          Les règles critiques sont traitées côté Oracle pour garantir robustesse et cohérence, même si l’application évolue côté Flask.
         </p>
 
-        <ul style="margin-top:10px;">
-          <li>
-            <strong>Gestion de l’Overbooking</strong> — <code>creerReservation</code> & <code>verifierDisponibilite</code><br><br>
-            Atomicité des réservations : la procédure centralise la création et appelle une fonction de vérification
-            des chevauchements. Résultat : un bien ne peut jamais être réservé deux fois sur la même période,
-            même en cas de requêtes concurrentes.
-          </li>
+        <div class="grid-2" style="margin-top:12px; gap:12px;">
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Anti-overbooking</h4>
+            <p class="section-text" style="max-width:none;">
+              Empêcher le chevauchement de réservations via une vérification des dates avant insertion (SQL) et un workflow PL/SQL
+              (ex : <code>creerReservation</code>).
+            </p>
+          </div>
 
-          <li style="margin-top:14px;">
-            <strong>Sécurité Anti-Fraude</strong> — <code>trg_no_update_paiement_if_reussi</code><br><br>
-            Verrou d’immuabilité : une fois le paiement validé, toute tentative de modification est refusée au niveau
-            du moteur Oracle. Résultat : résistance aux manipulations post-transaction.
-          </li>
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Immuabilité du paiement</h4>
+            <p class="section-text" style="max-width:none;">
+              Une fois validé, un paiement ne peut pas être modifié (contrôle côté Oracle, ex : trigger de protection) afin d’éviter
+              des manipulations post-transaction.
+            </p>
+          </div>
 
-          <li style="margin-top:14px;">
-            <strong>Contrôle d’Accès de Données</strong> — <code>trg_secu_bien_owner</code><br><br>
-            Protection “owner-only” : le trigger vérifie l’utilisateur Oracle de la session avant modification/suppression.
-            Résultat : un bien est géré uniquement par son propriétaire légitime, impossible d’usurper via l’interface web.
-          </li>
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Contrôle d’accès propriétaire</h4>
+            <p class="section-text" style="max-width:none;">
+              Un propriétaire ne peut gérer que ses propres biens. Contrôle en couche Flask (RBAC) et protection côté base pour
+              éviter l’usurpation.
+            </p>
+          </div>
 
-          <li style="margin-top:14px;">
-            <strong>Automatisation des Métriques</strong> — <code>trg_maj_note_bien</code> & <code>majNoteMoyenne</code><br><br>
-            Mise à jour automatique de la note moyenne : à chaque avis client, le trigger déclenche une procédure autonome
-            de recalcul. Résultat : notes toujours fraîches pour la recherche/tri sans charge côté application.
-          </li>
-        </ul>
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Notes & agrégations</h4>
+            <p class="section-text" style="max-width:none;">
+              Mise à jour des métriques (note moyenne) et agrégations via PL/SQL + vues afin d’alléger les requêtes Flask et garder
+              des informations à jour.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <!-- ================= CHOIX TECHNIQUES ================= -->
+      <!-- ================= TECH DECISIONS ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Choix techniques</h3>
-        <ul>
-          <li>Oracle Database pour la fiabilité transactionnelle</li>
-          <li>Flask pour le backend</li>
-          <li>PL/SQL pour la logique métier</li>
-          <li>Architecture en couches</li>
-        </ul>
+        <h3>Choix techniques (justifiés)</h3>
+        <div class="grid-2" style="margin-top:12px; gap:12px;">
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Pourquoi Oracle + PL/SQL ?</h4>
+            <ul style="margin:0;">
+              <li>Transactions fiables et intégrité forte</li>
+              <li>Centralisation de la logique métier (procédures, triggers)</li>
+              <li>Requêtes avancées + vues pour l’agrégation</li>
+            </ul>
+          </div>
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 6px 0;">Pourquoi Flask ?</h4>
+            <ul style="margin:0;">
+              <li>Backend léger et flexible</li>
+              <li>Routes claires + Jinja2 pour pages dynamiques</li>
+              <li>Intégration simple avec Oracle via <code>python-oracledb</code></li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <!-- ================= RESULTATS ================= -->
+      <!-- ================= SCREENSHOTS ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Résultats</h3>
-        <ul>
-          <li>Application web fonctionnelle</li>
-          <li>Base de données robuste</li>
-          <li>Système sécurisé</li>
-          <li>Gestion complète des locations</li>
-        </ul>
-      </div>
-       <!-- ================= SCREENSHOTS PLATEFORME ================= -->
-      <div class="card" style="margin-top:16px;">
-        <h3>Screenshots de la plateforme</h3>
+        <h3>Screenshots</h3>
+        <p class="section-text" style="max-width:none;">
+          Exemples d’écrans : espace propriétaire, espace public, gestion des réservations et authentification.
+        </p>
 
         <div class="projects" style="grid-template-columns:1fr 1fr; margin-top:12px;">
           <div class="project-card" style="pointer-events:none;">
@@ -165,59 +245,73 @@
           </div>
 
           <div class="project-card" style="pointer-events:none;">
-            <img src="ouve.png" alt="Espace ouvert" />
+            <img src="ouve.png" alt="Espace public" />
             <div class="project-body">
-              <h3>Espace ouvert</h3>
-              <p>Recherche, réservation et historique.</p>
+              <h3>Espace Public</h3>
+              <p>Recherche, consultation et accès aux détails.</p>
             </div>
           </div>
 
           <div class="project-card" style="pointer-events:none;">
             <img src="reserv.png" alt="Gestion des réservations" />
             <div class="project-body">
-              <h3>Gestion des Réservations</h3>
-              <p>Demandes, statuts, annulation/confirmation.</p>
+              <h3>Réservations</h3>
+              <p>Statuts, acceptation/refus, suivi du cycle.</p>
             </div>
           </div>
 
           <div class="project-card" style="pointer-events:none;">
             <img src="insc.png" alt="Inscription / Connexion" />
             <div class="project-body">
-              <h3>Inscription / Connexion</h3>
-              <p>Création de compte + authentification.</p>
+              <h3>Authentification</h3>
+              <p>Inscription + connexion + rôles.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ================= DEMONSTRATION (FULL WIDTH, LIENS OK) ================= -->
+      <!-- ================= RESULTS + IMPACT ================= -->
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <h3>Résultats</h3>
+          <ul>
+            <li>Application fonctionnelle avec workflow réservation complet</li>
+            <li>Base Oracle robuste (contraintes, vues, PL/SQL)</li>
+            <li>Séparation claire des rôles (locataire / propriétaire)</li>
+            <li>Contrôles de cohérence (disponibilité, statuts, paiement)</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Ce que ce projet démontre</h3>
+          <ul>
+            <li>Conception & modélisation de base de données</li>
+            <li>Implémentation de règles métier côté SGBD</li>
+            <li>Développement backend Flask (auth, sessions, RBAC)</li>
+            <li>Application data-driven (vues, agrégations, dashboards)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ================= CTA ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Démonstration</h3>
-
-        <p style="margin-bottom:10px;">Vidéo :</p>
-        <a
-          class="btn btn-primary"
-          href="https://youtu.be/xxOOS9JRwuo"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Voir la vidéo de démonstration
-        </a>
-
-        <p style="margin-top:16px; margin-bottom:10px;">Code source GitHub :</p>
-        <a
-          class="btn btn-ghost"
-          href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Voir le code sur GitHub
-        </a>
+        <h3>Accès rapide</h3>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn btn-primary" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener noreferrer">
+            Voir la vidéo de démonstration
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener noreferrer">
+            Consulter le code
+          </a>
+          <a class="btn btn-ghost" href="../../index.html#contact">
+            Me contacter
+          </a>
+        </div>
       </div>
 
       <footer class="footer">© 2026 — Malak Mounji</footer>
-
     </section>
   </main>
+
 </body>
 </html>
