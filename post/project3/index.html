@@ -8,70 +8,179 @@
 </head>
 
 <body>
-  <div class="bg-glow"></div>
+ <section class="ax-section">
 
-  <header class="header">
-    <div class="container nav">
-      <a class="logo" href="../../index.html#portfolio">← Retour</a>
+  <h2 class="ax-title">Bien Immobilier — Plateforme de Location</h2>
 
-      <nav class="nav-links">
-        <a href="../../index.html#home">Home</a>
-        <a href="../../index.html#about">About</a>
-        <a href="../../index.html#skills">Skills</a>
-        <a href="../../index.html#portfolio" class="active">Portfolio</a>
-        <a href="../../index.html#contact">Contact</a>
-      </nav>
+  <p class="ax-lead">
+    Application web de location immobilière permettant la gestion complète du cycle de location :
+    publication de biens, réservation, paiement et avis clients.
+  </p>
 
-      <div class="nav-actions">
-        <a class="btn btn-primary" href="../../CV_Malak_Mounji.pdf" download>Download CV</a>
-      </div>
-    </div>
-  </header>
+  <p class="ax-text">
+    Le projet met l’accent sur la conception de base de données, la cohérence transactionnelle et la sécurité des données.
+  </p>
 
-  <main class="container">
-    <section class="section" style="border-top:none;">
-      <div class="section-head">
-        <h2>Nom du projet (à compléter)</h2>
-        <p>Une courte phrase : objectif + valeur.</p>
-      </div>
+  <hr class="ax-sep">
 
-      <div class="grid-2">
-        <div class="card">
-          <h3>Contexte</h3>
-          <p>Explique le besoin / problème en 4-5 lignes.</p>
+  <!-- ================= VUE D'ENSEMBLE ================= -->
+  <h3 class="ax-subtitle">Vue d’ensemble</h3>
+  <ul class="ax-list">
+    <li>Publication et gestion de biens immobiliers</li>
+    <li>Réservation avec visualisation des disponibilités</li>
+    <li>Paiement et historique des transactions</li>
+    <li>Avis clients et notes des biens</li>
+    <li>Tableaux de bord locataire et propriétaire</li>
+  </ul>
 
-          <h3 style="margin-top:14px;">Objectifs</h3>
-          <ul>
-            <li>Objectif 1</li>
-            <li>Objectif 2</li>
-            <li>Objectif 3</li>
-          </ul>
-        </div>
+  <hr class="ax-sep">
 
-        <div class="card">
-          <h3>Stack</h3>
-          <ul>
-            <li>Python / SQL / Power BI / etc</li>
-            <li>Librairies</li>
-            <li>Déploiement (optionnel)</li>
-          </ul>
+  <!-- ================= ARCHITECTURE ================= -->
+  <h3 class="ax-subtitle">Architecture du système</h3>
+  <p class="ax-text">
+    L’application repose sur une architecture en couches séparant clairement l’interface utilisateur,
+    la logique applicative et les données.
+  </p>
 
-          <h3 style="margin-top:14px;">Résultats</h3>
-          <ul>
-            <li>Résultat 1 (mesurable si possible)</li>
-            <li>Résultat 2</li>
-          </ul>
-        </div>
-      </div>
+  <!-- ================= PRESENTATION ================= -->
+  <h4 class="ax-subtitle">Couche Présentation</h4>
+  <ul class="ax-list">
+    <li>HTML / CSS</li>
+    <li>Tailwind CSS</li>
+    <li>Interface de recherche des biens</li>
+    <li>Pages réservation et paiement</li>
+    <li>Tableaux de bord utilisateurs</li>
+  </ul>
 
-      <div class="card" style="margin-top:16px;">
-        <h3>Captures / Démo</h3>
-        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="#" target="_blank">Lien démo</a>
-          <a class="btn btn-ghost" href="#" target="_blank">Lien GitHub</a>
-        </div>
-      </div>
+  <!-- ================= APPLICATIVE ================= -->
+  <h4 class="ax-subtitle">Couche Applicative (Backend)</h4>
+  <ul class="ax-list">
+    <li>Backend Flask</li>
+    <li>Authentification utilisateurs</li>
+    <li>Gestion des sessions</li>
+    <li>Validation des données</li>
+    <li>Contrôle d’accès locataire / propriétaire</li>
+  </ul>
 
+  <!-- ================= DONNEES ================= -->
+  <h4 class="ax-subtitle">Couche Données (Oracle)</h4>
+  <p class="ax-text">La base relationnelle gère les entités principales :</p>
+  <ul class="ax-list">
+    <li>Utilisateurs</li>
+    <li>Biens immobiliers</li>
+    <li>Réservations</li>
+    <li>Locations</li>
+    <li>Paiements</li>
+    <li>Avis clients</li>
+    <li>Photos des biens</li>
+  </ul>
+
+  <p class="ax-text">Schéma relationnel des tables :</p>
+  <div class="ax-image-box">
+    <!-- Remplace "schema_tables.png" par le chemin réel de ta photo -->
+    <img src="schema_tables.png" alt="Schéma des tables - Bien Immobilier" style="width:100%;border-radius:8px;">
+  </div>
+
+  <hr class="ax-sep">
+
+  <!-- ================= FONCTIONNALITES ================= -->
+  <h3 class="ax-subtitle">Fonctionnalités</h3>
+
+  <h4 class="ax-subtitle">Locataire</h4>
+  <ul class="ax-list">
+    <li>Consultation des logements</li>
+    <li>Recherche par critères</li>
+    <li>Visualisation des disponibilités</li>
+    <li>Réservation de logements</li>
+    <li>Paiement</li>
+    <li>Ajout d’avis</li>
+  </ul>
+
+  <h4 class="ax-subtitle">Propriétaire</h4>
+  <ul class="ax-list">
+    <li>Ajout de biens</li>
+    <li>Modification de biens</li>
+    <li>Suppression de biens</li>
+    <li>Gestion des réservations</li>
+    <li>Validation des demandes</li>
+  </ul>
+
+  <hr class="ax-sep">
+
+  <!-- ================= DEFIS TECHNIQUES ================= -->
+  <h3 class="ax-subtitle">Défis techniques</h3>
+
+  <ul class="ax-list">
+
+    <li>
+      <strong>1) Gestion de l’overbooking — <code>creerReservation</code> + <code>verifierDisponibilite</code></strong><br>
+      Le défi principal était d’éviter les doubles réservations sur un même bien lors d’accès simultanés.
+      La création d’une réservation passe toujours par une vérification des chevauchements de dates.
+      Cette logique centralisée garantit l’atomicité : si un conflit existe, la réservation est refusée
+      avant insertion, assurant une disponibilité fiable côté utilisateur.
+    </li>
+
+    <li>
+      <strong>2) Sécurité anti-fraude paiement — <code>trg_no_update_paiement_if_reussi</code></strong><br>
+      Pour sécuriser les transactions, un paiement validé devient immuable.
+      Toute tentative de modification (montant, statut, date) après succès est bloquée au niveau Oracle,
+      ce qui protège la plateforme contre les manipulations post-transaction, même si l’attaque vient
+      de l’interface web ou d’une requête directe.
+    </li>
+
+    <li>
+      <strong>3) Contrôle d’accès propriétaire — <code>trg_secu_bien_owner</code></strong><br>
+      Le défi était de s’assurer qu’un bien ne puisse être modifié/supprimé que par son propriétaire.
+      Le trigger vérifie l’identité de l’utilisateur de la session avant toute opération critique,
+      empêchant l’usurpation et garantissant que les actions d’administration des biens restent strictement
+      limitées au propriétaire légitime.
+    </li>
+
+    <li>
+      <strong>4) Automatisation des métriques — <code>trg_maj_note_bien</code> + <code>majNoteMoyenne</code></strong><br>
+      Pour garder des notes fiables sans surcharger le backend, le recalcul est automatisé :
+      à chaque avis client, un trigger déclenche une mise à jour de la note moyenne du bien.
+      Résultat : des scores toujours à jour pour la recherche/tri des biens, sans calculs coûteux côté Flask.
+    </li>
+
+    <li>
+      <strong>5) Intégrité des données — contraintes + suppression contrôlée</strong><br>
+      Le défi était d’éviter des états incohérents : dates invalides, suppression d’un bien ayant des réservations
+      actives, ou suppression d’une réservation liée à une location/paiement. Des règles en base (contraintes et protections)
+      assurent la cohérence du cycle réservation → location → paiement.
+    </li>
+
+    <li>
+      <strong>6) Gestion des rôles — séparation Locataire / Propriétaire</strong><br>
+      Implémentation d’un accès différencié : chaque rôle dispose de ses pages, actions et données.
+      Cela évite l’exposition d’informations sensibles et simplifie l’expérience utilisateur via des dashboards dédiés.
+    </li>
+
+  </ul>
+
+  <hr class="ax-sep">
+
+  <!-- ================= CHOIX TECHNIQUES ================= -->
+  <h3 class="ax-subtitle">Choix techniques</h3>
+  <ul class="ax-list">
+    <li>Flask pour le backend</li>
+    <li>Oracle Database pour la gestion des données</li>
+    <li>Architecture en couches</li>
+    <li>Base relationnelle normalisée</li>
+  </ul>
+
+  <hr class="ax-sep">
+
+  <!-- ================= RESULTATS ================= -->
+  <h3 class="ax-subtitle">Résultats</h3>
+  <ul class="ax-list">
+    <li>Application web fonctionnelle</li>
+    <li>Base de données robuste</li>
+    <li>Système sécurisé</li>
+    <li>Gestion complète des locations</li>
+  </ul>
+
+</section>
       <footer class="footer">© 2026 — Malak Mounji</footer>
     </section>
   </main>
