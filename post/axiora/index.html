@@ -756,9 +756,9 @@ elif st.session_state.page == "Assistant":
           </div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- 2) ACCORDEON : texte à côté + bouton code -->
-    <!-- ========================================================= -->
+
+
+    
     <h3 id="accordeon" class="ax-subtitle"> Accordéon “Exploration des Indices” : navigation scalable</h3>
 
     <div class="ax-media">
@@ -811,9 +811,10 @@ if st.session_state.indices_open:
           </div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- 3) FILTRES : (on laisse image large, mais code affichable) -->
-    <!-- ========================================================= -->
+
+
+
+    
     <h3 id="filtres" class="ax-subtitle"> Filtres &amp; contrôles : layout 3 zones (contrôle → insight → vérification)</h3>
 
     <p class="ax-text">
@@ -851,9 +852,9 @@ with col_table:
       </code></pre>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- 4) COMPONENTS UI : top bar + KPI (code affichable) -->
-    <!-- ========================================================= -->
+
+
+    
     <h3 id="components" class="ax-subtitle"> Composants UI réutilisables : Top Bar &amp; KPI cards (HTML/CSS)</h3>
 
     <p class="ax-text">
@@ -1101,109 +1102,9 @@ def area_miroir(df):
         <li><strong>Lecture actionnable :</strong> ces écarts orientent des mesures ciblées (formation, soutien à l’emploi féminin, services facilitant l’activité).</li>
       </ul>
     </div>
-   <!-- ========================================================= -->
-<!-- 2) Corrélation / lecture croisée : diplôme vs activité -->
-<!-- ========================================================= -->
-<h3 class="ax-subtitle">2) Corrélation — niveau d’éducation & taux d’activité (selon milieu)</h3>
 
-<p class="ax-text">
-  Cette vue vérifie une relation structurante : <strong>l’éducation agit-elle comme levier d’accès à l’activité</strong>,
-  et <strong>de la même manière</strong> en urbain et en rural ? L’objectif est d’identifier où la formation
-  explique la participation — et où d’autres freins (opportunités locales, mobilité, contraintes sociales)
-  deviennent dominants.
-</p>
-
-<!--  Image = même largeur que le texte -->
-<div class="ax-fullwidth" style="margin-top:12px;">
-  <img class="ax-img"
-       src="images/lo.png"
-       alt="Évolution du taux d’activité par niveau et milieu">
-</div>
-
-<div class="card" style="margin-top:14px;">
-  <h3 style="margin-top:0;">Lecture analytique</h3>
-  <ul class="ax-list" style="margin-bottom:0;">
-    <li><strong>Effet diplôme :</strong> mesure l’écart “Sans diplôme” vs “Avec diplôme” (intensité du levier éducation).</li>
-    <li><strong>Effet milieu :</strong> compare urbain/rural pour repérer où le diplôme “paye” le plus en participation.</li>
-    <li><strong>Valeur décisionnelle :</strong> si l’écart se creuse, la formation est un levier prioritaire ; sinon, il faut traiter des contraintes structurelles (mobilité, tissu économique, etc.).</li>
-  </ul>
-</div>
-
-<!--  Bouton + code caché par défaut -->
-<div style="margin: 12px 0 0 0;">
-  <button type="button" class="ax-btn" onclick="toggleCode('codeWorkCorr', this)">
-    Afficher le code
-  </button>
-</div>
-
-<pre id="codeWorkCorr" class="ax-code hidden"><code>
-df = pd.DataFrame(data)
-
-col1, col2, col3 = st.columns([1, 2, 1])
-
-
-with col1:
-    year_options = ["2016", "2017", "2018"]
-    selected_year = st.selectbox("Choisir l'année", year_options)
-    graph_options = ["scatter chart", "Line Plot", "Bar Plot"]
-    graph_type = st.selectbox("Type de graphique", graph_options, index=2)
-
-    show_urbain = st.checkbox("Urbain", True, key="chec7")
-    show_rural  = st.checkbox("Rural", True, key="chec8")
-    show_total  = st.checkbox("Total", True, key="chec9")
-
-
-columns_to_plot = []
-if show_urbain:
-    columns_to_plot.append(f"{selected_year} – Urbain")
-if show_rural:
-    columns_to_plot.append(f"{selected_year} – Rural")
-if show_total:
-    columns_to_plot.append(f"{selected_year} – Total")
-
-
-with col2:
-    if not columns_to_plot:
-        st.warning("⚠ Veuillez sélectionner au moins un indicateur !")
-    else:
-        # --- Graphiques ---
-        if graph_type == "Line Plot":
-            fig = px.line(
-                df, x="Provinces", y=columns_to_plot, markers=True,
-                color_discrete_sequence=custom_colors
-            )
-            st.plotly_chart(fig, use_container_width=True)
-
-        elif graph_type == "scatter chart":
-            if len(columns_to_plot) >= 2:
-                x_col = columns_to_plot[0]
-                y_col = columns_to_plot[1]
-            else:
-                # si un seul indicateur choisi → x = Provinces, y = colonne
-                x_col = "Provinces"
-                y_col = columns_to_plot[0]
-
-            fig = px.scatter(
-                df, x=x_col, y=y_col, text="Provinces",
-                size_max=20, color_discrete_sequence=custom_colors
-            )
-            fig.update_traces(textposition="top center")
-            st.plotly_chart(fig, use_container_width=True)
-
-        else:  # Bar Plot
-            fig = px.bar(
-                df, x="Provinces", y=columns_to_plot, barmode="group",
-                color_discrete_sequence=custom_colors
-            )
-            st.plotly_chart(fig, use_container_width=True)
-
-
-with col3:
-    st.dataframe(df[["Provinces"] + columns_to_plot], use_container_width=True)
-</code></pre>
   </div>
 </section>
-
 
 
 
@@ -1776,43 +1677,54 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
 
-def forecast_metric(df_hist, target_col="Population", horizon=3):
-    """
-    Pipeline générique de prévision par Régression Linéaire
-    """
-    # Tri chronologique strict
-    df_hist = df_hist.sort_values("Année").copy()
 
-    # 1. Split temporel (No Shuffle pour éviter le Data Leakage)
+def forecast_metric(df_hist, target_col="Population", horizon=3):
+    df_hist = df_hist.copy()
+    df_hist["Année"] = pd.to_numeric(df_hist["Année"], errors="coerce")
+    df_hist[target_col] = pd.to_numeric(df_hist[target_col], errors="coerce")
+
+    df_hist = df_hist.dropna(subset=["Année", target_col])
+    df_hist = df_hist.sort_values("Année")
+
     split_idx = int(len(df_hist) * 0.8) if len(df_hist) >= 6 else max(len(df_hist) - 1, 1)
+
     train = df_hist.iloc[:split_idx]
     test  = df_hist.iloc[split_idx:]
 
     X_train = train["Année"].values.reshape(-1, 1)
     y_train = train[target_col].values
+
     X_test  = test["Année"].values.reshape(-1, 1)
     y_test  = test[target_col].values
 
-    
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-   
     if len(test) > 0:
         y_test_pred = model.predict(X_test)
         mae = mean_absolute_error(y_test, y_test_pred)
     else:
         mae = None
-
-    
     last_year = int(df_hist["Année"].max())
-    future_years = np.arange(last_year + 1, last_year + 1 + horizon)
-    y_future = model.predict(future_years.reshape(-1, 1))
+
+    future_years = np.arange(
+        last_year + 1,
+        last_year + 1 + horizon
+    )
+
+    y_future = model.predict(
+        future_years.reshape(-1, 1)
+    )
+
 
     df_future = pd.DataFrame({
+
         "Année": future_years,
+
         f"{target_col}_pred": y_future
+
     })
+
 
     return model, df_future, mae
       </code></pre>
@@ -2045,19 +1957,19 @@ def ask_axiora_assistant(user_prompt):
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
       <div class="card">
-        <h4 style="color: #1E293B; margin-top: 0;"> 1. Interrogation directe</h4>
+        <h4 style="color:#5d6d87; margin-top: 0;"> 1. Interrogation directe</h4>
         <p class="ax-text" style="font-size: 14px;"><em>"Quel est le taux de pauvreté dans la commune de Drargua en 2014 ?"</em></p>
         <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">Le modèle parcourt l'arborescence du dictionnaire injecté et retourne la valeur exacte instantanément.</p>
       </div>
       
       <div class="card">
-        <h4 style="color: #1E293B; margin-top: 0;"> 2. Calcul et Comparaison</h4>
+        <h4 style="color: #5d6d87; margin-top: 0;"> 2. Calcul et Comparaison</h4>
         <p class="ax-text" style="font-size: 14px;"><em>"Quelles sont les 3 provinces avec le taux de chômage urbain le plus élevé ?"</em></p>
         <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">L'IA compare les données entre elles, effectue des tris logiques, et hiérarchise l'information.</p>
       </div>
 
       <div class="card">
-        <h4 style="color: #1E293B; margin-top: 0;"> 3. Synthèse et Insight</h4>
+        <h4 style="color:#5d6d87; margin-top: 0;"> 3. Synthèse et Insight</h4>
         <p class="ax-text" style="font-size: 14px;"><em>"Fais-moi un résumé en 3 points de la situation de l'habitat rural à Tata."</em></p>
         <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">Le modèle agrège plusieurs colonnes disparates pour rédiger un paragraphe d'aide à la décision stratégique.</p>
       </div>
