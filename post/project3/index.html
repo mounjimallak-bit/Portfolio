@@ -101,8 +101,34 @@
  
   </div>
 
-</div>      <!-- ================= QUICK LINKS ================= -->
-      <div class="grid-2" style="margin-top: 10px;">
+</div>   
+
+
+
+      <!-- ================= TABLE DES MATIÈRES ================= -->
+<div class="card" style="margin-top:18px;">
+  <h3 style="margin:0 0 10px 0;">Table des matières</h3>
+
+  <div style="display:flex; flex-wrap:wrap; gap:10px;">
+    <a class="btn btn-ghost" href="#liens">01. Liens & livrables</a>
+    <a class="btn btn-ghost" href="#features">02. Fonctionnalités</a>
+    <a class="btn btn-ghost" href="#architecture">03. Architecture & données</a>
+    <a class="btn btn-ghost" href="#schema">04. Schéma relationnel</a>
+    <a class="btn btn-ghost" href="#bugs">05. Bugs & corrections</a>
+    <a class="btn btn-ghost" href="#security">06. Sécurité & rôles Oracle</a>
+    <a class="btn btn-ghost" href="#screenshots">07. Screenshots</a>
+    <a class="btn btn-ghost" href="#results">08. Résultats</a>
+    <a class="btn btn-ghost" href="#improvements">09. Améliorations</a>
+    <a class="btn btn-ghost" href="#cta">10. Accès rapide</a>
+  </div>
+
+  <p class="section-text" style="margin-top:12px; max-width:none;">
+    Navigation rapide : cliquez sur une section pour aller directement au contenu.
+  </p>
+</div>
+      <!-- ================= QUICK LINKS ================= -->
+      
+      <div id="liens" class="grid-2" style="margin-top: 10px;">
         <div class="card">
           <h3 style="margin-bottom:8px;">Liens</h3>
           <div style="display:flex; flex-wrap:wrap; gap:10px;">
@@ -132,7 +158,7 @@
       </div>
 
       <!-- ================= OVERVIEW + FEATURES ================= -->
-      <div class="grid-2" style="margin-top:16px;">
+     <div id="features" class="grid-2" style="margin-top:16px;">
         <div class="card">
           <h3>Fonctionnalités — Locataire</h3>
           <ul>
@@ -162,7 +188,7 @@
       </div>
 
      
-      <div class="card" style="margin-top:16px;">
+     <div id="architecture" class="card" style="margin-top:16px;">
         <h3>Architecture & données (Oracle)</h3>
         <div class="grid-2" style="margin-top:12px; gap:12px;">
           <div class="card" style="padding:14px; margin:0;">
@@ -188,7 +214,7 @@
         </div>
       </div>
 
-      <div class="card" style="margin-top:16px;">
+      <div id="schema" class="card" style="margin-top:16px;">
         <h3>Schéma relationnel</h3>
         <p class="section-text" style="max-width:none;">
           Modèle relationnel normalisé + contraintes  + indexes Oracle.
@@ -204,7 +230,7 @@
       </div>
 
  
-      <div class="card" style="margin-top:16px;">
+      <div id="bugs" class="card" style="margin-top:16px;">
         <h3>Bugs / cas limites & corrections (noms réels PL/SQL)</h3>
         <p class="section-text" style="max-width:none;">
           Liste des problèmes rencontrés et mécanismes Oracle mis en place (procédures / fonctions / triggers / vues / rôles).
@@ -283,7 +309,7 @@
         </div>
       </div>
 
-      <div class="card" style="margin-top:16px;">
+      <div id="security" class="card" style="margin-top:16px;">
         <h3>Sécurité & droits Oracle </h3>
         <div class="grid-2" style="margin-top:12px; gap:12px;">
           <div class="card" style="padding:14px; margin:0;">
@@ -309,7 +335,7 @@
       </div>
 
       
-      <div class="card" style="margin-top:16px;">
+     <div id="screenshots" class="card" style="margin-top:16px;">
         <h3>Screenshots</h3>
         <p class="section-text" style="max-width:none;">
           Interfaces principales : espace propriétaire, espace public, réservations et authentification.
@@ -355,7 +381,7 @@
       </div>
 
      
-      <div class="grid-2" style="margin-top:16px;">
+     <div id="results" class="grid-2" style="margin-top:16px;">
         <div class="card">
           <h3>Résultats</h3>
           <ul>
@@ -368,7 +394,7 @@
           </ul>
         </div>
 
-        <div class="card">
+        <div id="improvements" class="card" style="margin-top:16px;">
           <h3>Améliorations possibles</h3>
           <ul>
             <li>Tests automatisés des procédures/edge cases (dates, statuts, concurrence)</li>
@@ -380,7 +406,7 @@
       </div>
 
 
-      <div class="card" style="margin-top:16px;">
+      <div id="cta" class="card" style="margin-top:16px;">
         <h3>Accès rapide</h3>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <a class="btn btn-primary" href="https://youtu.be/AFmtnT5RAnk" target="_blank" rel="noopener noreferrer">
