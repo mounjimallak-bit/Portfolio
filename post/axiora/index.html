@@ -2014,7 +2014,6 @@ def ask_axiora_assistant(user_prompt):
 
 
 
-
 <section id="report" class="ax-section">
   <div class="container">
 
@@ -2023,49 +2022,33 @@ def ask_axiora_assistant(user_prompt):
     </div>
 
     <p class="ax-lead">
-      La valeur d'une analyse réside dans sa capacité à être partagée et archivée. [cite_start]J'ai développé un moteur de rendu <strong>PDF "Data-to-Doc"</strong> permettant de transformer instantanément les explorations interactives en rapports administratifs structurés[cite: 1, 2]. [cite_start]Le système automatise l'extraction, le nettoyage et la mise en forme pour fournir des documents prêts pour l'impression ou la diffusion institutionnelle[cite: 2].
+      La valeur d'une analyse réside dans sa capacité à être partagée et archivée. J'ai développé un moteur de rendu <strong>PDF "Data-to-Doc"</strong> permettant de transformer instantanément les explorations interactives en rapports administratifs structurés. Le système automatise l'extraction, le nettoyage et la mise en forme pour fournir des documents prêts pour l'impression ou la diffusion institutionnelle.
     </p>
 
-    <h3 id="parametrage" class="ax-subtitle" style="margin-top: 40px;">Paramétrage du rapport (Modularité & UX)</h3>
-
-    <div class="card">
-      <p class="ax-text">
-        Le générateur ne se contente pas de figer l'écran actuel. [cite_start]Il propose une interface de <strong>mapping dynamique</strong> où l'utilisateur définit les variables clés telles que le titre, l'auteur et les objectifs de l'étude[cite: 1, 2].
-      </p>
-      <ul class="ax-list">
-        [cite_start]<li><strong>Moteur Universel :</strong> Capable de traiter n'importe quel dataset chargé via le composant <code>st.file_uploader</code>[cite: 1, 2].</li>
-        [cite_start]<li><strong>Pipeline de nettoyage :</strong> Intégration d'un algorithme qui élimine automatiquement les lignes de totaux et traite les valeurs aberrantes avant l'exportation[cite: 1].</li>
-        [cite_start]<li><strong>State Persistence :</strong> Utilisation de <code>st.session_state</code> pour conserver les paramètres du rapport durant toute la session, permettant une navigation fluide entre la configuration et la génération[cite: 1].</li>
-      </ul>
-    </div>
-
-    <br>
-
-    <h3 id="contenu-pdf" class="ax-subtitle">Contenu du PDF (Analyse & DataViz)</h3>
-
+    <h3 id="contenu-pdf" class="ax-subtitle" style="margin-top: 40px;">Contenu du PDF (Analyse & DataViz)</h3>
     <p class="ax-text">
-      Le rapport est construit selon les standards académiques. [cite_start]J'ai étendu la classe <code>FPDF</code> pour gérer des mises en page complexes incluant des résumés exécutifs et des tables des matières interactives[cite: 1, 2].
+      Le rapport est construit selon les standards académiques. J'ai étendu la classe FPDF pour gérer des mises en page complexes incluant des résumés exécutifs et des tables des matières interactives.
     </p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
       <div class="card">
         <h4 style="color:#5d6d87; margin-top: 0;">Analyse Statistique</h4>
         <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          [cite_start]Calcul automatique des indicateurs descriptifs (Moyenne, Écart-type, Quartiles) et identification précise des <strong>Top/Bottom 10</strong> des localités pour souligner les disparités[cite: 1, 2].
+          Calcul automatique des indicateurs descriptifs (Moyenne, Écart-type, Quartiles) et identification précise des <strong>Top/Bottom 10</strong> des localités pour souligner les disparités.
         </p>
       </div>
 
       <div class="card">
         <h4 style="color:#5d6d87; margin-top: 0;">Intégration Visuelle</h4>
         <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          [cite_start]Exportation haute résolution des graphiques Plotly et Matplotlib injectés dynamiquement dans le flux du document pour illustrer les tendances[cite: 1, 2].
+          Exportation haute résolution des graphiques Plotly et Matplotlib injectés dynamiquement dans le flux du document pour illustrer les tendances.
         </p>
       </div>
 
-      <div class="card" style="grid-column: span 1;">
+      <div class="card">
         <h4 style="color:#5d6d87; margin-top: 0;">Structure Dynamique</h4>
         <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          [cite_start]Pagination automatique et sections d'analyses textuelles générées (Abstract, Introduction, Conclusion) pour faciliter la lecture décisionnelle[cite: 2].
+          Pagination automatique et sections d'analyses textuelles générées (Abstract, Introduction, Conclusion) pour faciliter la lecture décisionnelle.
         </p>
       </div>
     </div>
@@ -2073,20 +2056,19 @@ def ask_axiora_assistant(user_prompt):
     <br><br>
 
     <h3 id="export" class="ax-subtitle">Export & nommage automatique (Industrialisation)</h3>
-
     <div class="card">
       <p class="ax-text">
-        [cite_start]Le système gère l'exportation de manière entièrement automatisée, garantissant un livrable professionnel sans intervention manuelle supplémentaire[cite: 1].
+        Le système gère l'exportation de manière entièrement automatisée, garantissant un livrable professionnel sans intervention manuelle supplémentaire.
       </p>
       <ul class="ax-list">
-        [cite_start]<li><strong>Encodage robuste :</strong> Gestion native des caractères spéciaux (latin-1) pour assurer la parfaite lisibilité des textes en français et des noms de localités[cite: 1].</li>
-        [cite_start]<li><strong>Smart Naming :</strong> Le fichier est automatiquement nommé selon le format <code>Titre_Projet_Date.pdf</code> pour un classement archivistique optimal[cite: 1].</li>
-        [cite_start]<li><strong>Téléchargement instantané :</strong> Utilisation du composant <code>st.download_button</code> pour transférer directement le buffer mémoire vers le poste client sans stockage serveur inutile[cite: 1].</li>
+        <li><strong>Encodage robuste :</strong> Gestion native des caractères spéciaux (latin-1) pour assurer la parfaite lisibilité des textes en français et des noms de localités.</li>
+        <li><strong>Smart Naming :</strong> Le fichier est automatiquement nommé selon le format <code>Titre_Projet_Date.pdf</code> pour un classement archivistique optimal.</li>
+        <li><strong>Téléchargement instantané :</strong> Utilisation du composant <code>st.download_button</code> pour transférer directement le buffer mémoire vers le poste client sans stockage serveur inutile.</li>
       </ul>
     </div>
     
     <div style="margin-top: 40px; text-align: center;">
-      <a href="../../Rapport_automatique_RGPH.pdf" target="_blank" class="ax-btn" style="border: 2px solid #5d6d87; background: transparent; color: #1E293B; padding: 15px 30px;">
+      <a href="Rapport_automatique_RGPH.pdf" target="_blank" class="ax-btn" style="border: 2px solid #5d6d87; background: transparent; color:#5d6d87; padding: 15px 30px; text-decoration: none; border-radius: 5px;">
         Voir l'exemple complet : Rapport d'analyse RGPH 2014 (PDF)
       </a>
     </div>
@@ -2095,6 +2077,80 @@ def ask_axiora_assistant(user_prompt):
 </section>
 
 
+   <section id="resultats" class="ax-section">
+  <div class="container">
+    <div class="section-head">
+      <h1>Résultats & points forts</h1>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4 style="color:#5d6d87;">Transformation Digitale</h4>
+        <p class="ax-text">
+          Passage d'une donnée publique statique et complexe de HCP à une plateforme interactive "Self-Service BI". L'utilisateur n'est plus spectateur mais acteur de son exploration territoriale.
+        </p>
+      </div>
+
+      <div class="card">
+        <h4 style="color:#5d6d87;"> IA Métier & Fiabilité</h4>
+        <p class="ax-text">
+          Mise en place d'un assistant IA "Grounded" sur un dictionnaire de données unifié (<code>hcpdata.py</code>), garantissant des analyses sans hallucinations et une interprétation immédiate des KPIs.
+        </p>
+      </div>
+
+      <div class="card">
+        <h4 style="color:#5d6d87;"> Visualisation Avancée</h4>
+        <p class="ax-text">
+          Utilisation combinée de cartes choroplèthes, graphiques miroirs et radars pour rendre visibles les disparités socio-économiques et la pression urbaine dans la région Souss-Massa.
+        </p>
+      </div>
+
+      <div class="card">
+        <h4 style="color:#5d6d87;">Automatisation de Reporting</h4>
+        <p class="ax-text">
+          Réduction drastique du temps de rédaction administrative grâce au moteur PDF "Data-to-Doc", capable de générer un rapport structuré de 10 pages en moins de 5 secondes[cite: 2].
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="conclusion" class="ax-section">
+  <div class="container">
+    <div class="card" style="border-top: 4px solid #5d6d87;">
+      <h2 style="margin-top:0;">Conclusion</h2>
+      <p class="ax-text">
+        Axiora Data démontre ma capacité à piloter un projet Data complexe de bout en bout : de l'ingestion de fichiers Excel hétérogènes au déploiement d'une application web analytique intégrant du Machine Learning et de l'IA Générative. 
+      </p>
+      <p class="ax-text">
+        Ce projet s'inscrit dans une volonté de démocratiser l'accès à l'information territoriale et de fournir aux décideurs de l'ENSA Agadir et de la région des outils modernes, prédictifs et opérationnels pour orienter les politiques de développement.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" class="ax-section">
+  <div class="container">
+    <div class="section-head">
+      <h1>Roadmap & Évolutions</h1>
+    </div>
+
+    <div class="ax-step">
+      <div class="ax-step-title">Phase 1 : Actualisation RGPH 2024</div>
+      <p class="ax-text">Intégration automatisée des nouveaux indicateurs démographiques et socio-économiques dès leur publication officielle par le HCP pour un suivi en temps réel de la décennie.</p>
+    </div>
+
+    <div class="ax-step">
+      <div class="ax-step-title">Phase 2 : Forecasting Avancé</div>
+      <p class="ax-text">Transition vers des modèles de séries temporelles plus complexes (Prophet, XGBoost) pour affiner les prévisions de pauvreté et de chômage en intégrant des variables exogènes.</p>
+    </div>
+
+    <div class="ax-step">
+      <div class="ax-step-title">Phase 3 : Industrialisation & Docker</div>
+      <p class="ax-text">Conteneurisation de l'application via Docker pour faciliter le déploiement sur serveurs institutionnels et optimisation du pipeline de cache pour gérer des volumes de données plus massifs.</p>
+    </div>
+  </div>
+</section>
      </main>
     <footer class="footer">
       © 2026 — Malak Mounji
