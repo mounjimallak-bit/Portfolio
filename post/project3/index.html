@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ImmoMarket — Détails du projet</title>
+  <title>Bien Immobilier — Détails du projet</title>
   <link rel="stylesheet" href="../../styles.css" />
   <meta name="description" content="ImmoMarket : plateforme de location immobilière développée avec Flask & Oracle PL/SQL (réservation, paiement, avis, gestion propriétaire/locataire)." />
 </head>
@@ -85,7 +85,7 @@
         <div class="card">
           <h3>Vue d’ensemble</h3>
           <p class="section-text" style="max-width:none;">
-            ImmoMarket est conçu comme une application <strong>data-driven</strong> : l’interface consomme des vues Oracle et la logique critique
+            Bien Immobilier est conçu comme une application <strong>data-driven</strong> : l’interface consomme des vues Oracle et la logique critique
             est centralisée dans la base via PL/SQL. L’objectif est d’obtenir une plateforme stable, cohérente et maintenable.
           </p>
 
@@ -136,13 +136,17 @@
           La base utilise des <strong>contraintes d’intégrité</strong>, des <strong>vues</strong> et des <strong>procédures PL/SQL</strong>.
         </p>
 
-        <div style="margin-top:12px;">
-          <img
-            src="shemasql.png"
-            alt="Schéma relationnel des tables (Oracle)"
-            style="width:100%; border-radius:14px; display:block;"
-          />
-        </div>
+        <div class="card" style="margin-top:16px;">
+    <h3>Modélisation & Couche Données (Oracle)</h3>
+    <div style="margin-top:12px; height: 600px;">
+        <iframe 
+            src="shemasql.pdf" 
+            width="100%" 
+            height="100%" 
+            style="border: none; border-radius: 14px;">
+        </iframe>
+    </div>
+</div>
 
         <div class="grid-2" style="margin-top:14px;">
           <div class="card" style="padding:14px; margin:0;">
