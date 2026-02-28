@@ -1998,7 +1998,134 @@ def ask_axiora_assistant(user_prompt):
 
   </div>
 </section>
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   <section id="report" class="ax-section">
+  <div class="container">
+
+    <div class="section-head">
+      <h1>Générateur automatique de rapports</h1>
+    </div>
+
+    <p class="ax-lead">
+      La valeur d'une analyse réside dans sa capacité à être partagée et archivée. J'ai développé un moteur de rendu <strong>PDF "Data-to-Doc"</strong> permettant de transformer instantanément les explorations interactives en rapports administratifs structurés, prêts pour l'impression ou la diffusion par email.
+    </p>
+
+    <h3 id="parametrage" class="ax-subtitle" style="margin-top: 40px;">Paramétrage du rapport (Modularité & UX)</h3>
+
+    <div class="ax-media ax-media-equal">
+      <div class="ax-media-text">
+        <p class="ax-text">
+          Le générateur ne se contente pas de figer l'écran actuel. Il propose une interface de <strong>mapping dynamique</strong> : l'utilisateur charge son fichier et définit les variables clés (Titre, Auteur, Objectifs). 
+        </p>
+        <ul class="ax-list">
+          <li><strong>Moteur Universel :</strong> Capable de traiter n'importe quel dataset chargé via <code>st.file_uploader</code>.</li>
+          <li><strong>Pipeline de nettoyage :</strong> Intégration d'un algorithme qui élimine les lignes de totaux et traite les valeurs aberrantes avant l'export.</li>
+          <li><strong>State Persistence :</strong> Utilisation de <code>st.session_state</code> pour conserver les paramètres du rapport durant toute la session de génération.</li>
+        </ul>
+      </div>
+
+      <div class="ax-media-figure">
+        <img class="ax-img" src="images/report_config.png" alt="Interface de paramétrage du rapport PDF">
+      </div>
+    </div>
+
+    <br><br>
+
+    <h3 id="contenu-pdf" class="ax-subtitle">Contenu du PDF (Analyse & DataViz)</h3>
+
+    <p class="ax-text">
+      Le rapport est construit selon les standards académiques et administratifs. J'ai étendu la classe <code>FPDF</code> pour gérer des mises en page complexes:
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px;">
+      <div class="card">
+        <h4 style="color:#1E293B; margin-top: 0;"> Analyse Statistique</h4>
+        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
+          Calcul automatique des indicateurs descriptifs (Moyenne, Écart-type, Quartiles) et identification des <strong>Top/Bottom 10</strong> des localités.
+        </p>
+      </div>
+
+      <div class="card">
+        <h4 style="color:#1E293B; margin-top: 0;"> Intégration Visuelle</h4>
+        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
+          Exportation des graphiques Plotly/Matplotlib en images haute résolution injectées dynamiquement dans le flux du document.
+        </p>
+      </div>
+
+      <div class="card">
+        <h4 style="color:#1E293B; margin-top: 0;"> Structure Dynamique</h4>
+        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
+          Table des matières interactive, pagination automatique et sections d'analyses textuelles générées pour faciliter la lecture décisionnelle.
+        </p>
+      </div>
+    </div>
+
+    <br><br>
+
+    <h3 id="export" class="ax-subtitle">Export & nommage automatique (Industrialisation)</h3>
+
+    <div class="ax-media ax-media-equal" style="align-items: center;">
+      <div class="ax-media-figure" style="order: 2;">
+         <img class="ax-img" src="images/pdf_preview.png" alt="Aperçu du rapport PDF généré">
+      </div>
+
+      <div class="ax-media-text" style="order: 1;">
+        <p class="ax-text">
+          le système gère l'exportation de manière automatisée :
+        </p>
+        <ul class="ax-list">
+          <li><strong>Encodage robuste :</strong> Gestion des caractères spéciaux (latin-1) pour assurer la compatibilité des textes en français et en arabe translittéré.</li>
+          <li><strong>Smart Naming :</strong> Le fichier est automatiquement nommé selon le format <code>Titre_Projet_Date.pdf</code>, facilitant le classement archivistique.</li>
+          <li><strong>Téléchargement instantané :</strong> Utilisation du composant <code>st.download_button</code> pour un transfert fluide du buffer mémoire vers le poste client.</li>
+        </ul>
+
+       
+
+# Génération du buffer pour téléchargement
+pdf_output = pdf.output(dest="S").encode("latin-1")
+st.download_button(label="⬇ Télécharger le Rapport", data=pdf_output, file_name="Rapport_Axiora.pdf")
+        </code></pre>
+      </div>
+    </div>
+    
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="../../Rapport_automatique_RGPH.pdf" target="_blank" class="ax-btn" style="border: 2px solid #1E293B; background: transparent; color: #1E293B;">
+             Voir un exemple de rapport généré dapres les donnees RGPH2014
+        </a>
+    </div>
+
+  </div>
+</section>
      </main>
     <footer class="footer">
       © 2026 — Malak Mounji
