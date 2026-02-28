@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bien Immobilier — Détails du projet</title>
   <link rel="stylesheet" href="../../styles.css" />
-  <meta name="description" content="Bien Immobilier : plateforme de location immobilière développée avec Flask & Oracle PL/SQL (réservation, paiement, avis, gestion propriétaire/locataire)." />
-
-  <!-- (Optionnel) petite amélioration SEO -->
-  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Plateforme de location immobilière (Flask + Oracle SQL/PLSQL) : annonces, réservations, locations, paiements, avis, messagerie, sécurité et règles métier en base." />
 </head>
 
 <body>
@@ -41,26 +38,16 @@
           <h2 style="margin:0;">Bien Immobilier — Plateforme de Location</h2>
           <span class="badge" style="transform: translateY(2px);">Flask</span>
           <span class="badge" style="transform: translateY(2px);">Oracle</span>
+          <span class="badge" style="transform: translateY(2px);">SQL</span>
           <span class="badge" style="transform: translateY(2px);">PL/SQL</span>
           <span class="badge" style="transform: translateY(2px);">Tailwind</span>
         </div>
 
-        <p style="max-width: 86ch;">
-          Application web de location immobilière couvrant le cycle complet :
-          <strong>publication</strong>, <strong>recherche</strong>, <strong>réservation</strong>, <strong>validation</strong>, <strong>paiement</strong> et <strong>avis</strong>.
-          L’objectif était de construire une solution robuste orientée <strong>transaction</strong>, avec une logique métier
-          <strong>centralisée en PL/SQL</strong> (anti-overbooking, statuts, paiements, intégrité) et une interface claire côté Flask.
+        <p style="max-width: 92ch;">
+          Application web de location immobilière couvrant : <strong>publication d’annonces</strong>, <strong>recherche</strong>,
+          <strong>réservation</strong>, <strong>confirmation</strong>, <strong>paiement</strong>, <strong>avis</strong> et <strong>messagerie</strong>.
+          Les règles critiques sont appliquées côté Oracle via <strong>vues</strong>, <strong>procédures/fonctions</strong>, <strong>triggers</strong> et <strong>rôles</strong>.
         </p>
-
-        <!-- Mini pitch recruteur -->
-        <div class="card" style="margin-top:14px; padding:14px;">
-          <p class="section-text" style="max-width:none; margin:0;">
-            <strong>Pourquoi ce projet intéresse un recruteur ?</strong><br />
-            Parce qu’il prouve que tu sais construire un backend “propre” :
-            <strong>auth + rôles</strong>, <strong>workflow métier</strong>, <strong>intégrité DB</strong>, <strong>gestion des erreurs</strong> et
-            <strong>séparation des responsabilités</strong> (UI / Flask / PL/SQL / Oracle).
-          </p>
-        </div>
       </div>
 
       <!-- ================= QUICK LINKS ================= -->
@@ -69,27 +56,26 @@
           <h3 style="margin-bottom:8px;">Liens</h3>
           <div style="display:flex; flex-wrap:wrap; gap:10px;">
             <a class="btn btn-primary" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener noreferrer">
-              Voir la démo vidéo
+              Démo vidéo
             </a>
             <a class="btn btn-ghost" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener noreferrer">
-              Code source GitHub
+              GitHub
             </a>
           </div>
 
           <p class="section-text" style="margin-top:12px; max-width:none;">
-            <strong>Rôle ciblé :</strong> Backend junior / Data Engineer junior / BI junior<br>
-            <strong>Livrables :</strong> app Flask, scripts SQL/PLSQL, schéma BD, démo vidéo<br>
-            <strong>Contexte :</strong> projet académique orienté SGBD + règles métier
+            <strong>Livrables :</strong> application Flask, scripts SQL/PLSQL, schéma BD, démo vidéo.<br>
+            <strong>Rôles applicatifs :</strong> Visiteur / Standard / Locataire / Propriétaire / Admin (droits Oracle).
           </p>
         </div>
 
         <div class="card">
-          <h3 style="margin-bottom:8px;">Stack & compétences démontrées</h3>
+          <h3 style="margin-bottom:8px;">Stack & composants</h3>
           <ul style="margin:0;">
-            <li><strong>Backend</strong> : Flask (sessions, auth, routes, validation, gestion d’erreurs)</li>
-            <li><strong>DB</strong> : Oracle SQL / PL/SQL (procédures, fonctions, vues, triggers, contraintes)</li>
-            <li><strong>UI</strong> : HTML / CSS / Tailwind + Jinja2 (templates dynamiques)</li>
-            <li><strong>Engineering</strong> : RBAC, transactions, intégrité, logs, séparation des couches</li>
+            <li><strong>Backend</strong> : Flask (routes, sessions, RBAC, gestion d’erreurs)</li>
+            <li><strong>DB</strong> : Oracle (modèle relationnel, indexes, vues, rôles/grants)</li>
+            <li><strong>PL/SQL</strong> : procédures/fonctions métier + triggers de sécurité et intégrité</li>
+            <li><strong>UI</strong> : HTML/CSS/Tailwind + Jinja2</li>
           </ul>
         </div>
       </div>
@@ -97,295 +83,249 @@
       <!-- ================= OVERVIEW + FEATURES ================= -->
       <div class="grid-2" style="margin-top:16px;">
         <div class="card">
-          <h3>Vue d’ensemble</h3>
-          <p class="section-text" style="max-width:none;">
-            Bien Immobilier est conçu comme une application <strong>data-driven</strong> : l’interface consomme des vues Oracle
-            (biens publics, note moyenne, photo principale) et les règles critiques sont garanties côté base via PL/SQL.
-            Cela permet de garder une cohérence solide même si l’interface évolue.
-          </p>
-
-          <h3 style="margin-top:14px;">Architecture en couches</h3>
+          <h3>Fonctionnalités — Locataire</h3>
           <ul>
-            <li><strong>Présentation</strong> : HTML/CSS/Tailwind (UI)</li>
-            <li><strong>Applicatif</strong> : Flask (auth, sessions, RBAC, endpoints)</li>
-            <li><strong>Logique métier</strong> : PL/SQL (procédures / fonctions / triggers)</li>
-            <li><strong>Données</strong> : Oracle (modèle relationnel, contraintes, vues)</li>
-          </ul>
-
-          <!-- Ajout indispensable -->
-          <h3 style="margin-top:14px;">Qualité & fiabilité</h3>
-          <ul>
-            <li><strong>Validation</strong> des entrées (dates, montants, champs obligatoires)</li>
-            <li><strong>Gestion des erreurs</strong> (messages utilisateurs + rollback transaction)</li>
-            <li><strong>Sécurité</strong> : sessions, contrôle d’accès, protections côté DB</li>
+            <li>Consulter le catalogue via <code>VUE_ANNONCES_PUBLIQUES</code> / <code>VUE_BIENS_PUBLICS</code></li>
+            <li>Rechercher par filtres via <code>rechercherBiens(...)</code></li>
+            <li>Créer une réservation via <code>creerReservation(...)</code> (anti-chevauchement)</li>
+            <li>Consulter son historique via <code>VUE_MES_RESERVATIONS</code> / <code>get_mes_reservations(...)</code></li>
+            <li>Payer via <code>genererPaiement(...)</code> puis <code>validerPaiement(...)</code> / <code>echouerPaiement(...)</code></li>
+            <li>Consulter ses paiements via <code>VUE_MES_PAIEMENTS</code></li>
+            <li>Messagerie (insertion contrôlée) via trigger <code>trg_secu_message_identity</code></li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>Fonctionnalités</h3>
-
-          <div class="grid-2" style="gap:12px; margin-top:10px;">
-            <div class="card" style="padding:14px; margin:0;">
-              <h4 style="margin:0 0 6px 0;">Locataire</h4>
-              <ul style="margin:0;">
-                <li>Parcourir & rechercher des logements</li>
-                <li>Voir détail + périodes indisponibles</li>
-                <li>Envoyer une demande de réservation</li>
-                <li>Paiement (workflow) + avis après séjour</li>
-              </ul>
-            </div>
-
-            <div class="card" style="padding:14px; margin:0;">
-              <h4 style="margin:0 0 6px 0;">Propriétaire</h4>
-              <ul style="margin:0;">
-                <li>Publier / modifier / supprimer des biens</li>
-                <li>Gérer les demandes (accepter/refuser)</li>
-                <li>Suivre l’état des réservations</li>
-              </ul>
-            </div>
-          </div>
-
-          <p class="section-text" style="margin-top:12px; max-width:none;">
-            <strong>Bonus :</strong> affichage des notes, photo principale, agrégations via vues SQL, et statuts de réservation pour un suivi clair.
-          </p>
+          <h3>Fonctionnalités — Propriétaire</h3>
+          <ul>
+            <li>Gérer les biens (CRUD) avec sécurité via <code>trg_secu_bien_owner</code></li>
+            <li>Créer/modifier/supprimer annonces via <code>creerAnnonce</code>, <code>modifierAnnonce</code>, <code>supprimerAnnonce</code> + <code>trg_secu_annonce_owner</code></li>
+            <li>Gérer photos via <code>trg_secu_photo_owner</code> (protection propriétaire)</li>
+            <li>Gérer équipements via <code>trg_secu_equipement_owner</code></li>
+            <li>Consulter réservations reçues via <code>VUE_RESERVATIONS_POUR_MOI</code></li>
+            <li>Confirmer une réservation via <code>confirmerReservation(...)</code> (création automatique de LOCATION)</li>
+            <li>Suivre revenus via <code>VUE_MES_REVENUS</code></li>
+            <li>Voir inventaire via <code>VUE_MES_BIENS</code>, annonces via <code>VUE_MES_ANNONCES</code> / <code>get_mes_annonces(...)</code></li>
+          </ul>
         </div>
       </div>
 
-      <!-- ================= DB MODEL ================= -->
+      <!-- ================= ARCHI + DATA ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Modélisation & Couche Données (Oracle)</h3>
+        <h3>Architecture & données (Oracle)</h3>
+        <div class="grid-2" style="margin-top:12px; gap:12px;">
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 8px 0;">Tables principales</h4>
+            <ul style="margin:0;">
+              <li><code>UTILISATEUR</code>, <code>PROPRIETAIRE</code>, <code>LOCATAIRE</code></li>
+              <li><code>BIEN</code>, <code>PHOTO_BIEN</code>, <code>TYPE_EQUIPEMENT</code>, <code>BIEN_EQUIPEMENT</code></li>
+              <li><code>ANNONCE</code>, <code>RESERVATION</code>, <code>LOCATION</code></li>
+              <li><code>PAIEMENT</code>, <code>AVIS_BIEN</code>, <code>MESSAGE</code></li>
+            </ul>
+          </div>
+
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 8px 0;">Vues utilisées (performance + clarté)</h4>
+            <ul style="margin:0;">
+              <li><code>VUE_ANNONCES_PUBLIQUES</code> : annonces dispo + photo principale + note</li>
+              <li><code>VUE_BIENS_PUBLICS</code> : biens publics + photo principale</li>
+              <li><code>VUE_MES_RESERVATIONS</code>, <code>VUE_RESERVATIONS_POUR_MOI</code></li>
+              <li><code>VUE_MES_PAIEMENTS</code>, <code>VUE_MES_REVENUS</code></li>
+              <li><code>VUE_MES_BIENS</code>, <code>VUE_MES_ANNONCES</code>, <code>VUE_MON_PROFIL</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= DB MODEL IMAGE ================= -->
+      <div class="card" style="margin-top:16px;">
+        <h3>Schéma relationnel</h3>
         <p class="section-text" style="max-width:none;">
-          Modèle relationnel normalisé couvrant utilisateurs, biens, réservations, locations, paiements et avis.
-          Le système s’appuie sur des <strong>contraintes d’intégrité</strong> + <strong>triggers</strong> pour sécuriser les opérations critiques.
+          Modèle relationnel normalisé + contraintes (PK/FK/CHECK) + indexes Oracle.
         </p>
 
         <div style="margin-top:12px;">
           <img
             src="rale.jpg"
-            alt="Schéma relationnel des tables (Oracle)"
+            alt="Schéma relationnel Oracle"
             style="width:100%; border-radius:14px; display:block; box-shadow: 0 6px 18px rgba(0,0,0,0.14);"
           />
         </div>
-
-        <div class="grid-2" style="margin-top:14px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;">Entités clés</h4>
-            <ul style="margin:0;">
-              <li>UTILISATEUR → (LOCATAIRE / PROPRIETAIRE)</li>
-              <li>BIEN, PHOTO_BIEN, AVIS_BIEN</li>
-              <li>RESERVATION → LOCATION → PAIEMENT</li>
-            </ul>
-          </div>
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;">Vues / requêtes</h4>
-            <ul style="margin:0;">
-              <li><code>VUE_BIENS_PUBLICS</code> : photo principale + note moyenne + infos</li>
-              <li>Vues dashboard : réservations par statut, revenus/activité, historique</li>
-            </ul>
-          </div>
-        </div>
       </div>
 
-      <!-- ================= TECHNICAL CHALLENGES (impression recruteur) ================= -->
+      <!-- ================= BUGS + SOLUTIONS (NOMS REELS) ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Défis techniques, bugs rencontrés & solutions</h3>
+        <h3>Bugs / cas limites & corrections (noms réels PL/SQL)</h3>
         <p class="section-text" style="max-width:none;">
-          Ici je liste volontairement des problèmes “réels” (et pas juste des features) : c’est exactement ce qui prouve ta maturité technique.
+          Liste des problèmes rencontrés et mécanismes Oracle mis en place (procédures / fonctions / triggers / vues / rôles).
         </p>
 
         <div class="grid-2" style="margin-top:12px; gap:12px;">
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;"><strong>1) Anti-overbooking (chevauchement de dates)</strong></h4>
-            <p class="section-text" style="max-width:none; margin:0;">
-              <strong>Bug :</strong> deux réservations pouvaient être acceptées si elles arrivaient très proches (concurrence).<br>
-              <strong>Solution :</strong> contrôle côté DB : vérification de chevauchement en PL/SQL + transaction atomique.
-              Rejet immédiat si une période existe déjà (même si l’app Flask a un bug).
-            </p>
+            <h4 style="margin:0 0 8px 0;"><strong>1) Chevauchement des réservations (anti-overbooking)</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>Cause</strong> : réservation sur une période déjà occupée</li>
+              <li><strong>Détection</strong> : <code>verifierDisponibilite(p_id_bien, p_debut, p_fin)</code> (compte conflits)</li>
+              <li><strong>Blocage</strong> : <code>creerReservation(...)</code> lève <code>-20001</code> si conflit (transaction + rollback)</li>
+              <li><strong>Recherche cohérente</strong> : <code>rechercherBiens(...)</code> exclut les conflits via <code>NOT EXISTS</code></li>
+            </ul>
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;"><strong>2) Incohérence de statuts (réservation/paiement)</strong></h4>
-            <p class="section-text" style="max-width:none; margin:0;">
-              <strong>Bug :</strong> paiement “validé” alors que réservation “refusée” (workflow mal verrouillé).<br>
-              <strong>Solution :</strong> machine à états : statuts autorisés (PENDING → ACCEPTED → PAID → REVIEWED).
-              Triggers/contrôles PL/SQL pour empêcher toute transition interdite.
-            </p>
+            <h4 style="margin:0 0 8px 0;"><strong>2) Usurpation d’identité du locataire à l’insertion</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>Cause</strong> : un utilisateur tente d’insérer une réservation pour un autre <code>id_locataire</code></li>
+              <li><strong>Correction</strong> : trigger <code>trg_secu_resa_locataire</code> force <code>:NEW.id_locataire</code> à l’utilisateur connecté</li>
+            </ul>
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;"><strong>3) Sécurité : accès à des données d’un autre propriétaire</strong></h4>
-            <p class="section-text" style="max-width:none; margin:0;">
-              <strong>Bug :</strong> un utilisateur pouvait tenter d’accéder à un bien via un ID dans l’URL.<br>
-              <strong>Solution :</strong> double protection :
-              contrôle RBAC côté Flask (session + owner_id) + requêtes SQL filtrées par propriétaire pour empêcher l’usurpation.
-            </p>
+            <h4 style="margin:0 0 8px 0;"><strong>3) Accès non autorisé aux biens/annonces/photos/équipements</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>BIEN</strong> : <code>trg_secu_bien_owner</code> bloque UPDATE/DELETE si le bien ne correspond pas au propriétaire connecté</li>
+              <li><strong>ANNONCE</strong> : <code>trg_secu_annonce_owner</code> vérifie le propriétaire du bien lié</li>
+              <li><strong>PHOTO_BIEN</strong> : <code>trg_secu_photo_owner</code> empêche modification des photos d’un autre bien</li>
+              <li><strong>BIEN_EQUIPEMENT</strong> : <code>trg_secu_equipement_owner</code> empêche modification des équipements d’un autre bien</li>
+            </ul>
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;"><strong>4) Paiement non modifiable (immutabilité)</strong></h4>
-            <p class="section-text" style="max-width:none; margin:0;">
-              <strong>Bug :</strong> UPDATE possible sur paiement après validation (risque de fraude / incohérence).<br>
-              <strong>Solution :</strong> trigger de protection : un paiement validé devient “read-only”.
-              Toute tentative de modification est bloquée côté base.
-            </p>
+            <h4 style="margin:0 0 8px 0;"><strong>4) Suppression d’un bien avec réservations actives</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>Cause</strong> : suppression d’un bien alors que <code>RESERVATION</code> est <code>EN_ATTENTE</code> / <code>CONFIRMEE</code></li>
+              <li><strong>Correction</strong> : trigger <code>trg_no_delete_bien_with_active_res</code> bloque DELETE (erreur <code>-20010</code>)</li>
+            </ul>
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;"><strong>5) Performance sur la page d’accueil (liste des biens)</strong></h4>
-            <p class="section-text" style="max-width:none; margin:0;">
-              <strong>Bug :</strong> page lente à cause d’agrégations répétées (notes + photos).<br>
-              <strong>Solution :</strong> création de vues SQL (photo principale + moyenne des avis) pour éviter
-              des requêtes multiples depuis Flask et garder un affichage rapide.
-            </p>
+            <h4 style="margin:0 0 8px 0;"><strong>5) Fraude : modification d’un paiement “réussi”</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>Cause</strong> : UPDATE sur <code>PAIEMENT</code> après validation</li>
+              <li><strong>Correction</strong> : trigger <code>trg_no_update_paiement_if_reussi</code> bloque toute modification si <code>statut_paiement = 'REUSSI'</code> (erreur <code>-20011</code>)</li>
+              <li><strong>Workflow</strong> : validation via <code>validerPaiement(p_id_paiement)</code>, échec via <code>echouerPaiement(...)</code>, remboursement via <code>emettreRemboursement(...)</code></li>
+            </ul>
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;"><strong>6) Gestion des erreurs / rollback</strong></h4>
-            <p class="section-text" style="max-width:none; margin:0;">
-              <strong>Bug :</strong> en cas d’erreur DB, l’app pouvait laisser une réservation “partiellement créée”.<br>
-              <strong>Solution :</strong> transactions + rollback et messages UI propres (retour utilisateur clair),
-              avec logs côté serveur pour debug.
-            </p>
+            <h4 style="margin:0 0 8px 0;"><strong>6) Dates incohérentes lors de la confirmation</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>Règle</strong> : <code>date_fin &gt; date_debut</code> (contrainte <code>chk_dates_res</code>)</li>
+              <li><strong>Contrôle métier</strong> : trigger <code>trg_reservation_check</code> bloque confirmation si dates invalides (erreur <code>-20015</code>)</li>
+              <li><strong>Automatisation</strong> : <code>confirmerReservation(p_id_reservation)</code> calcule le total via <code>calculerPrixTotal(...)</code> et crée la ligne <code>LOCATION</code></li>
+            </ul>
+          </div>
+
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 8px 0;"><strong>7) Usurpation en messagerie (expéditeur)</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>Cause</strong> : insertion avec un <code>id_expediteur</code> falsifié</li>
+              <li><strong>Correction</strong> : trigger <code>trg_secu_message_identity</code> force <code>:NEW.id_expediteur</code> à l’utilisateur connecté</li>
+            </ul>
+          </div>
+
+          <div class="card" style="padding:14px; margin:0;">
+            <h4 style="margin:0 0 8px 0;"><strong>8) Note moyenne non mise à jour après avis</strong></h4>
+            <ul style="margin:0;">
+              <li><strong>Correction</strong> : procédure <code>majNoteMoyenne(p_id_location)</code> (AUTONOMOUS_TRANSACTION) recalcule <code>BIEN.note_moyenne</code></li>
+              <li><strong>Automatisation</strong> : trigger <code>trg_maj_note_bien</code> (AFTER INSERT/UPDATE ON <code>AVIS_BIEN</code>)</li>
+            </ul>
           </div>
         </div>
       </div>
 
-      <!-- ================= TECH DECISIONS ================= -->
+      <!-- ================= SECURITY / ROLES ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Choix techniques (justifiés)</h3>
+        <h3>Sécurité & droits Oracle (RBAC)</h3>
         <div class="grid-2" style="margin-top:12px; gap:12px;">
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;">Pourquoi Oracle + PL/SQL ?</h4>
+            <h4 style="margin:0 0 8px 0;">Rôles DB</h4>
             <ul style="margin:0;">
-              <li>Transactions fiables et intégrité forte</li>
-              <li>Logique métier garantie côté DB (procédures, triggers)</li>
-              <li>Vues/agrégations pour des pages rapides et stables</li>
+              <li><code>ROLE_VISITEUR</code> : lecture vues publiques (<code>VUE_ANNONCES_PUBLIQUES</code>, <code>VUE_BIENS_PUBLICS</code>)</li>
+              <li><code>ROLE_STANDARD</code> : profil + messagerie</li>
+              <li><code>ROLE_LOCATAIRE</code> : réservations, paiements, avis + vues personnelles</li>
+              <li><code>ROLE_PROPRIETAIRE</code> : gestion biens/annonces/photos/équipements + vues propriétaires</li>
+              <li><code>ROLE_ADMIN</code> : droits complets</li>
             </ul>
           </div>
+
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;">Pourquoi Flask ?</h4>
+            <h4 style="margin:0 0 8px 0;">Bonnes pratiques appliquées</h4>
             <ul style="margin:0;">
-              <li>Backend léger et flexible</li>
-              <li>Routes claires + templates Jinja2</li>
-              <li>Connexion Oracle via <code>python-oracledb</code></li>
+              <li>Contrôles critiques côté DB (triggers) + séparation des responsabilités (Flask vs Oracle)</li>
+              <li>Vues dédiées pour limiter l’exposition des données</li>
+              <li>Indexes pour accélérer recherche et jointures (réservations, paiements, messages)</li>
             </ul>
           </div>
         </div>
       </div>
 
-      <!-- ================= SCREENSHOTS (PLUS GRANDS) ================= -->
+      <!-- ================= SCREENSHOTS (AGRANDIS) ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Screenshots (interface)</h3>
+        <h3>Screenshots</h3>
         <p class="section-text" style="max-width:none;">
-          Écrans clés pour comprendre le workflow : espace propriétaire, espace public, réservations, authentification.
+          Interfaces principales : espace propriétaire, espace public, réservations et authentification.
         </p>
 
-        <!-- IMPORTANT : on agrandit les images -->
         <div class="projects" style="grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
           <div class="project-card" style="pointer-events:none;">
-            <img
-              src="propr.png"
-              alt="Espace propriétaire"
-              style="width:100%; height:300px; object-fit:cover; border-radius:16px;"
-            />
+            <img src="propr.png" alt="Espace propriétaire"
+                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
             <div class="project-body">
               <h3 style="margin-bottom:6px;">Espace Propriétaire</h3>
-              <p style="margin:0;">
-                Gestion des biens, suivi des demandes et contrôle des statuts (accept/refuse).
-              </p>
+              <p style="margin:0;">Gestion des biens, annonces, réservations reçues, revenus.</p>
             </div>
           </div>
 
           <div class="project-card" style="pointer-events:none;">
-            <img
-              src="ouve.png"
-              alt="Espace public"
-              style="width:100%; height:300px; object-fit:cover; border-radius:16px;"
-            />
+            <img src="ouve.png" alt="Espace public"
+                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
             <div class="project-body">
               <h3 style="margin-bottom:6px;">Espace Public</h3>
-              <p style="margin:0;">
-                Recherche + liste de biens (photo principale, note moyenne, détails).
-              </p>
+              <p style="margin:0;">Catalogue via <code>VUE_ANNONCES_PUBLIQUES</code> (photo principale + note).</p>
             </div>
           </div>
 
           <div class="project-card" style="pointer-events:none;">
-            <img
-              src="reserv.png"
-              alt="Gestion des réservations"
-              style="width:100%; height:300px; object-fit:cover; border-radius:16px;"
-            />
+            <img src="reserv.png" alt="Gestion des réservations"
+                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
             <div class="project-body">
-              <h3 style="margin-bottom:6px;">Gestion des Réservations</h3>
-              <p style="margin:0;">
-                Workflow complet : pending → accepted/refused → paid, suivi par rôle.
-              </p>
+              <h3 style="margin-bottom:6px;">Réservations</h3>
+              <p style="margin:0;">Création via <code>creerReservation</code>, confirmation via <code>confirmerReservation</code>, suivi via vues.</p>
             </div>
           </div>
 
           <div class="project-card" style="pointer-events:none;">
-            <img
-              src="insc.png"
-              alt="Inscription / Connexion"
-              style="width:100%; height:300px; object-fit:cover; border-radius:16px;"
-            />
+            <img src="insc.png" alt="Inscription / Connexion"
+                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
             <div class="project-body">
               <h3 style="margin-bottom:6px;">Authentification</h3>
-              <p style="margin:0;">
-                Inscription & connexion avec rôles (locataire/propriétaire) + sessions sécurisées.
-              </p>
+              <p style="margin:0;">Création compte via <code>sInscrire</code>, connexion via <code>seConnecter</code> (hash MD5).</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ================= INDISPENSABLE DANS UN PORTFOLIO ================= -->
-      <div class="card" style="margin-top:16px;">
-        <h3>Ce qui est indispensable (pour recruteurs)</h3>
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;">✅ Ce que tu dois toujours mettre</h4>
-            <ul style="margin:0;">
-              <li><strong>Problème</strong> : pourquoi ce projet existe</li>
-              <li><strong>Impact</strong> : ce que ça apporte (fiabilité, intégrité, workflow)</li>
-              <li><strong>Ton rôle</strong> : ce que TOI tu as fait</li>
-              <li><strong>Défis réels</strong> + solutions (bugs, edge cases)</li>
-              <li><strong>Démo</strong> + GitHub + captures</li>
-            </ul>
-          </div>
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 6px 0;">⭐ Bonus qui te différencie</h4>
-            <ul style="margin:0;">
-              <li>README GitHub clair (installation + DB + screenshots)</li>
-              <li>Schéma DB lisible + explication du workflow</li>
-              <li>Liste des règles métier (anti-overbooking, statuts, paiements)</li>
-              <li>Petite section “Améliorations futures” (API, tests, CI)</li>
-              <li>Qualité : logs, erreurs propres, validation côté serveur</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================= RESULTS + IMPACT ================= -->
+      <!-- ================= RESULTS ================= -->
       <div class="grid-2" style="margin-top:16px;">
         <div class="card">
           <h3>Résultats</h3>
           <ul>
-            <li>Workflow de réservation complet et cohérent</li>
-            <li>Base Oracle robuste (contraintes, vues, PL/SQL)</li>
-            <li>Rôles séparés (locataire / propriétaire) + accès sécurisé</li>
-            <li>Contrôles d’intégrité : disponibilité, statuts, paiements</li>
+            <li>Cycle complet réservation → location → paiement → avis</li>
+            <li>Anti-overbooking + contrôles dates + protection suppression</li>
+            <li>Protection anti-usurpation (réservation & messagerie)</li>
+            <li>Immuabilité des paiements réussis + remboursement</li>
+            <li>Note moyenne recalculée automatiquement après avis</li>
+            <li>Vues SQL pour pages rapides et requêtes simplifiées côté Flask</li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>Améliorations futures (pro)</h3>
+          <h3>Améliorations possibles</h3>
           <ul>
-            <li>Tests unitaires Flask + tests PL/SQL (cas limites)</li>
-            <li>Pagination + filtres avancés (prix, ville, disponibilité)</li>
-            <li>Historique des paiements + export (admin/BI)</li>
-            <li>Docker / script d’installation DB pour exécution facile</li>
+            <li>Tests automatisés des procédures/edge cases (dates, statuts, concurrence)</li>
+            <li>Pagination + filtres avancés côté recherche</li>
+            <li>Journalisation (audit) sur paiements et changements de statuts</li>
+            <li>CI/CD + script d’installation complet</li>
           </ul>
         </div>
       </div>
@@ -395,13 +335,13 @@
         <h3>Accès rapide</h3>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <a class="btn btn-primary" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener noreferrer">
-            Voir la vidéo de démonstration
+            Démo vidéo
           </a>
           <a class="btn btn-ghost" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener noreferrer">
-            Consulter le code
+            GitHub
           </a>
           <a class="btn btn-ghost" href="../../index.html#contact">
-            Me contacter
+            Contact
           </a>
         </div>
       </div>
