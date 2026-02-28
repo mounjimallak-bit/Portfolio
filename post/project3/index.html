@@ -105,25 +105,33 @@
 
 
 
-      <!-- ================= TABLE DES MATIÈRES ================= -->
+      <!-- ================= TABLE DES MATIÈRES (VERTICALE) ================= -->
 <div class="card" style="margin-top:18px;">
-  <h3 style="margin:0 0 10px 0;">Table des matières</h3>
+  <h3 style="margin:0 0 12px 0;">Table des matières</h3>
 
-  <div style="display:flex; flex-wrap:wrap; gap:10px;">
-    <a class="btn btn-ghost" href="#liens">01. Liens & livrables</a>
-    <a class="btn btn-ghost" href="#features">02. Fonctionnalités</a>
-    <a class="btn btn-ghost" href="#architecture">03. Architecture & données</a>
-    <a class="btn btn-ghost" href="#schema">04. Schéma relationnel</a>
-    <a class="btn btn-ghost" href="#bugs">05. Bugs & corrections</a>
-    <a class="btn btn-ghost" href="#security">06. Sécurité & rôles Oracle</a>
-    <a class="btn btn-ghost" href="#screenshots">07. Screenshots</a>
-    <a class="btn btn-ghost" href="#results">08. Résultats</a>
-    <a class="btn btn-ghost" href="#improvements">09. Améliorations</a>
-    <a class="btn btn-ghost" href="#cta">10. Accès rapide</a>
+  <div style="
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:10px 14px;
+  ">
+    <a class="btn btn-ghost" href="#liens" style="justify-content:flex-start;">01. Liens & livrables</a>
+    <a class="btn btn-ghost" href="#features" style="justify-content:flex-start;">02. Fonctionnalités</a>
+
+    <a class="btn btn-ghost" href="#architecture" style="justify-content:flex-start;">03. Architecture & données</a>
+    <a class="btn btn-ghost" href="#schema" style="justify-content:flex-start;">04. Schéma relationnel</a>
+
+    <a class="btn btn-ghost" href="#bugs" style="justify-content:flex-start;">05. Bugs & corrections</a>
+    <a class="btn btn-ghost" href="#security" style="justify-content:flex-start;">06. Sécurité & rôles Oracle</a>
+
+    <a class="btn btn-ghost" href="#screenshots" style="justify-content:flex-start;">07. Screenshots</a>
+    <a class="btn btn-ghost" href="#results" style="justify-content:flex-start;">08. Résultats</a>
+
+    <a class="btn btn-ghost" href="#improvements" style="justify-content:flex-start;">09. Améliorations</a>
+    <a class="btn btn-ghost" href="#cta" style="justify-content:flex-start;">10. Accès rapide</a>
   </div>
 
   <p class="section-text" style="margin-top:12px; max-width:none;">
-    Navigation rapide : cliquez sur une section pour aller directement au contenu.
+    Cliquez sur une section pour naviguer.
   </p>
 </div>
       <!-- ================= QUICK LINKS ================= -->
