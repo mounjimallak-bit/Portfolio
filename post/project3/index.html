@@ -33,24 +33,87 @@
     <section class="section" style="border-top:none;">
 
       <!-- ================= HERO ================= -->
-      <div class="section-head">
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <h2 style="margin:0;">Bien Immobilier — Plateforme de Location</h2>
-          <span class="badge" style="transform: translateY(2px);">Flask</span>
-          <span class="badge" style="transform: translateY(2px);">Oracle</span>
-          <span class="badge" style="transform: translateY(2px);">SQL</span>
-          <span class="badge" style="transform: translateY(2px);">PL/SQL</span>
-          <span class="badge" style="transform: translateY(2px);">Tailwind</span>
-        </div>
+<!-- ================= HERO GRAND CENTRE ================= -->
 
-        <p style="max-width: 92ch;">
-          Application web de location immobilière couvrant : <strong>publication d’annonces</strong>, <strong>recherche</strong>,
-          <strong>réservation</strong>, <strong>confirmation</strong>, <strong>paiement</strong>, <strong>avis</strong> et <strong>messagerie</strong>.
-          Les règles critiques sont appliquées côté Oracle via <strong>vues</strong>, <strong>procédures/fonctions</strong>, <strong>triggers</strong> et <strong>rôles</strong>.
-        </p>
-      </div>
+<div style="text-align:center; padding-top:20px; padding-bottom:10px;">
 
-      <!-- ================= QUICK LINKS ================= -->
+  <!-- TITRE GRAND -->
+  <h1 style="
+    font-size:42px;
+    margin-bottom:10px;
+    font-weight:700;
+    letter-spacing:0.5px;
+  ">
+    Bien Immobilier
+  </h1>
+
+  <!-- SOUS TITRE -->
+  <h2 style="
+    font-size:22px;
+    font-weight:500;
+    margin-bottom:18px;
+    opacity:0.85;
+  ">
+    Plateforme Web de Location Immobilière
+  </h2>
+
+
+  <!-- BADGES -->
+  <div style="
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+  ">
+
+    <span class="badge">Flask</span>
+    <span class="badge">Oracle</span>
+    <span class="badge">SQL</span>
+    <span class="badge">PL/SQL</span>
+    <span class="badge">Tailwind</span>
+
+  </div>
+
+
+  <!-- DESCRIPTION PRINCIPALE -->
+  <p style="
+    max-width:900px;
+    margin:auto;
+    font-size:18px;
+    line-height:1.7;
+  ">
+
+    Application web complète de location immobilière développée avec
+    <strong>Flask et Oracle</strong> permettant la gestion du cycle complet :
+
+    <br><br>
+
+    <strong>
+    Publication de biens • Recherche • Réservation • Confirmation • Paiement • Avis • Messagerie
+    </strong>
+
+    <br><br>
+
+    Le projet repose sur une architecture robuste où les règles métier sont
+    implémentées directement dans <strong>Oracle PL/SQL</strong> à l'aide de
+    <strong>procédures stockées, triggers et vues SQL</strong> afin de garantir :
+
+    <br><br>
+
+    • Cohérence transactionnelle  
+    • Sécurité des données  
+    • Anti-overbooking  
+    • Contrôle des accès  
+    • Immuabilité des paiements  
+
+  </p>
+
+
+ 
+  </div>
+
+</div>      <!-- ================= QUICK LINKS ================= -->
       <div class="grid-2" style="margin-top: 10px;">
         <div class="card">
           <h3 style="margin-bottom:8px;">Liens</h3>
@@ -98,7 +161,7 @@
         <div class="card">
           <h3>Fonctionnalités — Propriétaire</h3>
           <ul>
-            <li>Gérer les biens (CRUD) avec sécurité via <code>trg_secu_bien_owner</code></li>
+            <li>Gérer les biens  avec sécurité via <code>trg_secu_bien_owner</code></li>
             <li>Créer/modifier/supprimer annonces via <code>creerAnnonce</code>, <code>modifierAnnonce</code>, <code>supprimerAnnonce</code> + <code>trg_secu_annonce_owner</code></li>
             <li>Gérer photos via <code>trg_secu_photo_owner</code> (protection propriétaire)</li>
             <li>Gérer équipements via <code>trg_secu_equipement_owner</code></li>
@@ -110,7 +173,7 @@
         </div>
       </div>
 
-      <!-- ================= ARCHI + DATA ================= -->
+     
       <div class="card" style="margin-top:16px;">
         <h3>Architecture & données (Oracle)</h3>
         <div class="grid-2" style="margin-top:12px; gap:12px;">
@@ -125,7 +188,7 @@
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Vues utilisées (performance + clarté)</h4>
+            <h4 style="margin:0 0 8px 0;">Vues utilisées </h4>
             <ul style="margin:0;">
               <li><code>VUE_ANNONCES_PUBLIQUES</code> : annonces dispo + photo principale + note</li>
               <li><code>VUE_BIENS_PUBLICS</code> : biens publics + photo principale</li>
@@ -137,11 +200,10 @@
         </div>
       </div>
 
-      <!-- ================= DB MODEL IMAGE ================= -->
       <div class="card" style="margin-top:16px;">
         <h3>Schéma relationnel</h3>
         <p class="section-text" style="max-width:none;">
-          Modèle relationnel normalisé + contraintes (PK/FK/CHECK) + indexes Oracle.
+          Modèle relationnel normalisé + contraintes  + indexes Oracle.
         </p>
 
         <div style="margin-top:12px;">
@@ -153,7 +215,7 @@
         </div>
       </div>
 
-      <!-- ================= BUGS + SOLUTIONS (NOMS REELS) ================= -->
+ 
       <div class="card" style="margin-top:16px;">
         <h3>Bugs / cas limites & corrections (noms réels PL/SQL)</h3>
         <p class="section-text" style="max-width:none;">
@@ -216,7 +278,7 @@
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>7) Usurpation en messagerie (expéditeur)</strong></h4>
+            <h4 style="margin:0 0 8px 0;"><strong>7) Usurpation en messagerie </strong></h4>
             <ul style="margin:0;">
               <li><strong>Cause</strong> : insertion avec un <code>id_expediteur</code> falsifié</li>
               <li><strong>Correction</strong> : trigger <code>trg_secu_message_identity</code> force <code>:NEW.id_expediteur</code> à l’utilisateur connecté</li>
@@ -233,9 +295,8 @@
         </div>
       </div>
 
-      <!-- ================= SECURITY / ROLES ================= -->
       <div class="card" style="margin-top:16px;">
-        <h3>Sécurité & droits Oracle (RBAC)</h3>
+        <h3>Sécurité & droits Oracle </h3>
         <div class="grid-2" style="margin-top:12px; gap:12px;">
           <div class="card" style="padding:14px; margin:0;">
             <h4 style="margin:0 0 8px 0;">Rôles DB</h4>
@@ -249,7 +310,7 @@
           </div>
 
           <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Bonnes pratiques appliquées</h4>
+            <h4 style="margin:0 0 8px 0;"> pratiques appliquées</h4>
             <ul style="margin:0;">
               <li>Contrôles critiques côté DB (triggers) + séparation des responsabilités (Flask vs Oracle)</li>
               <li>Vues dédiées pour limiter l’exposition des données</li>
@@ -259,7 +320,7 @@
         </div>
       </div>
 
-      <!-- ================= SCREENSHOTS (AGRANDIS) ================= -->
+      
       <div class="card" style="margin-top:16px;">
         <h3>Screenshots</h3>
         <p class="section-text" style="max-width:none;">
@@ -299,13 +360,13 @@
                  style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
             <div class="project-body">
               <h3 style="margin-bottom:6px;">Authentification</h3>
-              <p style="margin:0;">Création compte via <code>sInscrire</code>, connexion via <code>seConnecter</code> (hash MD5).</p>
+              <p style="margin:0;">Création compte via <code>sInscrire</code>, connexion via <code>seConnecter</code> </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ================= RESULTS ================= -->
+     
       <div class="grid-2" style="margin-top:16px;">
         <div class="card">
           <h3>Résultats</h3>
@@ -330,7 +391,7 @@
         </div>
       </div>
 
-      <!-- ================= CTA ================= -->
+
       <div class="card" style="margin-top:16px;">
         <h3>Accès rapide</h3>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
