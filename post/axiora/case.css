@@ -1,27 +1,18 @@
 /* ================================================================
    Case study pages — extends ../../styles.css
-   Long-form reading: narrow measure, quiet figures, code folded away.
+   Long-form reading: one column, quiet figures, code folded away.
    ================================================================ */
 
+/* The container itself is the column. Nothing inside can be wider than
+   its parent, so text, figures, tables and code align by construction
+   rather than by a max-width repeated on every element. */
 .case{
+  width: min(100%, 760px);
+  margin-inline: auto;
   padding-bottom: var(--gap);
-  /* one reading column for the whole case study: text, figures, tables and
-     code all align on the same left edge and share the same right edge. */
-  --col: min(100%, 760px);
 }
 
-/* every direct child of a section sits in that column, no exceptions */
-.cs > *,
-.cs .shot,
-.cs .shot-grid,
-.cs .shot-pair,
-.cs .shot-duo,
-.cs .codebox,
-.cs .srctable,
-.cs .minitable,
-.cs .twocol,
-.cs .qa,
-.cs .limits{ max-width: var(--col); }
+.case-hero .wrap{ width: min(100%, 760px); }
 
 .case-hero{ padding-bottom: clamp(2rem, 5vw, 3.5rem); }
 
@@ -29,11 +20,10 @@
   font-family: var(--serif);
   font-size: clamp(1.1rem, 2.2vw, 1.4rem);
   line-height: 1.45;
-  max-width: 48ch;
   margin: 0 0 1.4rem;
 }
 
-.case-hero .lede{ max-width: 760px; margin: 0 0 1.8rem; }
+.case-hero .lede{ margin: 0 0 1.8rem; }
 
 /* ---- section rhythm ---- */
 .cs{
@@ -64,9 +54,7 @@
   margin: 1.6rem 0 .5rem;
 }
 
-.cs p,
-.cs ul,
-.cs ol{ max-width: var(--col); }
+
 
 .cs li{ margin-bottom: .4rem; }
 
@@ -93,7 +81,6 @@
 .srctable,
 .minitable{
   width: 100%;
-  max-width: var(--col);
   border-collapse: collapse;
   font-size: .87rem;
   margin: 1rem 0 1.6rem;
@@ -137,7 +124,7 @@
 }
 
 /* wide screenshots and strips: full column width is the point */
-.shot--wide img{ width: 100%; }
+
 
 /* two narrow portrait screenshots read as a pair, not a queue */
 .shot-pair{
@@ -147,7 +134,7 @@
   margin: 1.4rem 0 2rem;
 }
 .shot-pair .shot{ margin: 0; }
-.shot-pair img{ width: 100%; max-width: 336px; }
+.shot-pair img{ width: 100%; }
 
 /* same indicator, two years: side by side or the comparison is lost */
 .shot-duo{
@@ -155,7 +142,6 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1.2rem;
   margin: 1.4rem 0 2rem;
-  max-width: var(--measure);
 }
 .shot-duo .shot{ margin: 0; }
 .shot-duo img{ width: 100%; }
@@ -168,7 +154,6 @@
 
 /* ---- folded code ---- */
 .codebox{
-  max-width: var(--col);
   border: 1px solid var(--rule);
   margin: 1rem 0 1.8rem;
   background: var(--paper-alt);
@@ -209,7 +194,6 @@
 .limits-head{ margin-top: 2.6rem !important; }
 
 .limits{
-  max-width: var(--col);
   border: 1px solid var(--anomaly);
   border-left-width: 3px;
   padding: 1.2rem 1.4rem .4rem;
