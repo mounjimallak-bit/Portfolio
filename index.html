@@ -33,53 +33,6 @@
 
 <main id="main">
 
-<!-- ============ HERO ============ -->
-<section class="hero" id="top">
-  <div class="wrap">
-    <p class="eyebrow">Data &amp; AI Engineering — ENSA Agadir, Morocco</p>
-    <h1>I build systems that find the signal<br />other systems miss.</h1>
-    <p class="lede">
-      My final-year project detects faults in photovoltaic plants from raw sensor
-      data — an ensemble of eleven models scoring a live stream, five minutes at a
-      time. Below is its actual output on unseen data.
-    </p>
-
-    <figure class="signal-fig">
-      <svg class="signal" viewBox="0 0 1000 180" preserveAspectRatio="none" role="img"
-           aria-label="Anomaly score over time from the photovoltaic detection model, with the decision threshold and twelve detected anomalies.">
-        <line class="thr" x1="0" y1="17.3" x2="1000" y2="17.3"
-              fill="none" stroke="#C4443B" stroke-width="1" stroke-dasharray="5 4"/>
-        <path class="trace" fill="none" stroke="#1A4F8A" stroke-width="1.4" d="M 0,73.6 L 3,117.0 L 6,82.1 L 9,101.3 L 12,147.6 L 15,149.7 L 18,107.6 L 21,118.5 L 24,91.5 L 27,121.3 L 30,114.8 L 33,152.5 L 36,51.8 L 39,46.8 L 42,63.3 L 45,72.4 L 48,20.6 L 51,55.4 L 54,66.7 L 57,71.4 L 60,67.3 L 63,70.3 L 66,82.4 L 69,85.5 L 72,74.1 L 75,78.9 L 78,95.9 L 81,107.6 L 84,125.2 L 87,150.8 L 90,158.2 L 93,135.9 L 96,144.4 L 99,153.2 L 102,157.1 L 105,136.8 L 108,106.6 L 111,82.1 L 114,99.4 L 117,111.8 L 120,100.9 L 123,97.2 L 126,80.8 L 129,69.6 L 132,79.5 L 135,119.8 L 138,60.2 L 141,109.1 L 144,124.1 L 147,114.6 L 150,104.8 L 153,90.3 L 156,64.7 L 159,39.8 L 162,43.2 L 165,49.5 L 168,48.5 L 171,55.1 L 174,59.5 L 177,102.9 L 180,54.8 L 183,97.0 L 186,32.7 L 189,17.8 L 192,22.5 L 195,79.6 L 198,65.6 L 201,54.7 L 204,103.4 L 207,42.1 L 210,37.6 L 213,84.5 L 216,99.3 L 219,102.9 L 222,30.8 L 225,31.0 L 228,54.5 L 231,88.2 L 234,121.3 L 237,75.1 L 240,66.7 L 243,56.7 L 246,66.9 L 249,59.3 L 252,54.6 L 255,15.6 L 258,15.3 L 261,15.0 L 264,59.7 L 267,38.4 L 270,49.2 L 273,45.4 L 276,25.2 L 279,37.5 L 282,51.4 L 285,22.8 L 288,85.3 L 291,47.4 L 294,36.1 L 297,43.6 L 300,70.0 L 303,56.9 L 306,65.4 L 309,41.3 L 312,22.9 L 315,103.5 L 318,76.1 L 321,40.5 L 324,82.3 L 327,114.9 L 330,131.8 L 333,130.0 L 336,104.4 L 339,105.2 L 342,95.5 L 345,113.7 L 348,146.0 L 351,115.9 L 354,110.1 L 357,90.5 L 360,54.7 L 363,115.4 L 366,22.0 L 369,53.8 L 372,15.8 L 375,17.0 L 378,29.9 L 381,36.8 L 384,39.2 L 387,18.2 L 390,41.3 L 393,48.1 L 396,60.0 L 399,63.2 L 402,73.7 L 405,96.4 L 408,98.9 L 411,95.4 L 414,92.5 L 417,84.7 L 420,94.6 L 423,111.1 L 426,143.3 L 429,111.6 L 432,117.8 L 435,64.4 L 438,93.2 L 441,131.2 L 444,111.9 L 447,124.7 L 450,119.9 L 453,77.5 L 456,79.0 L 459,141.4 L 462,92.4 L 465,75.7 L 468,56.0 L 471,133.6 L 474,134.8 L 477,66.2 L 480,127.1 L 483,118.7 L 486,119.5 L 489,96.7 L 492,99.2 L 495,37.3 L 498,82.5 L 502,26.9 L 505,27.5 L 508,46.5 L 511,54.4 L 514,54.1 L 517,53.3 L 520,61.8 L 523,70.9 L 526,86.4 L 529,78.6 L 532,67.2 L 535,104.3 L 538,90.6 L 541,99.5 L 544,105.8 L 547,157.5 L 550,128.0 L 553,132.6 L 556,118.1 L 559,93.1 L 562,109.5 L 565,68.6 L 568,108.4 L 571,81.3 L 574,77.1 L 577,82.9 L 580,70.7 L 583,97.7 L 586,97.2 L 589,148.2 L 592,99.2 L 595,95.4 L 598,117.6 L 601,129.7 L 604,104.5 L 607,78.2 L 610,65.6 L 613,87.4 L 616,26.5 L 619,63.1 L 622,68.5 L 625,70.4 L 628,78.0 L 631,102.0 L 634,111.2 L 637,94.3 L 640,82.8 L 643,101.7 L 646,109.0 L 649,116.2 L 652,137.0 L 655,156.0 L 658,176.0 L 661,175.3 L 664,173.7 L 667,170.9 L 670,166.7 L 673,149.7 L 676,93.4 L 679,104.0 L 682,90.3 L 685,105.9 L 688,97.7 L 691,84.4 L 694,93.8 L 697,118.1 L 700,145.5 L 703,139.2 L 706,96.9 L 709,69.4 L 712,62.0 L 715,18.0 L 718,55.1 L 721,67.2 L 724,72.1 L 727,75.0 L 730,88.2 L 733,104.6 L 736,19.7 L 739,14.5 L 742,14.0 L 745,14.1 L 748,14.4 L 751,14.3 L 754,14.2 L 757,14.3 L 760,90.9 L 763,97.1 L 766,165.9 L 769,167.9 L 772,97.1 L 775,108.5 L 778,120.7 L 781,96.0 L 784,98.8 L 787,90.6 L 790,77.3 L 793,88.5 L 796,82.8 L 799,72.5 L 802,60.2 L 805,34.7 L 808,23.0 L 811,24.2 L 814,68.7 L 817,61.3 L 820,96.2 L 823,69.0 L 826,78.0 L 829,98.8 L 832,102.5 L 835,124.7 L 838,106.0 L 841,106.3 L 844,96.0 L 847,141.9 L 850,99.8 L 853,98.0 L 856,155.1 L 859,104.6 L 862,89.6 L 865,104.4 L 868,92.9 L 871,168.5 L 874,123.5 L 877,120.6 L 880,87.9 L 883,121.2 L 886,110.1 L 889,110.6 L 892,116.7 L 895,81.0 L 898,19.1 L 901,42.7 L 904,61.8 L 907,48.9 L 910,59.8 L 913,76.3 L 916,74.6 L 919,84.6 L 922,71.3 L 925,61.6 L 928,69.0 L 931,81.9 L 934,112.2 L 937,132.3 L 940,118.6 L 943,149.1 L 946,107.6 L 949,91.7 L 952,118.9 L 955,70.1 L 958,62.2 L 961,75.8 L 964,91.1 L 967,132.4 L 970,117.7 L 973,89.8 L 976,118.9 L 979,98.1 L 982,114.6 L 985,143.8 L 988,124.9 L 991,116.2 L 994,109.7 L 997,90.0 L 1000,99.0"/>
-        <circle class="anom" fill="#C4443B" cx="255" cy="15.6" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="258" cy="15.3" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="261" cy="15.0" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="372" cy="15.8" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="375" cy="17.0" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="739" cy="14.5" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="742" cy="14.0" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="745" cy="14.1" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="748" cy="14.4" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="751" cy="14.3" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="754" cy="14.2" r="3.5"/>
-        <circle class="anom" fill="#C4443B" cx="757" cy="14.3" r="3.5"/>
-      </svg>
-      <figcaption>
-        <span class="legend"><i class="k-trace"></i>Fusion anomaly score</span>
-        <span class="legend"><i class="k-thr"></i>Decision threshold (0.9460)</span>
-        <span class="legend"><i class="k-anom"></i>Detected anomaly</span>
-        <span class="src">Real output — held-out test partition, La Réunion PV plant.</span>
-      </figcaption>
-    </figure>
-
-    <dl class="metrics">
-      <div><dt>PR-AUC</dt><dd>0.7765</dd></div>
-      <div><dt>ROC-AUC</dt><dd>0.9964</dd></div>
-      <div><dt>Recall</dt><dd>0.973</dd></div>
-      <div><dt>Models in ensemble</dt><dd>11</dd></div>
-    </dl>
-  </div>
-</section>
-
 <!-- ============ WORK ============ -->
 <section class="section" id="work">
   <div class="wrap">
@@ -162,7 +115,7 @@
       <article class="project">
         <div class="proj-meta">
           <span class="tag">Personal project</span>
-          <span class="ctx">Individual · 2025</span>
+          <span class="ctx">Internship-HCP MOROCCO-Individual · 2025</span>
         </div>
 
         <h3>Axiora Data — socio-economic analytics platform</h3>
