@@ -1,433 +1,429 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bien Immobilier — Détails du projet</title>
-  <link rel="stylesheet" href="../../styles.css" />
-  <meta name="description" content="Plateforme de location immobilière (Flask + Oracle SQL/PLSQL) : annonces, réservations, locations, paiements, avis, messagerie, sécurité et règles métier en base." />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Estate Rental Platform — Case study · Malak Mounji</title>
+<meta name="description" content="Case study: a Flask and Oracle rental platform where the business rules live in the database — stored procedures, security triggers, views and role-based grants." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../styles.css" />
+<link rel="stylesheet" href="case.css" />
 </head>
-
 <body>
-  <div class="bg-glow"></div>
 
-  <header class="header">
-    <div class="container nav">
-      <a class="logo" href="../../index.html#portfolio">← Retour</a>
+<a class="skip" href="#main">Skip to content</a>
 
-      <nav class="nav-links">
-        <a href="../../index.html#home">Home</a>
-        <a href="../../index.html#about">About</a>
-        <a href="../../index.html#portfolio" class="active">Portfolio</a>
-        <a href="../../index.html#contact">Contact</a>
-      </nav>
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <a class="wordmark" href="../../index.html">Malak&nbsp;Mounji</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="../../index.html#work">All work</a>
+      <a href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener">Demo</a>
+      <a href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener">Source</a>
+      <a class="nav-cv" href="../../malak.pdf">CV (PDF)</a>
+    </nav>
+  </div>
+</header>
 
-      <div class="nav-actions">
-        <a class="btn btn-primary" href="../../Mounji_malak.pdf" download>Download CV</a>
-      </div>
+<main id="main">
+
+<section class="hero case-hero">
+  <div class="wrap">
+    <p class="eyebrow">Case study · Individual · 2024</p>
+    <h1>Estate Rental Platform</h1>
+    <p class="standfirst">
+      A Flask and Oracle rental application where the business rules are enforced
+      by the database rather than by the web layer.
+    </p>
+    <p class="lede">
+      Tenants browse listings, check availability and request reservations; owners
+      publish properties and confirm or reject requests. The design question behind
+      the project was where each rule should live — and the answer, for anything
+      that must never be bypassed, was Oracle.
+    </p>
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener">Watch the demo</a>
+      <a class="btn" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener">View source</a>
     </div>
-  </header>
-
-  <main class="container">
-    <section class="section" style="border-top:none;">
-
-      <!-- ================= HERO ================= -->
-<!-- ================= HERO GRAND CENTRE ================= -->
-
-<div style="text-align:center; padding-top:20px; padding-bottom:10px;">
-
-  <!-- TITRE GRAND -->
-  <h1 style="
-    font-size:42px;
-    margin-bottom:10px;
-    font-weight:700;
-    letter-spacing:0.5px;
-  ">
-    Bien Immobilier
-  </h1>
-
-  <!-- SOUS TITRE -->
-  <h2 style="
-    font-size:22px;
-    font-weight:500;
-    margin-bottom:18px;
-    opacity:0.85;
-  ">
-    Plateforme Web de Location Immobilière
-  </h2>
-
-
-  <!-- BADGES -->
-  <div style="
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:20px;
-  ">
-
-    <span class="badge">Flask</span>
-    <span class="badge">Oracle</span>
-    <span class="badge">SQL</span>
-    <span class="badge">PL/SQL</span>
-    <span class="badge">Tailwind</span>
-
   </div>
+</section>
 
+<div class="wrap case">
 
-  <!-- DESCRIPTION PRINCIPALE -->
-  <p style="
-    max-width:900px;
-    margin:auto;
-    font-size:18px;
-    line-height:1.7;
-  ">
+<nav class="toc" aria-label="On this page">
+  <p class="toc-head">On this page</p>
+  <ol>
+    <li><a href="#principle">Design principle</a></li>
+    <li><a href="#model">Data model</a></li>
+    <li><a href="#logic">Business logic</a></li>
+    <li><a href="#integrity">Integrity rules</a></li>
+    <li><a href="#security">Security model</a></li>
+    <li><a href="#views">Views</a></li>
+    <li><a href="#screens">Interface</a></li>
+    <li><a href="#outcome">Outcome</a></li>
+  </ol>
+</nav>
 
-    Application web complète de location immobilière développée avec
-    <strong>Flask et Oracle</strong> permettant la gestion du cycle complet :
+<!-- ===================== PRINCIPLE ===================== -->
+<section class="cs" id="principle">
+<h2>Design principle</h2>
 
-    
+<p>
+A rental platform has rules that must hold regardless of how a record is created:
+two confirmed reservations cannot overlap on the same property, a tenant cannot
+book on someone else's behalf, a successful payment cannot be edited afterwards.
+</p>
 
-    <strong>
-    Publication de biens • Recherche • Réservation • Confirmation • Paiement • Avis • Messagerie
-    </strong>
+<p>
+Implementing those checks in Flask would place them one layer above the data. Any
+other client — a script, a direct SQL session, a future mobile backend — would
+bypass them entirely. So the rules that matter are implemented as Oracle triggers
+and stored procedures, and Flask handles routing, sessions and presentation.
+</p>
 
-   
+<table class="srctable">
+<thead><tr><th>Layer</th><th>Responsibility</th></tr></thead>
+<tbody>
+<tr><td><strong>Flask</strong></td><td>Routes, sessions, role-based navigation, error handling, templates</td></tr>
+<tr><td><strong>PL/SQL</strong></td><td>Business operations, integrity rules, identity enforcement</td></tr>
+<tr><td><strong>Oracle model</strong></td><td>Tables, constraints, indexes, views, roles and grants</td></tr>
+</tbody>
+</table>
 
-  </p>
+<p class="note">
+The trade-off is real and worth stating: logic in the database is harder to
+version, test and debug than application code, and it ties the project to Oracle.
+The reason to accept that here is enforcement — a trigger cannot be skipped.
+</p>
+</section>
 
-<br>
- 
-  </div>
+<!-- ===================== MODEL ===================== -->
+<section class="cs" id="model">
+<h2>Data model</h2>
 
-</div>   
+<p>
+Fourteen tables, normalised, with foreign keys, check constraints and indexes on
+the columns used for search and joins.
+</p>
 
+<h3>Tables</h3>
+<table class="srctable">
+<thead><tr><th>Group</th><th>Tables</th></tr></thead>
+<tbody>
+<tr><td>Identity</td><td><code>UTILISATEUR</code>, <code>PROPRIETAIRE</code>, <code>LOCATAIRE</code></td></tr>
+<tr><td>Property</td><td><code>BIEN</code>, <code>PHOTO_BIEN</code>, <code>TYPE_EQUIPEMENT</code>, <code>BIEN_EQUIPEMENT</code></td></tr>
+<tr><td>Booking</td><td><code>ANNONCE</code>, <code>RESERVATION</code>, <code>LOCATION</code></td></tr>
+<tr><td>Transaction</td><td><code>PAIEMENT</code></td></tr>
+<tr><td>Feedback</td><td><code>AVIS_BIEN</code>, <code>AVIS_LOCATAIRE</code>, <code>MESSAGE</code></td></tr>
+</tbody>
+</table>
 
+<p>
+The separation between <code>RESERVATION</code> and <code>LOCATION</code> is
+deliberate: a reservation is a request that may be refused, a location is a
+confirmed contract. Confirmation creates the second from the first, so a rejected
+request leaves no contractual trace.
+</p>
 
-      <!-- ================= TABLE DES MATIÈRES (VERTICALE) ================= -->
-<div class="card" style="margin-top:18px;">
-  <h3 style="margin:0 0 12px 0;">Table des matières</h3>
+<figure class="shot shot--wide">
+  <img src="rale.jpg" alt="Relational schema of the fourteen tables" loading="lazy" />
+  <figcaption>Relational schema</figcaption>
+</figure>
+</section>
 
-  <div style="
-    display:grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap:10px 14px;
-  ">
-    <a class="btn btn-ghost" href="#liens" style="justify-content:flex-start;">01. Liens & livrables</a>
-    <a class="btn btn-ghost" href="#features" style="justify-content:flex-start;">02. Fonctionnalités</a>
+<!-- ===================== LOGIC ===================== -->
+<section class="cs" id="logic">
+<h2>Business logic</h2>
 
-    <a class="btn btn-ghost" href="#architecture" style="justify-content:flex-start;">03. Architecture & données</a>
-    <a class="btn btn-ghost" href="#schema" style="justify-content:flex-start;">04. Schéma relationnel</a>
+<p>
+Nineteen stored procedures and functions implement the operations. The booking
+lifecycle runs through them end to end.
+</p>
 
-    <a class="btn btn-ghost" href="#bugs" style="justify-content:flex-start;">05. Bugs & corrections</a>
-    <a class="btn btn-ghost" href="#security" style="justify-content:flex-start;">06. Sécurité & rôles Oracle</a>
+<h3>Booking lifecycle</h3>
+<ol class="pipeline">
+  <li><code>verifierDisponibilite()</code> — counts conflicting reservations for a property and date range</li>
+  <li><code>creerReservation()</code> — creates the request, or raises <code>-20001</code> if the period is taken</li>
+  <li><code>confirmerReservation()</code> — validates dates, computes the total and creates the <code>LOCATION</code> row</li>
+  <li><code>calculerPrixTotal()</code> — nights multiplied by nightly rate</li>
+  <li><code>genererPaiement()</code> → <code>validerPaiement()</code> / <code>echouerPaiement()</code></li>
+  <li><code>emettreRemboursement()</code> — refund path</li>
+  <li><code>majNoteMoyenne()</code> — recomputes the property rating after a review</li>
+</ol>
 
-    <a class="btn btn-ghost" href="#screenshots" style="justify-content:flex-start;">07. Screenshots</a>
-    <a class="btn btn-ghost" href="#results" style="justify-content:flex-start;">08. Résultats</a>
+<h3>Availability check</h3>
+<p>
+Overlap detection is the core rule. The procedure calls the availability function
+first, and aborts the whole transaction if a conflict exists.
+</p>
 
-    <a class="btn btn-ghost" href="#improvements" style="justify-content:flex-start;">09. Améliorations</a>
-    <a class="btn btn-ghost" href="#cta" style="justify-content:flex-start;">10. Accès rapide</a>
-  </div>
+<div class="codebox-static">
+<pre><code class="sql">CREATE OR REPLACE PROCEDURE creerReservation(
+    p_id_locataire NUMBER,
+    p_id_bien      NUMBER,
+    p_date_deb     DATE,
+    p_date_fin     DATE
+) IS
+    v_conf   NUMBER;
+    v_id_res NUMBER;
+BEGIN
+    v_conf := verifierDisponibilite(p_id_bien, p_date_deb, p_date_fin);
 
-  
+    IF v_conf &gt; 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Bien non disponible sur ces dates');
+    END IF;
+
+    INSERT INTO RESERVATION(id_locataire, id_bien, id_annonce,
+                            date_demande, date_debut, date_fin, statut)
+    VALUES(p_id_locataire, p_id_bien, NULL,
+           SYSDATE, p_date_deb, p_date_fin, 'EN_ATTENTE')
+    RETURNING id_reservation INTO v_id_res;
+
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN ROLLBACK; RAISE;
+END;</code></pre>
 </div>
-      <!-- ================= QUICK LINKS ================= -->
-      
-      <div id="liens" class="grid-2" style="margin-top: 10px;">
-        <div class="card">
-          <h3 style="margin-bottom:8px;">Liens</h3>
-          <div style="display:flex; flex-wrap:wrap; gap:10px;">
-            <a class="btn btn-primary" href="https://youtu.be/AFmtnT5RAnk" target="_blank" rel="noopener noreferrer">
-              Démo vidéo
-            </a>
-            <a class="btn btn-ghost" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener noreferrer">
-              GitHub-Estate-rental-web-application-Flask-Oracle
-            </a>
-          </div>
 
-          <p class="section-text" style="margin-top:12px; max-width:none;">
-            <strong>Vous trouverez ci-dessous la vidéo de démonstration ainsi que le code source PL/SQL et Flask du projet Bien Immobilier.<br>
-               </p>
-        </div>
+<p>
+Search results stay consistent with this rule: <code>rechercherBiens()</code>
+excludes conflicting properties through a <code>NOT EXISTS</code> subquery, so a
+property that cannot be booked never appears as available in the first place.
+</p>
+</section>
 
-        <div class="card">
-          <h3 style="margin-bottom:8px;">Stack & composants</h3>
-          <ul style="margin:0;">
-            <li><strong>Backend</strong> : Flask (routes, sessions, RBAC, gestion d’erreurs)</li>
-            <li><strong>DB</strong> : Oracle (modèle relationnel, indexes, vues, rôles/grants)</li>
-            <li><strong>PL/SQL</strong> : procédures/fonctions métier + triggers de sécurité et intégrité</li>
-            <li><strong>UI</strong> : HTML/CSS/Tailwind + Jinja2</li>
-          </ul>
-        </div>
-      </div>
+<!-- ===================== INTEGRITY ===================== -->
+<section class="cs" id="integrity">
+<h2>Integrity rules</h2>
 
-      <!-- ================= OVERVIEW + FEATURES ================= -->
-     <div id="features" class="grid-2" style="margin-top:16px;">
-        <div class="card">
-          <h3>Fonctionnalités — Locataire</h3>
-          <ul>
-            <li>Consulter le catalogue via <code>VUE_ANNONCES_PUBLIQUES</code> / <code>VUE_BIENS_PUBLICS</code></li>
-            <li>Rechercher par filtres via <code>rechercherBiens(...)</code></li>
-            <li>Créer une réservation via <code>creerReservation(...)</code> (anti-chevauchement)</li>
-            <li>Consulter son historique via <code>VUE_MES_RESERVATIONS</code> / <code>get_mes_reservations(...)</code></li>
-            <li>Payer via <code>genererPaiement(...)</code> puis <code>validerPaiement(...)</code> / <code>echouerPaiement(...)</code></li>
-            <li>Consulter ses paiements via <code>VUE_MES_PAIEMENTS</code></li>
-            <li>Messagerie (insertion contrôlée) via trigger <code>trg_secu_message_identity</code></li>
-          </ul>
-        </div>
+<p>
+Each of these triggers exists because of a specific way the data could be
+corrupted. They are listed with the error code they raise, since that is what the
+Flask layer catches and translates for the user.
+</p>
 
-        <div class="card">
-          <h3>Fonctionnalités — Propriétaire</h3>
-          <ul>
-            <li>Gérer les biens  avec sécurité via <code>trg_secu_bien_owner</code></li>
-            <li>Créer/modifier/supprimer annonces via <code>creerAnnonce</code>, <code>modifierAnnonce</code>, <code>supprimerAnnonce</code> + <code>trg_secu_annonce_owner</code></li>
-            <li>Gérer photos via <code>trg_secu_photo_owner</code> (protection propriétaire)</li>
-            <li>Gérer équipements via <code>trg_secu_equipement_owner</code></li>
-            <li>Consulter réservations reçues via <code>VUE_RESERVATIONS_POUR_MOI</code></li>
-            <li>Confirmer une réservation via <code>confirmerReservation(...)</code> (création automatique de LOCATION)</li>
-            <li>Suivre revenus via <code>VUE_MES_REVENUS</code></li>
-            <li>Voir inventaire via <code>VUE_MES_BIENS</code>, annonces via <code>VUE_MES_ANNONCES</code> / <code>get_mes_annonces(...)</code></li>
-          </ul>
-        </div>
-      </div>
+<table class="srctable">
+<thead><tr><th>Rule</th><th>Mechanism</th><th>Error</th></tr></thead>
+<tbody>
+<tr>
+  <td>A property with active reservations cannot be deleted</td>
+  <td><code>trg_no_delete_bien_with_active_res</code></td>
+  <td><code>-20010</code></td>
+</tr>
+<tr>
+  <td>A successful payment cannot be modified</td>
+  <td><code>trg_no_update_paiement_if_reussi</code></td>
+  <td><code>-20011</code></td>
+</tr>
+<tr>
+  <td>End date must follow start date</td>
+  <td><code>chk_dates_res</code> + <code>trg_reservation_check</code></td>
+  <td><code>-20015</code></td>
+</tr>
+<tr>
+  <td>Property rating recomputed after a review</td>
+  <td><code>trg_maj_note_bien</code> → <code>majNoteMoyenne()</code></td>
+  <td>—</td>
+</tr>
+</tbody>
+</table>
 
-     
-     <div id="architecture" class="card" style="margin-top:16px;">
-        <h3>Architecture & données (Oracle)</h3>
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Tables principales</h4>
-            <ul style="margin:0;">
-              <li><code>UTILISATEUR</code>, <code>PROPRIETAIRE</code>, <code>LOCATAIRE</code></li>
-              <li><code>BIEN</code>, <code>PHOTO_BIEN</code>, <code>TYPE_EQUIPEMENT</code>, <code>BIEN_EQUIPEMENT</code></li>
-              <li><code>ANNONCE</code>, <code>RESERVATION</code>, <code>LOCATION</code></li>
-              <li><code>PAIEMENT</code>, <code>AVIS_BIEN</code>, <code>MESSAGE</code></li>
-            </ul>
-          </div>
+<h3>Payment immutability</h3>
+<p>
+Once <code>statut_paiement = 'REUSSI'</code>, the row is frozen. Correcting a
+payment therefore requires an explicit refund through
+<code>emettreRemboursement()</code>, which leaves a trace, rather than an update
+that would erase the original state. This is the rule that most clearly belongs in
+the database rather than in application code.
+</p>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Vues utilisées </h4>
-            <ul style="margin:0;">
-              <li><code>VUE_ANNONCES_PUBLIQUES</code> : annonces dispo + photo principale + note</li>
-              <li><code>VUE_BIENS_PUBLICS</code> : biens publics + photo principale</li>
-              <li><code>VUE_MES_RESERVATIONS</code>, <code>VUE_RESERVATIONS_POUR_MOI</code></li>
-              <li><code>VUE_MES_PAIEMENTS</code>, <code>VUE_MES_REVENUS</code></li>
-              <li><code>VUE_MES_BIENS</code>, <code>VUE_MES_ANNONCES</code>, <code>VUE_MON_PROFIL</code></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+<h3>Rating updates</h3>
+<p>
+<code>majNoteMoyenne()</code> is declared <code>AUTONOMOUS_TRANSACTION</code>, so
+recomputing the average commits independently of the transaction that inserted the
+review. Without it, the procedure would be modifying a table already involved in
+the firing statement.
+</p>
+</section>
 
-      <div id="schema" class="card" style="margin-top:16px;">
-        <h3>Schéma relationnel</h3>
-        <p class="section-text" style="max-width:none;">
-          Modèle relationnel normalisé + contraintes  + indexes Oracle.
-        </p>
+<!-- ===================== SECURITY ===================== -->
+<section class="cs" id="security">
+<h2>Security model</h2>
 
-        <div style="margin-top:12px;">
-          <img
-            src="rale.jpg"
-            alt="Schéma relationnel Oracle"
-            style="width:100%; border-radius:14px; display:block; box-shadow: 0 6px 18px rgba(0,0,0,0.14);"
-          />
-        </div>
-      </div>
+<h3>Identity enforcement</h3>
+<p>
+The most direct attack on a platform like this is acting as someone else — booking
+under another tenant's identity, or sending a message with a forged sender. Two
+triggers close that path by overwriting the submitted identifier with the
+identity of the connected database user.
+</p>
 
- 
-      <div id="bugs" class="card" style="margin-top:16px;">
-        <h3>Bugs / cas limites & corrections (noms réels PL/SQL)</h3>
-        <p class="section-text" style="max-width:none;">
-          Liste des problèmes rencontrés et mécanismes Oracle mis en place (procédures / fonctions / triggers / vues / rôles).
-        </p>
+<div class="codebox-static">
+<pre><code class="sql">CREATE OR REPLACE TRIGGER trg_secu_resa_locataire
+BEFORE INSERT ON RESERVATION
+FOR EACH ROW
+DECLARE
+    v_user_id NUMBER;
+BEGIN
+    IF USER IN ('AIRBNB_V2', 'SYSTEM', 'SYS') THEN RETURN; END IF;
 
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>1) Chevauchement des réservations (anti-overbooking)</strong></h4>
-            <ul style="margin:0;">
-              <li><strong>Cause</strong> : réservation sur une période déjà occupée</li>
-              <li><strong>Détection</strong> : <code>verifierDisponibilite(p_id_bien, p_debut, p_fin)</code> (compte conflits)</li>
-              <li><strong>Blocage</strong> : <code>creerReservation(...)</code> lève <code>-20001</code> si conflit (transaction + rollback)</li>
-              <li><strong>Recherche cohérente</strong> : <code>rechercherBiens(...)</code> exclut les conflits via <code>NOT EXISTS</code></li>
-            </ul>
-          </div>
+    SELECT id_utilisateur INTO v_user_id
+    FROM UTILISATEUR WHERE login_db = USER;
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>2) Usurpation d’identité du locataire à l’insertion</strong></h4>
-            <ul style="margin:0;">
-              <li><strong>Cause</strong> : un utilisateur tente d’insérer une réservation pour un autre <code>id_locataire</code></li>
-              <li><strong>Correction</strong> : trigger <code>trg_secu_resa_locataire</code> force <code>:NEW.id_locataire</code> à l’utilisateur connecté</li>
-            </ul>
-          </div>
+    IF :NEW.id_locataire != v_user_id THEN
+         :NEW.id_locataire := v_user_id;
+    END IF;
+END;</code></pre>
+</div>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>3) Accès non autorisé aux biens/annonces/photos/équipements</strong></h4>
-            <ul style="margin:0;">
-              <li><strong>BIEN</strong> : <code>trg_secu_bien_owner</code> bloque UPDATE/DELETE si le bien ne correspond pas au propriétaire connecté</li>
-              <li><strong>ANNONCE</strong> : <code>trg_secu_annonce_owner</code> vérifie le propriétaire du bien lié</li>
-              <li><strong>PHOTO_BIEN</strong> : <code>trg_secu_photo_owner</code> empêche modification des photos d’un autre bien</li>
-              <li><strong>BIEN_EQUIPEMENT</strong> : <code>trg_secu_equipement_owner</code> empêche modification des équipements d’un autre bien</li>
-            </ul>
-          </div>
+<p>
+Each application user maps to an Oracle account, so <code>USER</code> is a
+trustworthy identity — not a value the client can set. The same pattern protects
+messaging through <code>trg_secu_message_identity</code>.
+</p>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>4) Suppression d’un bien avec réservations actives</strong></h4>
-            <ul style="margin:0;">
-              <li><strong>Cause</strong> : suppression d’un bien alors que <code>RESERVATION</code> est <code>EN_ATTENTE</code> / <code>CONFIRMEE</code></li>
-              <li><strong>Correction</strong> : trigger <code>trg_no_delete_bien_with_active_res</code> bloque DELETE (erreur <code>-20010</code>)</li>
-            </ul>
-          </div>
+<h3>Ownership enforcement</h3>
+<p>
+Four triggers verify that the connected owner actually owns the object being
+modified, following the foreign key back to <code>BIEN</code> where needed:
+</p>
+<ul class="dims">
+  <li><code>trg_secu_bien_owner</code> — properties</li>
+  <li><code>trg_secu_annonce_owner</code> — listings, checked through the linked property</li>
+  <li><code>trg_secu_photo_owner</code> — photos</li>
+  <li><code>trg_secu_equipement_owner</code> — amenities</li>
+</ul>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>5) Fraude : modification d’un paiement “réussi”</strong></h4>
-            <ul style="margin:0;">
-              <li><strong>Cause</strong> : UPDATE sur <code>PAIEMENT</code> après validation</li>
-              <li><strong>Correction</strong> : trigger <code>trg_no_update_paiement_if_reussi</code> bloque toute modification si <code>statut_paiement = 'REUSSI'</code> (erreur <code>-20011</code>)</li>
-              <li><strong>Workflow</strong> : validation via <code>validerPaiement(p_id_paiement)</code>, échec via <code>echouerPaiement(...)</code>, remboursement via <code>emettreRemboursement(...)</code></li>
-            </ul>
-          </div>
+<h3>Database roles</h3>
+<p>
+Access is granted through five Oracle roles rather than a single application
+account, so privileges are enforced by the database engine itself.
+</p>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>6) Dates incohérentes lors de la confirmation</strong></h4>
-            <ul style="margin:0;">
-              <li><strong>Règle</strong> : <code>date_fin &gt; date_debut</code> (contrainte <code>chk_dates_res</code>)</li>
-              <li><strong>Contrôle métier</strong> : trigger <code>trg_reservation_check</code> bloque confirmation si dates invalides (erreur <code>-20015</code>)</li>
-              <li><strong>Automatisation</strong> : <code>confirmerReservation(p_id_reservation)</code> calcule le total via <code>calculerPrixTotal(...)</code> et crée la ligne <code>LOCATION</code></li>
-            </ul>
-          </div>
+<table class="srctable">
+<thead><tr><th>Role</th><th>Grants</th></tr></thead>
+<tbody>
+<tr><td><code>ROLE_VISITEUR</code></td><td>Public views only</td></tr>
+<tr><td><code>ROLE_STANDARD</code></td><td>Own profile, messaging</td></tr>
+<tr><td><code>ROLE_LOCATAIRE</code></td><td>Reservations, payments, reviews, personal views</td></tr>
+<tr><td><code>ROLE_PROPRIETAIRE</code></td><td>Property, listing, photo and amenity management</td></tr>
+<tr><td><code>ROLE_ADMIN</code></td><td>Full access</td></tr>
+</tbody>
+</table>
+</section>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>7) Usurpation en messagerie </strong></h4>
-            <ul style="margin:0;">
-              <li><strong>Cause</strong> : insertion avec un <code>id_expediteur</code> falsifié</li>
-              <li><strong>Correction</strong> : trigger <code>trg_secu_message_identity</code> force <code>:NEW.id_expediteur</code> à l’utilisateur connecté</li>
-            </ul>
-          </div>
+<!-- ===================== VIEWS ===================== -->
+<section class="cs" id="views">
+<h2>Views</h2>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"><strong>8) Note moyenne non mise à jour après avis</strong></h4>
-            <ul style="margin:0;">
-              <li><strong>Correction</strong> : procédure <code>majNoteMoyenne(p_id_location)</code> (AUTONOMOUS_TRANSACTION) recalcule <code>BIEN.note_moyenne</code></li>
-              <li><strong>Automatisation</strong> : trigger <code>trg_maj_note_bien</code> (AFTER INSERT/UPDATE ON <code>AVIS_BIEN</code>)</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+<p>
+Ten views serve as the read interface. Flask queries views rather than base
+tables, which keeps SQL out of the route handlers and limits what each role can
+read to exactly what its pages need.
+</p>
 
-      <div id="security" class="card" style="margin-top:16px;">
-        <h3>Sécurité & droits Oracle </h3>
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Rôles DB</h4>
-            <ul style="margin:0;">
-              <li><code>ROLE_VISITEUR</code> : lecture vues publiques (<code>VUE_ANNONCES_PUBLIQUES</code>, <code>VUE_BIENS_PUBLICS</code>)</li>
-              <li><code>ROLE_STANDARD</code> : profil + messagerie</li>
-              <li><code>ROLE_LOCATAIRE</code> : réservations, paiements, avis + vues personnelles</li>
-              <li><code>ROLE_PROPRIETAIRE</code> : gestion biens/annonces/photos/équipements + vues propriétaires</li>
-              <li><code>ROLE_ADMIN</code> : droits complets</li>
-            </ul>
-          </div>
+<table class="srctable">
+<thead><tr><th>View</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>VUE_ANNONCES_PUBLIQUES</code></td><td>Available listings with main photo and rating</td></tr>
+<tr><td><code>VUE_BIENS_PUBLICS</code></td><td>Public property catalogue</td></tr>
+<tr><td><code>VUE_UTILISATEURS_PUBLICS</code></td><td>Public profile fields only</td></tr>
+<tr><td><code>VUE_MES_RESERVATIONS</code></td><td>Tenant's own bookings</td></tr>
+<tr><td><code>VUE_RESERVATIONS_POUR_MOI</code></td><td>Requests received by an owner</td></tr>
+<tr><td><code>VUE_MES_PAIEMENTS</code></td><td>Tenant's payment history</td></tr>
+<tr><td><code>VUE_MES_REVENUS</code></td><td>Owner's revenue</td></tr>
+<tr><td><code>VUE_MES_BIENS</code> / <code>VUE_MES_ANNONCES</code></td><td>Owner's inventory and listings</td></tr>
+<tr><td><code>VUE_MON_PROFIL</code></td><td>Connected user's profile</td></tr>
+</tbody>
+</table>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;"> pratiques appliquées</h4>
-            <ul style="margin:0;">
-              <li>Contrôles critiques côté DB (triggers) + séparation des responsabilités (Flask vs Oracle)</li>
-              <li>Vues dédiées pour limiter l’exposition des données</li>
-              <li>Indexes pour accélérer recherche et jointures (réservations, paiements, messages)</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+<p class="note">
+Selecting a public view exposes no column that a visitor should not see, which
+makes accidental data leakage a schema question rather than a code review question.
+</p>
+</section>
 
-      
-     <div id="screenshots" class="card" style="margin-top:16px;">
-        <h3>Screenshots</h3>
-        <p class="section-text" style="max-width:none;">
-          Interfaces principales : espace propriétaire, espace public, réservations et authentification.
-        </p>
+<!-- ===================== SCREENS ===================== -->
+<section class="cs" id="screens">
+<h2>Interface</h2>
 
-        <div class="projects" style="grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
-          <div class="project-card" style="pointer-events:none;">
-            <img src="propr.png" alt="Espace propriétaire"
-                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Espace Propriétaire</h3>
-              <p style="margin:0;">Gestion des biens, annonces, réservations reçues, revenus.</p>
-            </div>
-          </div>
+<p>Flask with Jinja2 templates and TailwindCSS; navigation adapts to the role.</p>
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="ouve.png" alt="Espace public"
-                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Espace Public</h3>
-              <p style="margin:0;">Catalogue via <code>VUE_ANNONCES_PUBLIQUES</code> (photo principale + note).</p>
-            </div>
-          </div>
+<h3>Owner dashboard</h3>
+<p>Property inventory, listings, incoming requests and revenue.</p>
+<figure class="shot shot--wide"><img src="propr.png" alt="Owner dashboard" loading="lazy" /><figcaption>Owner space</figcaption></figure>
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="reserv.png" alt="Gestion des réservations"
-                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Réservations</h3>
-              <p style="margin:0;">Création via <code>creerReservation</code>, confirmation via <code>confirmerReservation</code>, suivi via vues.</p>
-            </div>
-          </div>
+<h3>Public catalogue</h3>
+<p>Served from <code>VUE_ANNONCES_PUBLIQUES</code>, with main photo and average rating.</p>
+<figure class="shot shot--wide"><img src="ouve.png" alt="Public catalogue" loading="lazy" /><figcaption>Public catalogue</figcaption></figure>
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="insc.png" alt="Inscription / Connexion"
-                 style="width:100%; height:340px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Authentification</h3>
-              <p style="margin:0;">Création compte via <code>sInscrire</code>, connexion via <code>seConnecter</code> </p>
-            </div>
-          </div>
-        </div>
-      </div>
+<h3>Reservations</h3>
+<p>Creation, confirmation and tracking through the stored procedures.</p>
+<figure class="shot shot--wide"><img src="reserv.png" alt="Reservations view" loading="lazy" /><figcaption>Reservations</figcaption></figure>
 
-     
-     <div id="results" class="grid-2" style="margin-top:16px;">
-        <div class="card">
-          <h3>Résultats</h3>
-          <ul>
-            <li>Cycle complet réservation → location → paiement → avis</li>
-            <li>Anti-overbooking + contrôles dates + protection suppression</li>
-            <li>Protection anti-usurpation (réservation & messagerie)</li>
-            <li>Immuabilité des paiements réussis + remboursement</li>
-            <li>Note moyenne recalculée automatiquement après avis</li>
-            <li>Vues SQL pour pages rapides et requêtes simplifiées côté Flask</li>
-          </ul>
-        </div>
+<h3>Authentication</h3>
+<p>Registration through <code>sInscrire()</code>, login through <code>seConnecter()</code>.</p>
+<figure class="shot shot--wide"><img src="insc.png" alt="Registration screen" loading="lazy" /><figcaption>Authentication</figcaption></figure>
+</section>
 
-        <div id="improvements" class="card" style="margin-top:16px;">
-          <h3>Améliorations possibles</h3>
-          <ul>
-            <li>Tests automatisés des procédures/edge cases (dates, statuts, concurrence)</li>
-            <li>Pagination + filtres avancés côté recherche</li>
-            <li>Journalisation (audit) sur paiements et changements de statuts</li>
-            <li>CI/CD + script d’installation complet</li>
-          </ul>
-        </div>
-      </div>
+<!-- ===================== OUTCOME ===================== -->
+<section class="cs" id="outcome">
+<h2>Outcome</h2>
 
+<p>
+The full cycle works end to end: publish, search, reserve, confirm, pay, review.
+Thirty-nine PL/SQL objects — nineteen procedures and functions, ten triggers, ten
+views — carry the rules, backed by five database roles.
+</p>
 
-      <div id="cta" class="card" style="margin-top:16px;">
-        <h3>Accès rapide</h3>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="https://youtu.be/AFmtnT5RAnk" target="_blank" rel="noopener noreferrer">
-            Démo vidéo
-          </a>
-          <a class="btn btn-ghost" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
-          <a class="btn btn-ghost" href="../../index.html#contact">
-            Contact
-          </a>
-        </div>
-      </div>
+<p>What the project taught me, and what I would defend:</p>
 
-      <footer class="footer">© 2026 — Malak Mounji</footer>
-    </section>
-  </main>
+<ul>
+  <li><strong>Enforcement belongs where it cannot be bypassed.</strong> Identity triggers that overwrite the submitted value are stronger than a validation check in a route handler, because they hold for every client.</li>
+  <li><strong>Immutability beats correction.</strong> Freezing successful payments and requiring an explicit refund keeps a history that an update would destroy.</li>
+  <li><strong>Views are an access-control tool</strong>, not only a convenience — granting a role a view instead of a table decides what it can read at the schema level.</li>
+</ul>
+
+<h3 class="limits-head">Known weaknesses</h3>
+
+<div class="limits">
+<p>Two of these I would fix before deploying this anywhere real:</p>
+<ul>
+  <li><strong>Password hashing uses MD5 without a salt.</strong> <code>sInscrire()</code> and <code>seConnecter()</code> hash through <code>DBMS_CRYPTO.HASH_MD5</code>. MD5 is broken for password storage and an unsalted digest is vulnerable to rainbow tables; a slow salted algorithm is what this should use.</li>
+  <li><strong>The availability check is not concurrency-safe.</strong> <code>verifierDisponibilite()</code> counts conflicts and <code>creerReservation()</code> then inserts. Two concurrent transactions can both pass the check before either commits, and both bookings are written. Closing this requires locking the property row or enforcing non-overlap as a constraint rather than a procedural check.</li>
+  <li><strong>Identity correction is silent.</strong> <code>trg_secu_resa_locataire</code> rewrites a mismatched tenant identifier rather than raising. It prevents the attack, but leaves no signal that one was attempted; raising an error would also make the rule visible during debugging.</li>
+  <li><strong>No automated tests.</strong> The procedures are exercised manually. Edge cases around dates, status transitions and concurrency deserve a test suite.</li>
+</ul>
+</div>
+
+<h3>Next steps</h3>
+<ul>
+  <li>Replace MD5 with a salted, slow hash and migrate stored credentials.</li>
+  <li>Make booking concurrency-safe through row locking or an exclusion constraint.</li>
+  <li>Add an audit table for payment and status changes.</li>
+  <li>Build a PL/SQL test suite covering the eight integrity rules.</li>
+</ul>
+</section>
+
+</div><!-- /.case -->
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener">Watch the demo</a>
+      <a class="btn" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="../../index.html#work">All projects</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap"><p>Malak Mounji — ENSA Agadir, Morocco</p></div>
+</footer>
 
 </body>
 </html>
