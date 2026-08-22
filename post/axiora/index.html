@@ -52,6 +52,23 @@
 </section>
 
 <div class="wrap case">
+<nav class="toc" aria-label="On this page">
+  <p class="toc-head">On this page</p>
+  <ol>
+    <li><a href="#context">Context</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#data">Data and preparation</a></li>
+    <li><a href="#interface">Interface</a></li>
+    <li><a href="#exploration">Indicator modules</a></li>
+    <li><a href="#maps">Geographic mapping</a></li>
+    <li><a href="#forecasting">Trend projection</a></li>
+    <li><a href="#assistant">Assistant</a></li>
+    <li><a href="#reporting">PDF reporting</a></li>
+    <li><a href="#outcome">Outcome</a></li>
+    <li><a href="#roadmap">Next steps</a></li>
+  </ol>
+</nav>
+
 
 <!-- ===================== CONTEXT ===================== -->
 <section class="cs" id="context">
@@ -751,72 +768,44 @@ look confident and mean nothing.
   <li><strong>Inertia</strong> — demographic quantities move slowly, so a linear trend is a defensible first approximation</li>
 </ul>
 
-<h3>Pipeline</h3>
+<h3>How it is implemented</h3>
 
 <ol class="pipeline">
-  <li><strong>Preparation</strong> — series reshaped with <code>pd.melt</code> to isolate year as the independent variable from the target indicator.</li>
-  <li><strong>Temporal split</strong> — train and test split chronologically, with no shuffling. Shuffling a time series would train on future points and test on past ones, which inflates the score without improving the model.</li>
-  <li><strong>Fit and evaluate</strong> — the model is fitted on the earlier portion and scored on the held-out later portion using mean absolute error.</li>
-  <li><strong>Projection</strong> — future years are generated and passed through the fitted model to produce the displayed curve.</li>
+  <li><strong>Reshaping</strong> — each series is reshaped with <code>pd.melt</code> so that the year becomes an explicit independent variable and the indicator the target.</li>
+  <li><strong>Fitting</strong> — one <code>LinearRegression</code> per territory, fitted on the full observed series.</li>
+  <li><strong>Extrapolation</strong> — the fitted line is evaluated at the next three years and appended to the observed series for display.</li>
 </ol>
 
-<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error
+<div class="codebox-static">
+<pre><code class="python">df_melt = df.melt(
+    id_vars="Province", value_vars=cols,
+    var_name="Année", value_name=selected_indicator
+)
+df_melt["Année"] = df_melt["Année"].str.extract(r"(\d{4})").astype(int)
 
+predictions = []
+for prov in df["Province"]:
+    sub = df_melt[df_melt["Province"] == prov]
+    X = sub["Année"].values.reshape(-1, 1)
+    y = sub[selected_indicator].values
 
-def forecast_metric(df_hist, target_col="Population", horizon=3):
-    df_hist = df_hist.copy()
-    df_hist["Année"] = pd.to_numeric(df_hist["Année"], errors="coerce")
-    df_hist[target_col] = pd.to_numeric(df_hist[target_col], errors="coerce")
+    model = LinearRegression().fit(X, y)
 
-    df_hist = df_hist.dropna(subset=["Année", target_col])
-    df_hist = df_hist.sort_values("Année")
+    future_years = np.array([2019, 2020, 2021]).reshape(-1, 1)
+    y_pred = model.predict(future_years)
 
-    split_idx = int(len(df_hist) * 0.8) if len(df_hist) >= 6 else max(len(df_hist) - 1, 1)
+    for yr, val in zip([2019, 2020, 2021], y_pred):
+        predictions.append({"Province": prov, "Année": yr,
+                            selected_indicator: val})</code></pre>
+</div>
 
-    train = df_hist.iloc[:split_idx]
-    test  = df_hist.iloc[split_idx:]
-
-    X_train = train["Année"].values.reshape(-1, 1)
-    y_train = train[target_col].values
-
-    X_test  = test["Année"].values.reshape(-1, 1)
-    y_test  = test[target_col].values
-
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-
-    if len(test) > 0:
-        y_test_pred = model.predict(X_test)
-        mae = mean_absolute_error(y_test, y_test_pred)
-    else:
-        mae = None
-    last_year = int(df_hist["Année"].max())
-
-    future_years = np.arange(
-        last_year + 1,
-        last_year + 1 + horizon
-    )
-
-    y_future = model.predict(
-        future_years.reshape(-1, 1)
-    )
-
-
-    df_future = pd.DataFrame({
-
-        "Année": future_years,
-
-        f"{target_col}_pred": y_future
-
-    })
-
-
-    return model, df_future, mae
-      </code></code></pre></details>
+<p class="note">
+The model is fitted on every available observation and extrapolated forward. There
+is no held-out split and no error metric: with series of four to six points — and,
+for the inter-census indicators, only two — there are not enough observations to
+hold any back and still fit a line. This is stated plainly below rather than
+implied, because it determines how much weight these curves can carry.
+</p>
 
 <h3>What the projections show</h3>
 
@@ -848,24 +837,27 @@ territories specifically.
 
 <div class="limits">
 <p>
-These projections extrapolate an observed trend. They are not forecasts in the
-statistical sense, and the following constraints should be read alongside every
-figure produced by this module:
+These curves extrapolate an observed trend. They are not forecasts in the
+statistical sense, and the following constraints apply to every figure this module
+produces:
 </p>
 <ul>
-  <li><strong>Short series.</strong> Most indicators offer between four and six temporal points. Confidence intervals on a regression fitted to so few observations are wide, and are not displayed on these charts.</li>
+  <li><strong>No out-of-sample evaluation.</strong> The regression is fitted on the complete series and extrapolated; no portion is held back, so no error metric is reported. The fit quality shown on the charts is in-sample by construction.</li>
+  <li><strong>Very short series.</strong> Most indicators offer four to six temporal points. Two of the demographic series rest on the 2004 and 2014 censuses alone — two points, through which a straight line passes exactly, leaving no residual and no way to judge the fit.</li>
   <li><strong>No structural change modelled.</strong> A linear fit assumes the mechanism producing the trend continues unchanged. It cannot represent a policy shift, an economic shock, or a change in census methodology.</li>
   <li><strong>Univariate.</strong> Each indicator is projected from its own history alone. No exogenous variable — climate, public investment, migration — enters the model.</li>
-  <li><strong>Held-out error only.</strong> Evaluation uses mean absolute error on the final portion of each series. With series this short, that estimate is itself unstable.</li>
+  <li><strong>No uncertainty displayed.</strong> The charts show a single line. Confidence intervals on a regression fitted to so few points would be wide, and are not drawn.</li>
 </ul>
 <p class="limits-note">
-The module is intended to make the direction of change legible, not to produce
-figures suitable for planning decisions on their own.
+This module is intended to make the direction of an observed trend legible. It is
+not an evaluated predictive model, and its output should not be used on its own as
+the basis for a planning decision.
 </p>
 </div>
 
 <h3>Possible extensions</h3>
 <ul>
+  <li><strong>A real evaluation.</strong> On the monthly CPI series, which has enough points, hold out a chronological test portion and report mean absolute error — the missing piece today.</li>
   <li><strong>Seasonal models.</strong> If HCP publishes at monthly frequency, a model handling seasonality (such as Prophet) would apply to the CPI series, which already has monthly granularity.</li>
   <li><strong>Multivariate models.</strong> Composite indicators such as poverty depend on several measured quantities; a gradient-boosted model over multiple features would fit that structure better than a univariate line.</li>
   <li><strong>Exogenous variables.</strong> Adding geospatial or external data — climate, public investment programmes — as features, provided enough observations exist to justify the added parameters.</li>
@@ -1008,10 +1000,13 @@ would defend:
 
 <h3>What I would do differently</h3>
 <p>
-The forecasting module is the weakest part of the project, and knowingly so: the
-data does not support more than trend extrapolation. If I revisited it, I would
-display confidence intervals rather than a single line, and state the held-out
-error next to each projection in the interface itself — not only in the code.
+The forecasting module is the weakest part of the project, and knowingly so. It
+extrapolates without evaluating, because the series are too short to hold anything
+back — but the interface presents the result as a curve like any other, which
+overstates it. Revisiting it, I would restructure the data to obtain longer series
+where possible, hold out a genuine test portion on those, report the resulting
+error next to each projection, and mark the two-point census series as
+extrapolation only.
 </p>
 </section>
 
