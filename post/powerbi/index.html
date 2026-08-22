@@ -1,496 +1,377 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carrefour Sales Analysis — Détails du projet</title>
-  <link rel="stylesheet" href="../../styles.css" />
-  <meta
-    name="description"
-    content="Projet Business Intelligence Power BI : ETL Python, data warehousing simplifié, schéma étoile, mesures DAX et dashboards interactifs pour l’analyse des ventes Carrefour."
-  />
-</head>
+/* ================================================================
+   Case study pages — extends ../../styles.css
+   Long-form reading: one column, quiet figures, code folded away.
+   ================================================================ */
 
-<body>
-  <div class="bg-glow"></div>
+/* The container itself is the column. Nothing inside can be wider than
+   its parent, so text, figures, tables and code align by construction
+   rather than by a max-width repeated on every element. */
+.case{
+  width: min(100%, 760px);
+  margin-inline: auto;
+  padding-bottom: var(--gap);
+}
 
-  <header class="header">
-    <div class="container nav">
-      <a class="logo" href="../../index.html#portfolio">← Retour</a>
+.case-hero .wrap{ width: min(100%, 760px); }
 
-      <nav class="nav-links">
-        <a href="../../index.html#home">Home</a>
-        <a href="../../index.html#about">About</a>
-        <a href="../../index.html#portfolio" class="active">Portfolio</a>
-        <a href="../../index.html#contact">Contact</a>
-      </nav>
+.case-hero{ padding-bottom: clamp(2rem, 5vw, 3.5rem); }
 
-      <div class="nav-actions">
-        <a class="btn btn-primary" href="../../malak.pdf" download>Download CV</a>
-      </div>
-    </div>
-  </header>
+.case-hero .standfirst{
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  line-height: 1.45;
+  margin: 0 0 1.4rem;
+}
 
-  <main class="container">
-    <section class="section" style="border-top:none;">
+.case-hero .lede{ margin: 0 0 1.8rem; }
 
-      <!-- ================= HERO ================= -->
-      <div style="text-align:center; padding-top:20px; padding-bottom:10px;">
-         
-        <h1 style="
-          font-size:42px;
-          margin-bottom:10px;
-          font-weight:700;
-          letter-spacing:0.5px;
-        ">
-          Carrefour Sales Analysis
-        </h1>
- <h2 >Projet réalisé en binôme avec RAWANE CERBOUCHE</h2>
-        <h2 style="
-          font-size:22px;
-          font-weight:500;
-          margin-bottom:18px;
-          opacity:0.85;
-        ">
-          Business Intelligence Dashboard — Power BI
-        </h2>
+/* ---- section rhythm ---- */
+.cs{
+  padding: clamp(2.2rem, 5vw, 3.4rem) 0;
+  border-top: 1px solid var(--rule);
+}
 
-        <div style="
-          display:flex;
-          justify-content:center;
-          gap:10px;
-          flex-wrap:wrap;
-          margin-bottom:20px;
-        ">
-          <span class="badge">Power BI</span>
-          <span class="badge">Python</span>
-          <span class="badge">Pandas</span>
-          <span class="badge">DAX</span>
-          <span class="badge">ETL</span>
-          <span class="badge">Star Schema</span>
-        </div>
+.cs > h2{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -.015em;
+  margin: 0 0 1.4rem;
+}
 
-        <p style="
-          max-width:920px;
-          margin:auto;
-          font-size:18px;
-          line-height:1.7;
-        ">
-          Projet complet de <strong>Business Intelligence</strong> permettant de transformer des données brutes de ventes Carrefour en
-          <strong>insights analytiques</strong> à travers un pipeline
-          <strong>ETL Python</strong>, une architecture inspirée du
-          <strong>data warehousing</strong>, un <strong>schéma étoile</strong> et des
-          <strong>dashboards interactifs Power BI</strong>.
-        </p>
+.cs h3{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.12rem;
+  margin: 2.4rem 0 .7rem;
+}
 
-        <br>
-      </div>
+.cs h4{
+  font-size: .78rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 1.6rem 0 .5rem;
+}
 
-      <!-- ================= TABLE DES MATIÈRES ================= -->
-      <div class="card" style="margin-top:18px;">
-        <h3 style="margin:0 0 12px 0;">Table des matières</h3>
 
-        <div style="
-          display:grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap:10px 14px;
-        ">
-          <a class="btn btn-ghost" href="#liens" style="justify-content:flex-start;">01. Liens & livrables</a>
-          <a class="btn btn-ghost" href="#overview" style="justify-content:flex-start;">02. Vue d’ensemble</a>
 
-          <a class="btn btn-ghost" href="#etl" style="justify-content:flex-start;">03. ETL & préparation</a>
-          <a class="btn btn-ghost" href="#warehouse" style="justify-content:flex-start;">04. Data Warehousing</a>
+.cs li{ margin-bottom: .4rem; }
 
-          <a class="btn btn-ghost" href="#schema" style="justify-content:flex-start;">05. Schéma étoile</a>
-          <a class="btn btn-ghost" href="#measures" style="justify-content:flex-start;">06. Mesures DAX</a>
+.cs .note{
+  border-left: 2px solid var(--rule);
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+  font-size: .95rem;
+}
 
-          <a class="btn btn-ghost" href="#dashboards" style="justify-content:flex-start;">07. Dashboards</a>
-          <a class="btn btn-ghost" href="#screenshots" style="justify-content:flex-start;">08. Screenshots</a>
+/* reading of a figure — sits under the chart it explains */
+.reading{
+  border-left: 2px solid var(--signal);
+  padding-left: 1.1rem;
+  font-size: .97rem;
+}
 
-          <a class="btn btn-ghost" href="#results" style="justify-content:flex-start;">09. Résultats & insights</a>
-          <a class="btn btn-ghost" href="#cta" style="justify-content:flex-start;">10. Accès rapide</a>
-        </div>
-      </div>
+/* ---- numbered pipeline ---- */
+.pipeline{ padding-left: 1.3rem; }
+.pipeline li{ margin-bottom: .7rem; }
+.pipeline li::marker{ font-family: var(--mono); color: var(--ink-soft); }
 
-      <!-- ================= LIENS ================= -->
-      <div id="liens" class="grid-2" style="margin-top:10px;">
-        <div class="card">
-          <h3 style="margin-bottom:8px;">Liens</h3>
-          <div style="display:flex; flex-wrap:wrap; gap:10px;">
-            <a class="btn btn-primary" href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener noreferrer">
-              GitHub Repository
-            </a>
-<a class="btn btn-ghost" href="./project_powerbi.pbit" download>
-  Télécharger le template Power BI
-</a>
-            <a class="btn btn-ghost" href="https://drive.google.com/file/d/1X8w2iwG33Yd4KUv2MXWcPAy2ngNGf-DJ/view" target="_blank" rel="noopener noreferrer">
-              Full Raw Dataset
-            </a>
-            <a class="btn btn-ghost" href="https://drive.google.com/file/d/1939kxoTLac0OPcrJ3B8phA9asYU4_G3M/view" target="_blank" rel="noopener noreferrer">
-              Full Cleaned Dataset
-            </a>
-          </div>
+/* ---- tables ---- */
+.srctable,
+.minitable{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .87rem;
+  margin: 1rem 0 1.6rem;
+}
 
-         </div>
+.minitable{ font-size: .8rem; }
 
-        <div class="card">
-          <h3 style="margin-bottom:8px;">Stack & composants</h3>
-          <ul style="margin:0;">
-            <li><strong>ETL</strong> : Python + Pandas pour le nettoyage et la transformation</li>
-            <li><strong>Data Model</strong> : modèle analytique Power BI en schéma étoile</li>
-            <li><strong>BI</strong> : mesures DAX, KPIs, filtres, dashboards interactifs</li>
-            <li><strong>Fichiers</strong> : CSV bruts, dataset nettoyé, template Power BI</li>
-          </ul>
-        </div>
-      </div>
+.srctable th,
+.srctable td,
+.minitable th,
+.minitable td{
+  text-align: left;
+  padding: .5rem .7rem .5rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
 
-      <!-- ================= OVERVIEW ================= -->
-      <div id="overview" class="grid-2" style="margin-top:16px;">
-        <div class="card">
-          <h3>Objectif du projet</h3>
-          <ul>
-            <li>Analyser les ventes validées et annulées</li>
-            <li>Mesurer l’impact des remises sur le chiffre d’affaires</li>
-            <li>Comparer les performances par catégorie, ville et moyen de paiement</li>
-            <li>Suivre les tendances temporelles et les comportements clients</li>
-            <li>Centraliser les KPIs dans une solution BI claire et exploitable</li>
-          </ul>
-        </div>
+.srctable thead th,
+.minitable thead th{
+  font-size: .72rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom-color: var(--ink);
+}
 
-        <div class="card">
-          <h3>Pipeline analytique</h3>
-          <p class="section-text" style="max-width:none;">
-            Ce projet suit un workflow complet de Business Intelligence :
-          </p>
+.minitable td:nth-child(n+3){ font-family: var(--mono); text-align: right; }
 
-          <div style="
-            margin-top:10px;
-            display:flex;
-            flex-wrap:wrap;
-            gap:10px;
-          ">
-            <span class="badge">Raw Data</span>
-            <span class="badge">ETL Python</span>
-            <span class="badge">Processed Data</span>
-            <span class="badge">Star Schema</span>
-            <span class="badge">DAX</span>
-            <span class="badge">Power BI Dashboard</span>
-          </div>
+/* ---- screenshots ---- */
+.shot{ margin: 1.4rem 0 2rem; }
 
-          <p class="section-text" style="margin-top:12px; max-width:none;">
-            <strong>Raw Data → ETL → Clean Data → Star Schema → KPI Reporting</strong>
-          </p>
-        </div>
-      </div>
+/* Never upscale: a 336px screenshot blown up to 1080px is just blurry.
+   Images render at natural size, capped by the column. */
+.shot img{
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  background: #fff;
+}
 
-      <!-- ================= ETL ================= -->
-      <div id="etl" class="card" style="margin-top:16px;">
-        <h3>ETL & préparation des données</h3>
-        <p class="section-text" style="max-width:none;">
-          Avant l’analyse dans Power BI, les données ont été préparées via un script ETL en Python afin de garantir leur cohérence,
-          leur lisibilité et leur exploitabilité.
-        </p>
+/* wide screenshots and strips: full column width is the point */
 
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Extract</h4>
-            <ul style="margin:0;">
-              <li>Import du fichier CSV source contenant les transactions Carrefour</li>
-              <li>Chargement des colonnes de vente, client, paiement, date et catégorie</li>
-              <li>Gestion de l’encodage CSV pour éviter les erreurs de lecture</li>
-            </ul>
-          </div>
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Transform</h4>
-            <ul style="margin:0;">
-              <li>Nettoyage des textes et standardisation des valeurs</li>
-              <li>Correction / conversion des dates</li>
-              <li>Suppression de colonnes inutiles</li>
-              <li>Normalisation des champs mois / année</li>
-              <li>Création d’un dataset prêt pour l’analyse Power BI</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+/* two narrow portrait screenshots read as a pair, not a queue */
+.shot-pair{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin: 1.4rem 0 2rem;
+}
+.shot-pair .shot{ margin: 0; }
+.shot-pair img{ width: 100%; }
 
-      <!-- ================= WAREHOUSING ================= -->
-      <div id="warehouse" class="card" style="margin-top:16px;">
-        <h3>Data Warehousing (approche simplifiée)</h3>
-        <p class="section-text" style="max-width:none;">
-          Même sans entrepôt de données enterprise, le projet suit une logique inspirée du
-          <strong>data warehousing</strong> avec séparation claire des couches de données.
-        </p>
+/* same indicator, two years: side by side or the comparison is lost */
+.shot-duo{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin: 1.4rem 0 2rem;
+}
+.shot-duo .shot{ margin: 0; }
+.shot-duo img{ width: 100%; }
 
-        <div class="grid-3" style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:12px;">
-          <div class="card" style="padding:16px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Raw Layer</h4>
-            <p style="margin:0;">
-              Données brutes d’origine, non modifiées, servant de base au pipeline ETL.
-            </p>
-          </div>
+.shot figcaption{
+  margin-top: .55rem;
+  font-size: .8rem;
+  color: var(--ink-soft);
+}
 
-          <div class="card" style="padding:16px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Processed Layer</h4>
-            <p style="margin:0;">
-              Dataset nettoyé, structuré et prêt à alimenter le modèle analytique.
-            </p>
-          </div>
+/* ---- folded code ---- */
+.codebox{
+  border: 1px solid var(--rule);
+  margin: 1rem 0 1.8rem;
+  background: var(--paper-alt);
+}
 
-          <div class="card" style="padding:16px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Reporting Layer</h4>
-            <p style="margin:0;">
-              Couche BI construite dans Power BI avec KPIs, visuels et exploration interactive.
-            </p>
-          </div>
-        </div>
-      </div>
+.codebox summary{
+  cursor: pointer;
+  padding: .55rem .9rem;
+  font-family: var(--mono);
+  font-size: .78rem;
+  letter-spacing: .04em;
+  color: var(--ink-soft);
+  list-style: none;
+}
 
-      <!-- ================= STAR SCHEMA ================= -->
-      <div id="schema" class="card" style="margin-top:16px;">
-        <h3>Schéma étoile</h3>
-        <p class="section-text" style="max-width:none;">
-          Le modèle de données a été structuré en <strong>schéma étoile</strong> pour améliorer la performance analytique,
-          simplifier les relations et faciliter les calculs DAX.
-        </p>
+.codebox summary::before{ content: "▸ "; }
+.codebox[open] summary::before{ content: "▾ "; }
+.codebox summary::-webkit-details-marker{ display: none; }
+.codebox[open] summary{ border-bottom: 1px solid var(--rule); }
 
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Table de faits</h4>
-            <ul style="margin:0;">
-              <li><code>Fact_Sales</code> : ventes, quantités, remises, commandes, profils clients</li>
-            </ul>
+.codebox pre{
+  margin: 0;
+  padding: .9rem;
+  overflow-x: auto;
+  background: #fff;
+}
 
-            <h4 style="margin:14px 0 8px 0;">Tables de dimensions</h4>
-            <ul style="margin:0;">
-              <li><code>Dim_Date</code></li>
-              <li><code>Dim_Produit</code></li>
-              <li><code>dim_client</code></li>
-              <li><code>Dim_Geography</code></li>
-              <li><code>Dim_payment</code></li>
-              <li><code>Dim_status</code></li>
-              <li><code>Dim_refund</code></li>
-            </ul>
-          </div>
+.codebox code{
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 1.6;
+  background: none;
+  padding: 0;
+  white-space: pre;
+}
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Avantages du modèle</h4>
-            <ul style="margin:0;">
-              <li>Relations plus claires</li>
-              <li>Calculs DAX plus simples</li>
-              <li>Navigation analytique plus flexible</li>
-              <li>Meilleure lisibilité du modèle</li>
-              <li>Structure standard en BI / data warehouse</li>
-            </ul>
-          </div>
-        </div>
+/* ---- limitations: the section that must not be skimmed ---- */
+.limits-head{ margin-top: 2.6rem !important; }
 
-        <div style="margin-top:14px;">
-          <img
-            src="etoile.png"
-            alt="Schéma étoile Power BI"
-            style="width:100%; border-radius:14px; display:block; box-shadow:0 6px 18px rgba(0,0,0,0.14);"
-          />
-        </div>
-      </div>
+.limits{
+  border: 1px solid var(--anomaly);
+  border-left-width: 3px;
+  padding: 1.2rem 1.4rem .4rem;
+  margin-bottom: 1.5rem;
+}
 
-      <!-- ================= MEASURES ================= -->
-      <div id="measures" class="card" style="margin-top:16px;">
-        <h3>Mesures DAX & KPIs</h3>
-        <p class="section-text" style="max-width:none;">
-          Plusieurs mesures DAX ont été créées pour transformer les données transactionnelles en indicateurs business directement exploitables.
-        </p>
+.limits p,
+.limits ul{ max-width: none; }
 
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">KPIs principaux</h4>
-            <ul style="margin:0;">
-              <li><code>Total Sales (Valid)</code></li>
-              <li><code>Total Orders</code></li>
-              <li><code>Total Qty</code></li>
-              <li><code>Total Discount</code></li>
-              <li><code>CA_Validé</code></li>
-              <li><code>CA_Annulé</code></li>
-              <li><code>Taux_Annulation %</code></li>
-              <li><code>Taux_discount_Global</code></li>
-            </ul>
-          </div>
+.limits-note{
+  font-size: .92rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Analyses avancées</h4>
-            <ul style="margin:0;">
-              <li><code>CA_MoM_Prev</code></li>
-              <li><code>CA_PY</code></li>
-              <li><code>CA_YTD</code></li>
-              <li><code>Croissance_CA_YoY %</code></li>
-              <li><code>Articles_par_Panier</code></li>
-              <li><code>Taux_Discount_Moyen</code></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+/* ---- two-column comparison ---- */
+.twocol{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+  align-items: start;
+  margin: 1.2rem 0 1.6rem;
+}
 
-      <!-- ================= DASHBOARDS ================= -->
-      <div id="dashboards" class="card" style="margin-top:16px;">
-        <h3>Dashboards développés</h3>
-        <p class="section-text" style="max-width:none;">
-          Le projet a été structuré en plusieurs vues analytiques afin de couvrir différentes dimensions métier : ventes, remises,
-          annulations, paiements, géographie, comportement client et tendance temporelle.
-        </p>
+.twocol .minitable,
+.twocol .codebox{ max-width: none; }
 
-        <div class="grid-2" style="margin-top:12px; gap:12px;">
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Vues principales</h4>
-            <ul style="margin:0;">
-              <li>Sales Dashboard</li>
-              <li>Transaction Details</li>
-              <li>Discounts & Promotions</li>
-              <li>Cancellations & Refunds</li>
-              <li>Payment Analysis</li>
-            </ul>
-          </div>
+.twocol h4{ margin-top: 0; }
 
-          <div class="card" style="padding:14px; margin:0;">
-            <h4 style="margin:0 0 8px 0;">Vues complémentaires</h4>
-            <ul style="margin:0;">
-              <li>Geography Analysis</li>
-              <li>Customer Insights</li>
-              <li>Times Dashboard</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+/* ---- assistant question types ---- */
+.qa{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.4rem;
+  margin: 1.2rem 0 1.6rem;
+}
 
-      <!-- ================= SCREENSHOTS ================= -->
-      <div id="screenshots" class="card" style="margin-top:16px;">
-        <h3>Screenshots</h3>
-        <p class="section-text" style="max-width:none;">
-          Aperçu des principales pages du dashboard Power BI.
-        </p>
+.qa > div{ border-top: 1px solid var(--rule); padding-top: .8rem; }
+.qa h4{ margin-top: 0; }
+.qa p{ font-size: .9rem; margin: 0 0 .5rem; }
 
-        <div class="projects" style="grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
+.qa .q{
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink);
+  font-size: .97rem;
+}
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="sales_dashboard.png" alt="Sales Dashboard"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Sales Dashboard</h3>
-              <p style="margin:0;">Vue synthétique des ventes, quantités, catégories et remises.</p>
-            </div>
-          </div>
+@media (max-width: 780px){
+  .twocol{ grid-template-columns: 1fr; }
+}
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="transaction details.png" alt="Transaction Details"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Transaction Details</h3>
-              <p style="margin:0;">Détail transactionnel avec filtres, commandes et profils clients.</p>
-            </div>
-          </div>
+@media print{
+  .codebox{ display: none; }
+  .shot img{ max-height: 9cm; object-fit: contain; }
+}
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="discount and promotions.png" alt="Discounts and Promotions"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Discounts & Promotions</h3>
-              <p style="margin:0;">Analyse des remises par catégorie, paiement et évolution temporelle.</p>
-            </div>
-          </div>
+/* ---- gallery: nine projection charts read as a set, not a queue ---- */
+.shot-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem .9rem;
+  margin: 1.4rem 0 2rem;
+}
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="cencellation.png" alt="Cancellations and Refunds"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Cancellations & Refunds</h3>
-              <p style="margin:0;">Suivi des annulations, causes dominantes et impact business.</p>
-            </div>
-          </div>
+.shot-grid .shot{ margin: 0; }
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="payment analysis.png" alt="Payment Analysis"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Payment Analysis</h3>
-              <p style="margin:0;">Comparaison des moyens de paiement, commandes et taux d’annulation.</p>
-            </div>
-          </div>
+.shot-grid .shot img{
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  padding: .4rem;
+}
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="geography analysis.png" alt="Geography Analysis"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Geography Analysis</h3>
-              <p style="margin:0;">Analyse des performances commerciales par ville et zone.</p>
-            </div>
-          </div>
+.shot-grid figcaption{ font-size: .74rem; }
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="customer insights.png" alt="Customer Insights"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Customer Insights</h3>
-              <p style="margin:0;">Segmentation clients par genre, tranche d’âge et volume d’achats.</p>
-            </div>
-          </div>
+@media (max-width: 900px){
+  .shot-grid{ grid-template-columns: repeat(2, 1fr); }
+}
 
-          <div class="project-card" style="pointer-events:none;">
-            <img src="2.png" alt="Times Dashboard"
-                 style="width:100%; height:320px; object-fit:cover; border-radius:16px;" />
-            <div class="project-body">
-              <h3 style="margin-bottom:6px;">Times Dashboard</h3>
-              <p style="margin:0;">Tendances temporelles, croissance, cumul annuel et évolution mensuelle.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+@media (max-width: 560px){
+  .shot-grid{ grid-template-columns: 1fr; }
+}
 
-      <!-- ================= RESULTS ================= -->
-      <div id="results" class="grid-2" style="margin-top:16px;">
-        <div class="card">
-          <h3>Résultats</h3>
-          <ul>
-            <li>Vision centralisée des ventes, remises, annulations et commandes</li>
-            <li>Comparaison claire des performances par catégorie</li>
-            <li>Analyse des moyens de paiement et de leur comportement</li>
-            <li>Suivi des tendances temporelles et des variations mensuelles</li>
-            <li>Lecture rapide des KPIs grâce aux cartes et indicateurs DAX</li>
-            <li>Modèle BI structuré et scalable pour futures extensions</li>
-          </ul>
-        </div>
+/* safety net: never let a figure exceed its column, even unstyled-adjacent */
+.cs img{ max-width: 100%; height: auto; }
 
-        <div class="card" style="margin-top:16px;">
-          <h3>Insights clés</h3>
-          <ul>
-            <li>Identification des catégories les plus performantes</li>
-            <li>Mesure de l’impact des remises sur le chiffre d’affaires</li>
-            <li>Détection des villes les plus contributrices</li>
-            <li>Analyse des motifs d’annulation dominants</li>
-            <li>Segmentation clients selon genre, âge et panier</li>
-          </ul>
-        </div>
-      </div>
+@media (max-width: 560px){
+  .shot-pair,
+  .shot-duo{ grid-template-columns: 1fr; }
+}
 
-      <!-- ================= CTA ================= -->
-      <div id="cta" class="card" style="margin-top:16px;">
-        <h3>Accès rapide</h3>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
-          <a class="btn btn-ghost" href="https://drive.google.com/file/d/1X8w2iwG33Yd4KUv2MXWcPAy2ngNGf-DJ/view" target="_blank" rel="noopener noreferrer">
-            Full Raw Data
-          </a>
-          <a class="btn btn-ghost" href="https://drive.google.com/file/d/1939kxoTLac0OPcrJ3B8phA9asYU4_G3M/view" target="_blank" rel="noopener noreferrer">
-            Full Cleaned Data
-          </a>
-          <a class="btn btn-ghost" href="../../index.html#contact">
-            Contact
-          </a>
-        </div>
-      </div>
+/* ---- table of contents ----
+   Sits in the left margin on wide screens, so it costs no reading width.
+   Collapses to a compact block above the text when the margin disappears. */
+.toc{
+  font-size: .82rem;
+  border-top: 1px solid var(--ink);
+  padding-top: .8rem;
+  margin: 0 0 2.5rem;
+}
 
-      <footer class="footer">© 2026 — Malak Mounji</footer>
-    </section>
-  </main>
-</body>
-</html>
+.toc-head{
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 .7rem;
+}
+
+.toc ol{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: toc;
+}
+
+.toc li{
+  counter-increment: toc;
+  margin: 0;
+  padding: .22rem 0;
+}
+
+.toc li::before{
+  content: counter(toc, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: .7rem;
+  color: var(--ink-soft);
+  margin-right: .6rem;
+}
+
+.toc a{
+  text-decoration: none;
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+}
+
+.toc a:hover{ border-bottom-color: var(--signal); color: var(--signal); }
+
+/* wide screens: park it in the margin and let it follow the scroll */
+@media (min-width: 1180px){
+  .toc{
+    position: fixed;
+    top: 7.5rem;
+    left: calc(50% - 380px - 210px);
+    width: 180px;
+    margin: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+@media print{ .toc{ display: none; } }
+
+/* code shown unfolded when it is the evidence for a claim */
+.codebox-static{
+  border: 1px solid var(--rule);
+  background: #fff;
+  margin: 1rem 0 1.4rem;
+}
+.codebox-static pre{ margin: 0; padding: .9rem; overflow-x: auto; }
+.codebox-static code{
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 1.6;
+  background: none;
+  padding: 0;
+  white-space: pre;
+}
+
+/* compact definition lists used for measure and dimension names */
+.dims{ list-style: none; padding: 0; }
+.dims li{
+  padding: .3rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: .93rem;
+}
+
+/* wide screenshots fill the column; the column is already the reading width */
+.shot--wide img{ width: 100%; }
