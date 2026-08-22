@@ -1,377 +1,417 @@
-/* ================================================================
-   Case study pages — extends ../../styles.css
-   Long-form reading: one column, quiet figures, code folded away.
-   ================================================================ */
-
-/* The container itself is the column. Nothing inside can be wider than
-   its parent, so text, figures, tables and code align by construction
-   rather than by a max-width repeated on every element. */
-.case{
-  width: min(100%, 760px);
-  margin-inline: auto;
-  padding-bottom: var(--gap);
-}
-
-.case-hero .wrap{ width: min(100%, 760px); }
-
-.case-hero{ padding-bottom: clamp(2rem, 5vw, 3.5rem); }
-
-.case-hero .standfirst{
-  font-family: var(--serif);
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
-  line-height: 1.45;
-  margin: 0 0 1.4rem;
-}
-
-.case-hero .lede{ margin: 0 0 1.8rem; }
-
-/* ---- section rhythm ---- */
-.cs{
-  padding: clamp(2.2rem, 5vw, 3.4rem) 0;
-  border-top: 1px solid var(--rule);
-}
-
-.cs > h2{
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  letter-spacing: -.015em;
-  margin: 0 0 1.4rem;
-}
-
-.cs h3{
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.12rem;
-  margin: 2.4rem 0 .7rem;
-}
-
-.cs h4{
-  font-size: .78rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin: 1.6rem 0 .5rem;
-}
-
-
-
-.cs li{ margin-bottom: .4rem; }
-
-.cs .note{
-  border-left: 2px solid var(--rule);
-  padding-left: 1.1rem;
-  color: var(--ink-soft);
-  font-size: .95rem;
-}
-
-/* reading of a figure — sits under the chart it explains */
-.reading{
-  border-left: 2px solid var(--signal);
-  padding-left: 1.1rem;
-  font-size: .97rem;
-}
-
-/* ---- numbered pipeline ---- */
-.pipeline{ padding-left: 1.3rem; }
-.pipeline li{ margin-bottom: .7rem; }
-.pipeline li::marker{ font-family: var(--mono); color: var(--ink-soft); }
-
-/* ---- tables ---- */
-.srctable,
-.minitable{
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .87rem;
-  margin: 1rem 0 1.6rem;
-}
-
-.minitable{ font-size: .8rem; }
-
-.srctable th,
-.srctable td,
-.minitable th,
-.minitable td{
-  text-align: left;
-  padding: .5rem .7rem .5rem 0;
-  border-bottom: 1px solid var(--rule);
-  vertical-align: top;
-}
-
-.srctable thead th,
-.minitable thead th{
-  font-size: .72rem;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  border-bottom-color: var(--ink);
-}
-
-.minitable td:nth-child(n+3){ font-family: var(--mono); text-align: right; }
-
-/* ---- screenshots ---- */
-.shot{ margin: 1.4rem 0 2rem; }
-
-/* Never upscale: a 336px screenshot blown up to 1080px is just blurry.
-   Images render at natural size, capped by the column. */
-.shot img{
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  border: 1px solid var(--rule);
-  background: #fff;
-}
-
-/* wide screenshots and strips: full column width is the point */
-
-
-/* two narrow portrait screenshots read as a pair, not a queue */
-.shot-pair{
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.2rem;
-  margin: 1.4rem 0 2rem;
-}
-.shot-pair .shot{ margin: 0; }
-.shot-pair img{ width: 100%; }
-
-/* same indicator, two years: side by side or the comparison is lost */
-.shot-duo{
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.2rem;
-  margin: 1.4rem 0 2rem;
-}
-.shot-duo .shot{ margin: 0; }
-.shot-duo img{ width: 100%; }
-
-.shot figcaption{
-  margin-top: .55rem;
-  font-size: .8rem;
-  color: var(--ink-soft);
-}
-
-/* ---- folded code ---- */
-.codebox{
-  border: 1px solid var(--rule);
-  margin: 1rem 0 1.8rem;
-  background: var(--paper-alt);
-}
-
-.codebox summary{
-  cursor: pointer;
-  padding: .55rem .9rem;
-  font-family: var(--mono);
-  font-size: .78rem;
-  letter-spacing: .04em;
-  color: var(--ink-soft);
-  list-style: none;
-}
-
-.codebox summary::before{ content: "▸ "; }
-.codebox[open] summary::before{ content: "▾ "; }
-.codebox summary::-webkit-details-marker{ display: none; }
-.codebox[open] summary{ border-bottom: 1px solid var(--rule); }
-
-.codebox pre{
-  margin: 0;
-  padding: .9rem;
-  overflow-x: auto;
-  background: #fff;
-}
-
-.codebox code{
-  font-family: var(--mono);
-  font-size: .8rem;
-  line-height: 1.6;
-  background: none;
-  padding: 0;
-  white-space: pre;
-}
-
-/* ---- limitations: the section that must not be skimmed ---- */
-.limits-head{ margin-top: 2.6rem !important; }
-
-.limits{
-  border: 1px solid var(--anomaly);
-  border-left-width: 3px;
-  padding: 1.2rem 1.4rem .4rem;
-  margin-bottom: 1.5rem;
-}
-
-.limits p,
-.limits ul{ max-width: none; }
-
-.limits-note{
-  font-size: .92rem;
-  color: var(--ink-soft);
-  font-style: italic;
-}
-
-/* ---- two-column comparison ---- */
-.twocol{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(1.2rem, 3vw, 2.4rem);
-  align-items: start;
-  margin: 1.2rem 0 1.6rem;
-}
-
-.twocol .minitable,
-.twocol .codebox{ max-width: none; }
-
-.twocol h4{ margin-top: 0; }
-
-/* ---- assistant question types ---- */
-.qa{
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.4rem;
-  margin: 1.2rem 0 1.6rem;
-}
-
-.qa > div{ border-top: 1px solid var(--rule); padding-top: .8rem; }
-.qa h4{ margin-top: 0; }
-.qa p{ font-size: .9rem; margin: 0 0 .5rem; }
-
-.qa .q{
-  font-family: var(--serif);
-  font-style: italic;
-  color: var(--ink);
-  font-size: .97rem;
-}
-
-@media (max-width: 780px){
-  .twocol{ grid-template-columns: 1fr; }
-}
-
-@media print{
-  .codebox{ display: none; }
-  .shot img{ max-height: 9cm; object-fit: contain; }
-}
-
-/* ---- gallery: nine projection charts read as a set, not a queue ---- */
-.shot-grid{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem .9rem;
-  margin: 1.4rem 0 2rem;
-}
-
-.shot-grid .shot{ margin: 0; }
-
-.shot-grid .shot img{
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: contain;
-  padding: .4rem;
-}
-
-.shot-grid figcaption{ font-size: .74rem; }
-
-@media (max-width: 900px){
-  .shot-grid{ grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 560px){
-  .shot-grid{ grid-template-columns: 1fr; }
-}
-
-/* safety net: never let a figure exceed its column, even unstyled-adjacent */
-.cs img{ max-width: 100%; height: auto; }
-
-@media (max-width: 560px){
-  .shot-pair,
-  .shot-duo{ grid-template-columns: 1fr; }
-}
-
-/* ---- table of contents ----
-   Sits in the left margin on wide screens, so it costs no reading width.
-   Collapses to a compact block above the text when the margin disappears. */
-.toc{
-  font-size: .82rem;
-  border-top: 1px solid var(--ink);
-  padding-top: .8rem;
-  margin: 0 0 2.5rem;
-}
-
-.toc-head{
-  font-family: var(--mono);
-  font-size: .68rem;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin: 0 0 .7rem;
-}
-
-.toc ol{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  counter-reset: toc;
-}
-
-.toc li{
-  counter-increment: toc;
-  margin: 0;
-  padding: .22rem 0;
-}
-
-.toc li::before{
-  content: counter(toc, decimal-leading-zero);
-  font-family: var(--mono);
-  font-size: .7rem;
-  color: var(--ink-soft);
-  margin-right: .6rem;
-}
-
-.toc a{
-  text-decoration: none;
-  color: var(--ink);
-  border-bottom: 1px solid transparent;
-}
-
-.toc a:hover{ border-bottom-color: var(--signal); color: var(--signal); }
-
-/* wide screens: park it in the margin and let it follow the scroll */
-@media (min-width: 1180px){
-  .toc{
-    position: fixed;
-    top: 7.5rem;
-    left: calc(50% - 380px - 210px);
-    width: 180px;
-    margin: 0;
-    max-height: 70vh;
-    overflow-y: auto;
-  }
-}
-
-@media print{ .toc{ display: none; } }
-
-/* code shown unfolded when it is the evidence for a claim */
-.codebox-static{
-  border: 1px solid var(--rule);
-  background: #fff;
-  margin: 1rem 0 1.4rem;
-}
-.codebox-static pre{ margin: 0; padding: .9rem; overflow-x: auto; }
-.codebox-static code{
-  font-family: var(--mono);
-  font-size: .8rem;
-  line-height: 1.6;
-  background: none;
-  padding: 0;
-  white-space: pre;
-}
-
-/* compact definition lists used for measure and dimension names */
-.dims{ list-style: none; padding: 0; }
-.dims li{
-  padding: .3rem 0;
-  border-bottom: 1px solid var(--rule);
-  font-size: .93rem;
-}
-
-/* wide screenshots fill the column; the column is already the reading width */
-.shot--wide img{ width: 100%; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Carrefour Sales Analysis — Case study · Malak Mounji</title>
+<meta name="description" content="Case study: an end-to-end business intelligence workflow on 10,000 retail transactions — Python ETL, layered data preparation, star schema modelling, DAX measures and eight Power BI dashboard views." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../styles.css" />
+<link rel="stylesheet" href="case.css" />
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <a class="wordmark" href="../../index.html">Malak&nbsp;Mounji</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="../../index.html#work">All work</a>
+      <a href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener">Source</a>
+      <a class="nav-cv" href="../../malak.pdf">CV (PDF)</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero case-hero">
+  <div class="wrap">
+    <p class="eyebrow">Case study · Pair project with Rawane Cerbouche · 2025</p>
+    <h1>Carrefour Sales Analysis</h1>
+    <p class="standfirst">
+      An end-to-end business intelligence workflow on 10,000 retail transactions,
+      built as a layered pipeline rather than a single report file.
+    </p>
+    <p class="lede">
+      This page documents the full chain: what the raw export looked like, which
+      inconsistencies had to be resolved before any measure could be trusted, why
+      the model was structured as a star schema, and what the eight dashboard views
+      are each for.
+    </p>
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="./project_powerbi.pbit">Power BI template (.pbit)</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap case">
+
+<nav class="toc" aria-label="On this page">
+  <p class="toc-head">On this page</p>
+  <ol>
+    <li><a href="#objective">Objective</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#etl">ETL</a></li>
+    <li><a href="#layers">Data layers</a></li>
+    <li><a href="#model">Star schema</a></li>
+    <li><a href="#dax">DAX measures</a></li>
+    <li><a href="#dashboards">Dashboards</a></li>
+    <li><a href="#outcome">Outcome</a></li>
+  </ol>
+</nav>
+
+<!-- ===================== OBJECTIVE ===================== -->
+<section class="cs" id="objective">
+<h2>Objective</h2>
+
+<p>
+The dataset is a retail transaction export: 10,000 orders across 19 columns,
+covering order lines, product categories, payment methods, customer demographics,
+cities, discounts, and cancellation reasons.
+</p>
+
+<p>
+A spreadsheet of that size answers single questions well and comparative questions
+badly. Asking which categories carry the highest cancellation rate, or whether
+discounting actually moves revenue, means rebuilding the same pivot tables every
+time. The purpose of the project was to replace that with a model where those
+questions are already expressed as measures.
+</p>
+
+<h3>Questions the dashboard is built to answer</h3>
+<ul>
+  <li>How much revenue is validated, and how much is lost to cancellations?</li>
+  <li>What is the effect of discounting on revenue, by category and over time?</li>
+  <li>Which categories, cities and payment methods perform best?</li>
+  <li>How do sales move month over month and year over year?</li>
+  <li>Which customer segments — by gender, age band, basket size — drive volume?</li>
+</ul>
+</section>
+
+<!-- ===================== PIPELINE ===================== -->
+<section class="cs" id="pipeline">
+<h2>Pipeline</h2>
+
+<p>
+The project is deliberately split into stages rather than done inside Power BI
+alone. Cleaning happens in Python, where it is versioned and repeatable; modelling
+and measures happen in Power BI, where they belong.
+</p>
+
+<ol class="pipeline">
+  <li><strong>Raw layer</strong> — the untouched source export, kept as the reference point.</li>
+  <li><strong>Python ETL</strong> — a single script producing a clean, analysis-ready CSV.</li>
+  <li><strong>Processed layer</strong> — the cleaned dataset, with stable types and column set.</li>
+  <li><strong>Star schema</strong> — one fact table and seven dimensions built in the Power BI model.</li>
+  <li><strong>DAX measures</strong> — KPIs and time intelligence defined on top of the model.</li>
+  <li><strong>Reporting layer</strong> — eight interactive dashboard views.</li>
+</ol>
+
+<p class="note">
+Keeping cleaning outside the report matters: a transformation written in Power
+Query lives inside a binary file, while a Python script can be read, reviewed and
+re-run on a new export. Anyone can regenerate the processed dataset from the raw
+one with a single command.
+</p>
+</section>
+
+<!-- ===================== ETL ===================== -->
+<section class="cs" id="etl">
+<h2>ETL and data preparation</h2>
+
+<p>
+The ETL script (<code>ETL/etl.py</code>) takes the raw export and produces the
+processed dataset. Each transformation exists because of a specific defect in the
+source file.
+</p>
+
+<h3>Encoding</h3>
+<p>
+Retail exports arrive in whatever encoding the exporting system used. The reader
+attempts UTF-8, UTF-8 with BOM, CP1252 and Latin-1 in turn, and falls back to
+replacement characters rather than failing outright — so a single unusual byte in
+a city name cannot stop the pipeline.
+</p>
+
+<div class="codebox-static">
+<pre><code class="python">def read_csv_smart(path: Path) -> pd.DataFrame:
+    for enc in ("utf-8", "utf-8-sig", "cp1252", "latin1"):
+        try:
+            return pd.read_csv(path, encoding=enc)
+        except UnicodeDecodeError:
+            continue
+    return pd.read_csv(path, encoding="cp1252", encoding_errors="replace")</code></pre>
+</div>
+
+<h3>Text normalisation</h3>
+<p>
+Trailing whitespace in a category or city name creates duplicate members in a
+dimension — <code>"Lahore"</code> and <code>"Lahore "</code> become two rows in
+every visual. Text columns are stripped, and the literal strings
+<code>"nan"</code>, <code>"none"</code> and <code>"null"</code> — which arrive as
+text, not as missing values — are converted to true nulls.
+</p>
+
+<h3>Dates, months and years</h3>
+<p>
+The <code>month</code> column arrives in inconsistent forms across exports. The
+script parses it, and if fewer than 60% of values parse successfully, it discards
+the column and derives the month from <code>order_date</code> instead. The year is
+derived the same way when absent. A date dimension is only as good as the key it
+joins on.
+</p>
+
+<h3>Discount reconciliation</h3>
+<p>
+The most consequential fix. In the raw file, <code>discount_amount</code> does not
+consistently agree with <code>value × Discount_Percent</code>: the two disagree by
+a factor of one hundred on part of the rows. Left alone, every discount measure
+would be wrong — and wrong in a way that still produces plausible-looking totals.
+</p>
+
+<p>
+The script recomputes the expected amount, compares it to the stored one, and
+substitutes the expected value wherever the two diverge beyond a tolerance.
+</p>
+
+<div class="codebox-static">
+<pre><code class="python">da100    = df["discount_amount"] * 100.0
+expected = (df["value"] * df["Discount_Percent"] / 100.0) * 100.0
+
+use_expected = (da100 - expected).abs() &gt; 1e-2
+df["discount_amount"] = da100.where(~use_expected, expected)</code></pre>
+</div>
+
+<h3>Types and contract</h3>
+<p>
+Identifiers and counts are cast to nullable integers, monetary fields to floats,
+and the output is restricted to a fixed list of 18 columns. If any expected column
+is missing, the script raises rather than writing a partial file — so a malformed
+export fails loudly at the ETL stage instead of silently at the reporting stage.
+</p>
+</section>
+
+<!-- ===================== LAYERS ===================== -->
+<section class="cs" id="layers">
+<h2>Data layers</h2>
+
+<p>
+The project has no enterprise warehouse behind it, but it follows the same
+separation of concerns, which is what makes the pipeline auditable.
+</p>
+
+<table class="srctable">
+<thead><tr><th>Layer</th><th>Contents</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td><strong>Raw</strong></td><td>Original export, 10,000 rows × 19 columns</td><td>Never modified</td></tr>
+<tr><td><strong>Processed</strong></td><td>Cleaned dataset, 10,000 rows × 18 columns</td><td>Regenerated by script only</td></tr>
+<tr><td><strong>Reporting</strong></td><td>Power BI model, measures and views</td><td>Reads processed only</td></tr>
+</tbody>
+</table>
+
+<p class="note">
+One column is dropped between layers (a redundant selling-price field), and no
+rows are lost: the row count is identical before and after, which is the first
+thing to check when a cleaning script silently filters data.
+</p>
+</section>
+
+<!-- ===================== MODEL ===================== -->
+<section class="cs" id="model">
+<h2>Star schema</h2>
+
+<p>
+The cleaned table is a flat file. Loading it directly into Power BI works, but
+every filter then scans the full width of the table and every relationship has to
+be inferred. Restructuring it as a star schema separates what is measured from
+what it is measured by.
+</p>
+
+<h3>Fact table</h3>
+<p>
+<code>Fact_Sales</code> — one row per order line, carrying the numeric quantities:
+value, quantity ordered, price, discount amount and percent.
+</p>
+
+<h3>Dimensions</h3>
+<ul class="dims">
+  <li><code>Dim_Date</code> — calendar for time intelligence</li>
+  <li><code>Dim_Produit</code> — product and category</li>
+  <li><code>Dim_Client</code> — gender, age band</li>
+  <li><code>Dim_Geography</code> — city</li>
+  <li><code>Dim_Payment</code> — payment method</li>
+  <li><code>Dim_Status</code> — order status</li>
+  <li><code>Dim_Refund</code> — cancellation and refund reason</li>
+</ul>
+
+<figure class="shot shot--wide">
+  <img src="etoile.png" alt="Star schema: Fact_Sales at the centre, seven dimension tables around it" loading="lazy" />
+  <figcaption>Model view: one fact table, seven dimensions</figcaption>
+</figure>
+
+<h3>What the structure buys</h3>
+<ul>
+  <li><strong>Simpler DAX.</strong> Time intelligence functions expect a dedicated date table; without <code>Dim_Date</code>, year-to-date and prior-year measures have to be written by hand.</li>
+  <li><strong>Unambiguous relationships.</strong> Each filter path from a dimension to the fact table is single and directional.</li>
+  <li><strong>Readable model.</strong> A reader opening the file sees the business structure, not a 19-column rectangle.</li>
+</ul>
+</section>
+
+<!-- ===================== DAX ===================== -->
+<section class="cs" id="dax">
+<h2>DAX measures</h2>
+
+<p>
+Measures are where business questions become reusable definitions. Writing
+"revenue" once, correctly, means every visual that uses it agrees.
+</p>
+
+<h3>Base measures</h3>
+
+<div class="codebox-static">
+<pre><code class="dax">Total Sales    = SUM(FactSales[value])
+Total Orders   = COUNT(FactSales[order_id])
+Total Quantity = SUM(FactSales[qty_ordered])
+Total Discount = SUM(FactSales[discount_amount])
+Average Order Value = AVERAGE(FactSales[value])</code></pre>
+</div>
+
+<h3>Validated versus cancelled revenue</h3>
+<p>
+Total revenue on its own is misleading when a share of orders is later cancelled.
+Splitting the measure keeps the two visible side by side, and makes the
+cancellation rate a first-class indicator rather than something inferred.
+</p>
+<ul class="dims">
+  <li><code>CA_Validé</code> — revenue on validated orders</li>
+  <li><code>CA_Annulé</code> — revenue lost to cancellations</li>
+  <li><code>Taux_Annulation %</code> — cancellation rate</li>
+  <li><code>Taux_Discount_Global</code> — overall discount rate</li>
+</ul>
+
+<h3>Time intelligence</h3>
+<p>
+Built on <code>Dim_Date</code>, these give the dashboard its comparative
+dimension — a figure means little without the equivalent period beside it.
+</p>
+<ul class="dims">
+  <li><code>CA_MoM_Prev</code> — previous month revenue</li>
+  <li><code>CA_PY</code> — same period, previous year</li>
+  <li><code>CA_YTD</code> — year to date</li>
+  <li><code>Croissance_CA_YoY %</code> — year-over-year growth</li>
+</ul>
+
+<div class="codebox-static">
+<pre><code class="dax">Monthly Sales = CALCULATE([Total Sales], ALLEXCEPT(DimDate, DimDate[Month]))</code></pre>
+</div>
+
+<h3>Behavioural measures</h3>
+<ul class="dims">
+  <li><code>Articles_par_Panier</code> — items per basket</li>
+  <li><code>Taux_Discount_Moyen</code> — average discount rate</li>
+</ul>
+</section>
+
+<!-- ===================== DASHBOARDS ===================== -->
+<section class="cs" id="dashboards">
+<h2>Dashboard views</h2>
+
+<p>
+Eight views, each answering one family of questions. Splitting them this way keeps
+each page readable instead of producing a single crowded canvas.
+</p>
+
+<h3>Sales overview</h3>
+<p>Headline KPIs, revenue by category, and discount exposure at a glance.</p>
+<figure class="shot shot--wide"><img src="sales_dashboard.png" alt="Sales dashboard" loading="lazy" /><figcaption>Sales overview</figcaption></figure>
+
+<h3>Transaction details</h3>
+<p>Line-level drill-through with filters on order, customer and category — the view used to verify any figure seen elsewhere.</p>
+<figure class="shot shot--wide"><img src="transaction details.png" alt="Transaction details view" loading="lazy" /><figcaption>Transaction details</figcaption></figure>
+
+<h3>Discounts and promotions</h3>
+<p>Discount rate by category and payment method, tracked over time against revenue.</p>
+<figure class="shot shot--wide"><img src="discount and promotions.png" alt="Discounts and promotions view" loading="lazy" /><figcaption>Discounts and promotions</figcaption></figure>
+
+<h3>Cancellations and refunds</h3>
+<p>Cancellation volume, dominant reasons, and the revenue they represent.</p>
+<figure class="shot shot--wide"><img src="cencellation.png" alt="Cancellations and refunds view" loading="lazy" /><figcaption>Cancellations and refunds</figcaption></figure>
+
+<h3>Payment analysis</h3>
+<p>Comparison of payment methods by order volume, value and cancellation rate.</p>
+<figure class="shot shot--wide"><img src="payment analysis.png" alt="Payment analysis view" loading="lazy" /><figcaption>Payment analysis</figcaption></figure>
+
+<h3>Geography</h3>
+<p>Commercial performance by city, to identify where volume concentrates.</p>
+<figure class="shot shot--wide"><img src="geography analysis.png" alt="Geography analysis view" loading="lazy" /><figcaption>Geography analysis</figcaption></figure>
+
+<h3>Customer insights</h3>
+<p>Segmentation by gender, age band and purchase volume.</p>
+<figure class="shot shot--wide"><img src="customer insights.png" alt="Customer insights view" loading="lazy" /><figcaption>Customer insights</figcaption></figure>
+
+<h3>Time trends</h3>
+<p>Monthly evolution, cumulative year-to-date and growth against the prior year.</p>
+<figure class="shot shot--wide"><img src="2.png" alt="Time trends dashboard" loading="lazy" /><figcaption>Time trends</figcaption></figure>
+</section>
+
+<!-- ===================== OUTCOME ===================== -->
+<section class="cs" id="outcome">
+<h2>Outcome</h2>
+
+<p>
+The deliverable is a Power BI template plus the pipeline that feeds it: raw data,
+ETL script, processed dataset and model. Pointing the script at a new export
+regenerates the whole thing.
+</p>
+
+<p>Two parts of the work were the ones that mattered:</p>
+
+<ul>
+  <li><strong>The discount reconciliation.</strong> A hundred-fold discrepancy between the stored discount and the one implied by value and percentage would have corrupted every promotion measure while still producing believable totals. Finding it required checking the arithmetic rather than trusting the column.</li>
+  <li><strong>Separating cleaning from reporting.</strong> Putting the transformations in a versioned script rather than in Power Query is what makes the result reproducible by someone else.</li>
+</ul>
+
+<h3>Limitations</h3>
+<div class="limits">
+<ul>
+  <li><strong>Single static export.</strong> The pipeline runs on one file; there is no scheduled refresh or incremental load.</li>
+  <li><strong>No data quality report.</strong> The script fixes what it finds but does not log how many rows each correction touched — which would be the natural next step.</li>
+  <li><strong>Dimensions built in-model.</strong> The star schema is constructed inside the Power BI file rather than materialised as separate tables, so it is not reusable outside this report.</li>
+</ul>
+</div>
+
+<h3>Next steps</h3>
+<ul>
+  <li>Emit a data quality summary from the ETL — rows affected per correction, null counts per column.</li>
+  <li>Materialise the dimensions as CSVs or database tables, so the model is portable.</li>
+  <li>Add row-level security if the report were shared across regional teams.</li>
+</ul>
+</section>
+
+</div><!-- /.case -->
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="./project_powerbi.pbit">Power BI template</a>
+      <a class="btn" href="https://drive.google.com/file/d/1939kxoTLac0OPcrJ3B8phA9asYU4_G3M/view" target="_blank" rel="noopener">Raw dataset</a>
+      <a class="btn" href="https://drive.google.com/file/d/1X8w2iwG33Yd4KUv2MXWcPAy2ngNGf-DJ/view" target="_blank" rel="noopener">Cleaned dataset</a>
+      <a class="btn" href="../../index.html#work">All projects</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap"><p>Malak Mounji — ENSA Agadir, Morocco</p></div>
+</footer>
+
+</body>
+</html>
