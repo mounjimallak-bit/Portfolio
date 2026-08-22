@@ -1,454 +1,176 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axiora Data — Détails du projet</title>
-
-  <link rel="stylesheet" href="../../styles.css" />
-  <link rel="stylesheet" href="axiora.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Axiora Data — Case study · Malak Mounji</title>
+<meta name="description" content="Case study: an interactive analytics platform for Moroccan socio-economic indicators — data cleaning, choropleth mapping, trend projection, retrieval-grounded assistant and automated PDF reporting." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../styles.css" />
+<link rel="stylesheet" href="case.css" />
 </head>
-
 <body>
-  <div class="bg-glow"></div>
 
-  <header class="header">
-    <div class="container nav">
-      <a class="logo" href="../../index.html#portfolio">← Retour</a>
+<a class="skip" href="#main">Skip to content</a>
 
-      <nav class="nav-links">
-        <a href="../../index.html#home">Home</a>
-        <a href="../../index.html#about">About</a>
-        <a href="../../index.html#portfolio" class="active">Portfolio</a>
-        <a href="../../index.html#contact">Contact</a>
-      </nav>
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <a class="wordmark" href="../../index.html">Malak&nbsp;Mounji</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="../../index.html#work">All work</a>
+      <a href="https://axiora-data.streamlit.app/" target="_blank" rel="noopener">Live app</a>
+      <a href="https://github.com/mounjimallak-bit/Axiora-data-app" target="_blank" rel="noopener">Source</a>
+      <a class="nav-cv" href="../../malak.pdf">CV (PDF)</a>
+    </nav>
+  </div>
+</header>
 
-      <div class="nav-actions">
-        <a class="btn btn-primary" href="../../malak.pdf" download>Download CV</a>
-      </div>
-    </div>
-  </header>
+<main id="main">
 
-  <main class="container">
-
-   <section class="section" style="border-top:none; text-align: center; padding-bottom: 20px;">
-  <div class="container">
-    <div class="section-head">
-      <h1>Axiora Data — Analyse, Visualisation & Prévision des Indicateurs Socio-Économiques</h1>
-    </div>
-    
-    <div style="margin-top: 15px;">
-      <a href="https://axiora-data.streamlit.app/" target="_blank" class="ax-btn" style="display: inline-flex; align-items: center; text-decoration: none; font-weight: 500;">
-        Accéder à l'application en direct
-      </a>
+<section class="hero case-hero">
+  <div class="wrap">
+    <p class="eyebrow">Case study · Personal project · 2025</p>
+    <h1>Axiora Data</h1>
+    <p class="standfirst">
+      An analytics platform for the socio-economic indicators of the Souss-Massa
+      region, built on open data published by Morocco's High Commission for
+      Planning (HCP).
+    </p>
+    <p class="lede">
+      This page documents how the platform was built: what the raw data looked
+      like, why it had to be cleaned before anything else, how statistical tables
+      were joined to geographic boundaries, and what the forecasting module does
+      and does not claim.
+    </p>
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://axiora-data.streamlit.app/" target="_blank" rel="noopener">Open the live app</a>
+      <a class="btn" href="https://github.com/mounjimallak-bit/Axiora-data-app" target="_blank" rel="noopener">View source</a>
     </div>
   </div>
 </section>
-   
-</div>
-    <section class="section">
-  <div class="section-head">
-    <h2>Table des matières</h2>
-  </div>
 
-  <div class="card">
-    <ul style="list-style:none; padding-left:0; line-height:2;">
-       <li><a href="#introduction"><strong>Introduction</strong></a></li>
-      <br>
+<div class="wrap case">
 
-      <li><a href="#overview"><strong>Aperçu de la plateforme</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#objectifs">Objectifs</a></li>
-        <li><a href="#fonctionnalites">Fonctionnalités clés</a></li>
-        <li><a href="#architecture">Architecture générale</a></li>
-      </ul>
+<!-- ===================== CONTEXT ===================== -->
+<section class="cs" id="context">
+<h2>Context</h2>
 
-      <br>
+<p>
+Morocco's High Commission for Planning publishes a large volume of territorial
+statistics: census results, poverty and vulnerability rates, labour market
+indicators, housing, education, health and local finance. The data is public and
+detailed, but it is distributed as PDF documents and raw spreadsheets.
+</p>
 
-      <li><a href="#data"><strong>Données & préparation</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#sources">Sources des données (HCP)</a></li>
-        <li><a href="#structure-donnees">Structure des données</a></li>
-        <li><a href="#nettoyage">Nettoyage & validation</a></li>
-        <li><a href="#datasets">Construction des datasets par module</a></li>
-      </ul>
+<p>
+That format makes some questions expensive to answer. Comparing a province
+across three census years, or ranking communes by poverty rate, means opening
+several files, reconciling inconsistent labels and rebuilding the same tables by
+hand each time. The information exists; reaching it is the obstacle.
+</p>
 
-      <br>
+<p>
+Axiora Data loads those files once, harmonises them, and exposes them through a
+single interface where an indicator can be filtered, mapped, compared across
+years and extrapolated. It covers six domains — population, labour, housing,
+finance, education and poverty — for the Souss-Massa region.
+</p>
 
-      <li><a href="#navigation"><strong>Navigation & UI</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#menu">Menu principal</a></li>
-        <li><a href="#accordeon">Accordéon “Exploration des Indices”</a></li>
-        <li><a href="#filtres">Filtres & contrôles interactifs</a></li>
-        <li><a href="#components">Composants UI réutilisables</a></li>
-      </ul>
-
-      <br>
-
-      <li><a href="#exploration"><strong>Exploration des Indices</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#population">Population & Dynamique Démographique</a></li>
-        <li><a href="#marche">Marché du travail & Disparités</a></li>
-        <li><a href="#habitat">Habitat & Infrastructure</a></li>
-        <li><a href="#finance">Finance & Économie locale</a></li>
-        <li><a href="#enseignement">Enseignement & Capital Humain</a></li>
-      </ul>
-
-      <br>
-
-      <li><a href="#cartes"><strong>Cartes géographiques</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#choropleth">Cartes choroplèthes</a></li>
-        <li><a href="#tooltips">Tooltips & zoom</a></li>
-        <li><a href="#filtrage">Filtrage par année / zone</a></li>
-      </ul>
-
-      <br>
-
-      <li><a href="#ml"><strong>Prévision & Machine Learning</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#objectif-prevision">Objectifs des prévisions</a></li>
-        <li><a href="#modele">Modèle utilisé (Régression linéaire)</a></li>
-        <li><a href="#pipeline">Pipeline de prévision</a></li>
-        <li><a href="#visualisation-pred">Visualisation des prédictions</a></li>
-        <li><a href="#extensions">Extensions possibles</a></li>
-      </ul>
-
-      <br>
-
-      <li><a href="#assistant"><strong>Assistant IA (Chatbot)</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#role-assistant">Rôle de l’assistant</a></li>
-        <li><a href="#questions">Types de questions supportées</a></li>
-        <li><a href="#reponses">Réponses enrichies</a></li>
-      </ul>
-
-      <br>
-
-      <li><a href="#report"><strong>Générateur automatique de rapports</strong></a></li>
-      <ul style="padding-left:20px;">
-        <li><a href="#parametrage">Paramétrage du rapport</a></li>
-        <li><a href="#contenu-pdf">Contenu du PDF</a></li>
-        <li><a href="#export">Export & nommage automatique</a></li>
-      </ul>
-
-      <br>
-
-      <li><a href="#resultats"><strong>Résultats & points forts</strong></a></li>
-      <li><a href="#conclusion"><strong>Conclusion</strong></a></li>
-      <li><a href="#roadmap"><strong>Roadmap</strong></a></li>
-
-    </ul>
-  </div>
+<h3>What the platform does</h3>
+<ul>
+  <li>Explores indicators by year, province and commune, with year-on-year variation</li>
+  <li>Renders choropleth maps of poverty and vulnerability at province and commune level</li>
+  <li>Projects indicator trends forward using linear regression</li>
+  <li>Answers questions in natural language, constrained to the loaded dataset</li>
+  <li>Generates a formatted PDF report from any selected dataset</li>
+</ul>
 </section>
-     <section id="introduction" class="section">
-  <div class="section-head">
-    <h1>Introduction</h1>
-    <p></p>
 
-      <div class="grid-2">
-        <div class="card">
-          <h3>Contexte</h3>
-          <p>
-            Les indicateurs socio-économiques constituent un levier essentiel pour la compréhension du développement territorial et la prise de décision stratégique. 
-            Axiora Data a été développé comme une plateforme intelligente d’analyse, de visualisation et de prévision des indicateurs socio-économiques régionaux basés sur les données du HCP.
-          </p>
-        </div>
+<!-- ===================== ARCHITECTURE ===================== -->
+<section class="cs" id="architecture">
+<h2>Architecture</h2>
 
-        <div class="card">
-          <h3>Problématique</h3>
-          <p>
-            Les données publiques sont souvent statiques (PDF, tableaux bruts), ce qui limite l’exploration interactive, la comparaison multi-années et la projection des tendances futures. 
-            Il existe donc un besoin d’un outil interactif, dynamique, prédictif et orienté aide à la décision.
-          </p>
-        </div>
-      </div>
+<p>
+The application is a single Streamlit process. Data preparation happens once, at
+import time, and everything downstream reads from memory.
+</p>
 
-      
+<ol class="pipeline">
+  <li><strong>Sources</strong> — fifteen HCP spreadsheets covering six domains, organised by province and commune, spanning 2004 to 2024.</li>
+  <li><strong>Preparation</strong> — cleaning, type conversion, missing-value handling and label normalisation with pandas and NumPy.</li>
+  <li><strong>Consolidation</strong> — all cleaned datasets merged into one Python dictionary (<code>hcpdata.py</code>).</li>
+  <li><strong>Analysis</strong> — KPIs, year-on-year variation, top and bottom rankings computed on demand.</li>
+  <li><strong>Visualisation</strong> — interactive charts with Plotly; choropleth maps with GeoPandas.</li>
+  <li><strong>Forecasting</strong> — linear regression with a strict temporal train/test split (scikit-learn).</li>
+  <li><strong>Assistant and reporting</strong> — Gemini API for question answering, fpdf for report generation.</li>
+</ol>
 
-      <div class="card" style="margin-top:16px;">
-        <h3>Vision</h3>
-        <p>
-          Axiora Data est une plateforme d’intelligence socio-économique combinant Data Analytics, Visualisation avancée, Intelligence artificielle, Géospatial et automatisation de reporting.
-        </p>
-      </div>
-    </section>
-
-   
-     <section id="overview" class="section">
-  <div class="section-head">
-    <h1>Aperçu de la plateforme</h1>
-    <p></p>
-   
-  </div>
-
-  <div id="objectifs" class="outline-block">
-    <h1 class="outline-title">Objectifs</h1>
-    <p></p>
-    <ul class="outline-list">
-      <li>Centraliser et structurer les indicateurs socio-économiques (HCP) pour la région Souss-Massa.</li>
-      <li>Permettre une exploration interactive (années, provinces, communes, indicateurs).</li>
-      <li>Faciliter la comparaison multi-années et multi-territoires (variation %, tendances).</li>
-      <li>Intégrer un module de prévision (ML) pour projeter l’évolution des indicateurs.</li>
-      <li>Renforcer l’aide à la décision via un assistant IA et des rapports automatiques.</li>
-    </ul>
-    <p></p>
-  </div>
-
-  <div id="fonctionnalites" class="outline-block">
-    <h1 class="outline-title">Fonctionnalités clés</h1>
-    <p></p>
-    <ul class="outline-list">
-      <li><strong>Dashboard</strong> : indicateurs synthétiques et vues rapides.</li>
-      <li><strong>Exploration des indices</strong> : Population, Travail, Habitat, Finance, Enseignement, Pauvreté.</li>
-      <li><strong>Filtres dynamiques</strong> : année, province/commune, type d’indicateur, mode comparaison.</li>
-      <li><strong>Visualisations interactives</strong> : courbes, barres, heatmaps, scatter, tableaux.</li>
-      <li><strong>Cartes géographiques</strong> : choroplèthes pauvreté/vulnérabilité avec tooltips & zoom.</li>
-      <li><strong>Prévisions ML</strong> : projection de tendances et visualisation des prédictions.</li>
-      <li><strong>Assistant IA</strong> : réponses, résumés et interprétation des résultats.</li>
-      <li><strong>Rapports PDF</strong> : génération automatique avec graphiques + cartes + synthèse.</li>
-    
-    </ul>
-    <p></p>
-  </div>
-
-  <div id="architecture" class="outline-block">
-    <h1 class="outline-title">Architecture générale</h1>
-    <p></p>
-
-    <div class="arch-wrap">
-
-      <div class="arch-row">
-        <div class="arch-node">
-          <div class="arch-badge">1</div>
-          <div class="arch-content">
-            <div class="arch-title">Sources & Données (HCP)</div>
-            <div class="arch-sub">Population · Pauvreté/Vulnérabilité · Travail · Habitat · Finance · Enseignement</div>
-            <ul class="arch-points">
-              <li>Organisation par <strong>province</strong> et <strong>commune</strong></li>
-              <li>Gestion multi-années (ex. 2004 / 2007 / 2014 / 2016–2018)</li>
-              <li>Formats : tables/dicts structurés</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="arch-arrow">→</div>
-
-        <div class="arch-node">
-          <div class="arch-badge">2</div>
-          <div class="arch-content">
-            <div class="arch-title">Préparation & Validation</div>
-            <div class="arch-sub">Pandas · NumPy</div>
-            <ul class="arch-points">
-              <li>Nettoyage, conversion types, gestion valeurs manquantes</li>
-              <li>Normalisation des libellés (provinces/communes)</li>
-              <li>Construction de datasets par module</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="arch-row">
-        <div class="arch-node">
-          <div class="arch-badge">3</div>
-          <div class="arch-content">
-            <div class="arch-title">Analyse & Indicateurs</div>
-            <div class="arch-sub">KPI · Variation % · Comparaison</div>
-            <ul class="arch-points">
-              <li>Comparaison année N / N-1 et tendances</li>
-              <li>Top/Bottom (communes les plus touchées)</li>
-              <li>Résumés analytiques (insights)</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="arch-arrow">→</div>
-
-        <div class="arch-node">
-          <div class="arch-badge">4</div>
-          <div class="arch-content">
-            <div class="arch-title">Visualisation & Cartographie</div>
-            <div class="arch-sub">Plotly · GeoPandas</div>
-            <ul class="arch-points">
-              <li>Graphiques interactifs : barres, courbes, heatmaps, scatter</li>
-              <li>Cartes choroplèthes : pauvreté/vulnérabilité</li>
-              <li>Tooltips, zoom, filtrage par zone/année</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="arch-row">
-        <div class="arch-node">
-          <div class="arch-badge">5</div>
-          <div class="arch-content">
-            <div class="arch-title">Prévision (Machine Learning)</div>
-            <div class="arch-sub">Scikit-learn (Régression)</div>
-            <ul class="arch-points">
-              <li>Entraînement sur historique → prédiction future</li>
-              <li>Affichage des courbes (réel vs prédit)</li>
-              <li>Extensions possibles : RandomForest / XGBoost / Prophet</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="arch-arrow">→</div>
-
-        <div class="arch-node">
-          <div class="arch-badge">6</div>
-          <div class="arch-content">
-            <div class="arch-title">Services IA & Reporting</div>
-            <div class="arch-sub">Gemini API · FPDF</div>
-            <ul class="arch-points">
-              <li>Chatbot : questions, explications, synthèses</li>
-              <li>Rapport PDF : sections, graphiques, cartes, conclusion</li>
-              <li>Export automatique & nommage</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="arch-row arch-row-center">
-        <div class="arch-node arch-node-wide">
-          <div class="arch-badge">7</div>
-          <div class="arch-content">
-            <div class="arch-title">Interface Utilisateur (Streamlit)</div>
-            <div class="arch-sub">Sidebar · Boutons · Switchs · Pages</div>
-            <ul class="arch-points">
-              <li>Navigation par modules (indices) + sections dédiées (IA, PDF, cartes)</li>
-              <li>Contrôles interactifs : selects, toggles, sliders, comparaisons</li>
-              <li>Expérience fluide : feedback, alertes, indicateurs synthétiques</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-    </div>
-    <p></p>
-  </div>
+<p class="note">
+Holding the cleaned data in a single in-memory dictionary rather than reading
+files on each interaction keeps the interface responsive, and gives the
+assistant one consistent structure to work from.
+</p>
 </section>
-     
-    
-    
 
+<!-- ===================== DATA ===================== -->
+<section class="cs" id="data">
+<h2>Data and preparation</h2>
 
- <section id="data" class="ax-section">
-  <div class="container">
-    <h1>Données &amp; préparation</h1>
-    <p></p>
-     
-  
-   
-    <p class="ax-lead">
-      AXIORA s’appuie sur des données statistiques officielles (HCP) : <strong>RGPH</strong> (structure démographique)
-      et <strong>indicateurs de pauvreté</strong>. Avant toute analyse, cartographie, IA (Q&amp;A) ou génération de rapports,
-      un pipeline de préparation est appliqué pour garantir <strong>cohérence</strong>, <strong>fiabilité</strong> et
-      <strong>compatibilité</strong> entre sources.
-    </p>
+<h3>Sources</h3>
+<p>
+All data comes from HCP publications. The main files are:
+</p>
 
-    <h3 id="sources" class="ax-subtitle">Sources des données (HCP)</h3>
+<table class="srctable">
+<thead><tr><th>File</th><th>Content</th></tr></thead>
+<tbody>
+<tr><td><code>RGPH2014.xlsx</code></td><td>Census structure by territory: administrative codes, total population, urban/rural split, age bands, households</td></tr>
+<tr><td><code>RGPH2024 — indicators.xlsx</code></td><td>Updated demographic and socio-economic indicators by region and province</td></tr>
+<tr><td><code>chtouka pauvr.xlsx</code></td><td>Poverty rate, intensity and vulnerability by territory</td></tr>
+<tr><td><code>Poverty mapping 2004–2014.xlsx</code></td><td>Multidimensional poverty indicators over time, by region</td></tr>
+<tr><td><code>CPI base 100 2017.xlsx</code></td><td>Monthly and annual consumer price index series (2017–2024)</td></tr>
+<tr><td><code>Activity, employment 2016.xlsx</code></td><td>Activity, employment and unemployment rates by territory</td></tr>
+<tr><td><code>Labour 2017–2020.xlsx</code></td><td>Labour market indicators over time</td></tr>
+<tr><td><code>population17 / pop2018</code></td><td>Population counts and age structure</td></tr>
+<tr><td><code>Habitat17 / habitat</code></td><td>Housing characteristics</td></tr>
+<tr><td><code>finance17 / finance18</code></td><td>Budgetary and financial indicators</td></tr>
+<tr><td><code>enseignementprimaire17 / enseig18</code></td><td>School enrolment and schooling rates</td></tr>
+<tr><td><code>sante17 / sante18</code></td><td>Health infrastructure</td></tr>
+<tr><td><code>M.E17 / M.E18</code></td><td>Energy and mining sector indicators</td></tr>
+<tr><td><code>tourisme17.xlsx</code></td><td>Arrivals, overnight stays, hotel capacity</td></tr>
+</tbody>
+</table>
 
-    <ul class="ax-list">
-      <li><strong>RGPH2014.xlsx</strong> : structure démographique par territoire (codes, populations totales, répartition urbain/rural, tranches d’âge, ménages).</li>
-      <li><strong>RGPH2024 - Indicateurs démographiques et socioéconomiques.xlsx</strong> : indicateurs actualisés (population, activité, éducation, habitat) hiérarchisés par région et province.</li>
-      <li><strong>chtouka pauvr.xlsx</strong> : indicateurs socio-économiques et taux de pauvreté par territoire (taux, intensité, vulnérabilité).</li>
-      <li><strong>Cartographie de la pauvreté régionale 2004–2014.xlsx</strong> : évolution temporelle des indicateurs de pauvreté multidimensionnelle par région.</li>
-      <li><strong>IPC BASE 100 2017 (2017–2024).xlsx</strong> : séries mensuelles et annuelles de l’indice des prix à la consommation.</li>
-      <li><strong>pondérations.xlsx</strong> : structure des pondérations par catégorie de produits.</li>
-      <li><strong>Activité, emploi et chômage 2016.xlsx</strong> : taux d’activité, emploi et chômage par territoire.</li>
-      <li><strong>Travail 2017–2020.xlsx</strong> : évolution des indicateurs du marché du travail.</li>
-      <li><strong>M.E17.xlsx / M.E18.xlsx</strong> : indicateurs sectoriels énergie & mines.</li>
-      <li><strong>enseignementprimaire17.xlsx / enseig18.xlsx</strong> : effectifs scolaires et taux de scolarisation.</li>
-      <li><strong>finance17.xlsx / finance18.xlsx</strong> : indicateurs budgétaires et financiers.</li>
-      <li><strong>Habitat17.xlsx / habitat.xlsx</strong> : caractéristiques du logement.</li>
-      <li><strong>sante17.xlsx / sante18.xlsx</strong> : infrastructures sanitaires.</li>
-      <li><strong>population17.xlsx / pop2018.xlsx</strong> : effectifs démographiques et structure par âge.</li>
-      <li><strong>tourisme17.xlsx</strong> : arrivées/nuitées/capacité hôtelière.</li>
-    </ul>
+<h3>Why cleaning came first</h3>
 
-    <h3 id="structure-donnees" class="ax-subtitle">Structure des données</h3>
+<p>
+HCP spreadsheets are designed to be read by people, not parsed by programs. Five
+recurring problems made them unusable as-is:
+</p>
 
-   
+<ul>
+  <li><strong>Thousands separated by spaces</strong> — <code>421 844</code> is a string, not a number</li>
+  <li><strong>Percentages carrying their symbol</strong> — <code>49,8%</code> needs extraction before conversion</li>
+  <li><strong>Comma decimal separator</strong> (French convention) — silently breaks <code>float()</code></li>
+  <li><strong>Partially empty hierarchical rows</strong> — subtotal lines such as "Rural" or "Centre" that are not observations</li>
+  <li><strong>Column names varying between exports</strong> — the same field spelled differently across files</li>
+</ul>
 
-    <div class="ax-frame">
-      <h3 class="ax-subtitle">1- Extrait des données brutes — RGPH (Structure démographique)</h3>
+<p>
+Left unhandled, each of these produces a plausible but wrong result rather than an
+error: a column read as text sorts alphabetically, a subtotal row counted as an
+observation inflates every average. Cleaning is what makes the rest of the
+platform trustworthy.
+</p>
 
-      <p class="ax-text">
-        Le RGPH contient des informations démographiques détaillées par territoire :
-        <strong>codes administratifs</strong>, <strong>superficie</strong>,
-        <strong>population légale</strong>, <strong>population municipale</strong>,
-        <strong>répartition par sexe</strong> et <strong>classes d’âge</strong>.
-      </p>
-
-      <div class="ax-actions">
-        <a class="ax-btn" href="RGPH2014.html" target="_blank" rel="noopener">Ouvrir RGPH (HTML)</a>
-        <a class="ax-btn" href="RGPH2014.html" download>Télécharger RGPH (HTML)</a>
-      </div>
-
-      <div class="ax-table-full">
-        <iframe
-          src="RGPH2014.html"
-          class="ax-iframe-full"
-          title="RGPH2014 - Données brutes (table)"
-          loading="lazy"
-        ></iframe>
-      </div>
-    </div>
-
-    <h3 class="ax-subtitle">Analyse des données brutes (RGPH) — pourquoi nettoyer ?</h3>
-
-    <p class="ax-text">
-      Les exports HCP/Excel sont très utiles pour la lecture, mais <strong>pas directement exploitables</strong>
-      dans un pipeline analytique (pandas), une carte (GeoJSON/Leaflet) ou un modèle ML.
-      Les principaux points bloquants observés :
-    </p>
-
-    <ul class="ax-list">
-      <li><strong>Espaces</strong> dans les nombres (ex : <em>421 844</em>) → empêche la conversion numérique.</li>
-      <li><strong>Pourcentages</strong> avec symbole <code>%</code> → nécessite extraction/normalisation.</li>
-      <li><strong>Décimales</strong> avec virgule (format FR) → conversion contrôlée en <code>float</code>.</li>
-      <li><strong>Lignes hiérarchiques</strong> (Rural/Centre) parfois partielles → valeurs manquantes à filtrer ou compléter.</li>
-      <li><strong>Noms de colonnes</strong> variables selon l’export → standardisation indispensable.</li>
-    </ul>
-
-    <p class="ax-text">
-      Le nettoyage permet : (1) conversions numériques fiables, (2) colonnes cohérentes,
-      (3) suppression des ambiguïtés, (4) prévention d’erreurs statistiques,
-      (5) fusion plus simple avec la pauvreté et intégration cartographique/IA.
-    </p>
-
-    <div class="ax-frame">
-      <h3 class="ax-subtitle">2- Données brutes — Indicateurs de pauvreté</h3>
-
-      <p class="ax-text">
-        Le fichier “pauvreté” regroupe des indicateurs socio-économiques par territoire. On y retrouve les mêmes
-        problématiques de format (virgules, espaces, symboles) et parfois des valeurs manquantes selon le niveau territorial.
-      </p>
-
-      <div class="ax-actions">
-        <a class="ax-btn" href="chtouka pauvr.html" target="_blank" rel="noopener">Ouvrir Pauvreté (HTML)</a>
-        <a class="ax-btn" href="chtouka pauvr.html" download>Télécharger Pauvreté (HTML)</a>
-      </div>
-
-      <div class="ax-table-full ax-table-poverty">
-  <iframe
-    src="chtouka pauvr.html"
-    class="ax-iframe-full ax-iframe-poverty"
-    title="Pauvreté - Données brutes (table)"
-    loading="lazy"
-  ></iframe>
-</div>
-    </div>
-
-    <h3 id="nettoyage" class="ax-subtitle">Nettoyage &amp; validation</h3>
-    <div class="ax-step">
-      <div class="ax-step-title">A — Normalisation des colonnes</div>
-      <p class="ax-text">
-        Objectif : obtenir des noms de colonnes <strong>stables</strong> (trim, espaces multiples, caractères invisibles),
-        afin d’éviter des erreurs lors des jointures et transformations.
-      </p>
-      <button type="button" onclick="toggleCode('codeA', this)" class="ax-btn">Masquer le code</button>
-      <pre id="codeA" class="ax-code"><code>
+<h3>A — Column name normalisation</h3>
+<p>
+Stripping whitespace, collapsing repeated spaces and removing invisible characters,
+so that joins and transformations match on stable keys.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import re
 
 def normalize_colname(c: str) -> str:
@@ -458,17 +180,14 @@ def normalize_colname(c: str) -> str:
     return c
 
 df.columns = [normalize_colname(c) for c in df.columns]
-      </code></pre>
-    </div>
+      </code></code></pre></details>
 
-    <div class="ax-step">
-      <div class="ax-step-title">B — Conversion numérique (espaces, %, virgules)</div>
-      <p class="ax-text">
-        Objectif : transformer les champs “visuels” (ex : <em>33 610 084</em>, <em>49,8%</em>) en valeurs numériques
-        exploitables (<code>int</code>/<code>float</code>) avec une conversion <strong>robuste</strong>.
-      </p>
-      <button type="button" onclick="toggleCode('codeB', this)" class="ax-btn">Masquer le code</button>
-      <pre id="codeB" class="ax-code"><code>
+<h3>B — Numeric conversion</h3>
+<p>
+Turning display strings such as <code>33 610 084</code> or <code>49,8%</code> into
+integers and floats, with a conversion that fails safely rather than silently.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import re
 import pandas as pd
 import numpy as np
@@ -482,17 +201,14 @@ def to_number(x):
     s = s.replace(",", ".")                                            
     s = re.sub(r"[^0-9\.\-]", "", s)                                
     return pd.to_numeric(s, errors="coerce")
-      </code></pre>
-    </div>
+      </code></code></pre></details>
 
-    <div class="ax-step">
-      <div class="ax-step-title">C — Gestion des valeurs manquantes &amp; lignes hiérarchiques</div>
-      <p class="ax-text">
-        Certains niveaux territoriaux (ex : “Rural”, “Centre”) peuvent apparaître avec des lignes partiellement vides.
-        On identifie et traite ces cas pour éviter de fausser les statistiques et la cartographie.
-      </p>
-      <button type="button" onclick="toggleCode('codeC', this)" class="ax-btn">Masquer le code</button>
-      <pre id="codeC" class="ax-code"><code>
+<h3>C — Missing values and hierarchical rows</h3>
+<p>
+Identifying rows that carry no observation — aggregation levels left partially
+empty by the export — so they do not distort statistics or maps.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 
 numeric_cols = [c for c in df.columns if c not in ["CONC", "Localités"]]
 
@@ -501,16 +217,14 @@ df_clean = df.loc[~mask_all_nan].copy()
 
 
 df_clean["Localités"] = df_clean["Localités"].ffill()
-      </code></pre>
-    </div>
+      </code></code></pre></details>
 
-    <div class="ax-step">
-      <div class="ax-step-title">D — Standardisation des clés territoriales (fusion RGPH + pauvreté)</div>
-      <p class="ax-text">
-        Pour fusionner les deux sources, on normalise la clé (ex : <code>CONC</code>) afin de garantir une correspondance exacte.
-      </p>
-      <button type="button" onclick="toggleCode('codeD', this)" class="ax-btn">Masquer le code</button>
-      <pre id="codeD" class="ax-code"><code>
+<h3>D — Territorial key standardisation</h3>
+<p>
+Normalising the join key so census data and poverty data can be merged on an exact
+match.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 def normalize_code(x):
     s = "".join(ch for ch in str(x) if ch.isdigit())
     return s if s else None
@@ -519,14 +233,10 @@ rgph["CONC"]  = rgph["CONC"].apply(normalize_code)
 pauvr["CONC"] = pauvr["CONC"].apply(normalize_code)
 
 df_merged = rgph.merge(pauvr, on="CONC", how="left")
-      </code></pre>
-    </div>
+      </code></code></pre></details>
 
-    <div class="ax-step">
-      <div class="ax-step-title">E — Aperçu des données clean (extrait du dictionnaire)</div>
-     
-      <button type="button" onclick="toggleCode('codeE', this)" class="ax-btn">Masquer le code</button>
-      <pre id="codeE" class="ax-code"><code>
+<h3>E — Cleaned output</h3>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 
 data_clean_preview = {
   "Province": "Agadir-Ida -Ou-Tanane",
@@ -541,240 +251,29 @@ data_clean_preview = {
   "Taux_pauvrete_2007_head": [1.5, 12.6, 18.86, 0.5, 13.6],
   "Taux_pauvrete_2014_head": [0.39, 10.09, 26.2, 6.84, 6.91]
 }
-      </code></pre>
-    </div>
+      </code></code></pre></details>
 
-   <h3 id="datasets" class="ax-subtitle">Centralisation des datasets (Dictionnaire Python)</h3>
+<h3>Consolidation</h3>
+<p>
+After cleaning, the platform no longer depends on scattered files. Every dataset is
+consolidated into one nested Python dictionary in <code>hcpdata.py</code>, keyed by
+domain, then by province, then by indicator. This single structure feeds the
+pandas DataFrames behind each chart and supplies the assistant with one
+consistent, hierarchical context.
+</p>
+</section>
 
-    <p class="ax-text">
-      Après l'étape de nettoyage, AXIORA ne s'appuie plus sur de multiples fichiers éparpillés. Toutes les données sont consolidées dans une structure de données unique : un <strong>dictionnaire Python unifié</strong> (<code>hcpdata.py</code>).
-    </p>
+<!-- ===================== INTERFACE ===================== -->
+<section class="cs" id="interface">
+<h2>Interface</h2>
 
-    <p class="ax-text">
-      Cette approche en mémoire est idéale pour Streamlit : elle permet d'alimenter instantanément les DataFrames Pandas pour les visualisations, tout en fournissant un contexte clair, structuré et hiérarchisé à l'assistant IA, sans aucune latence liée à la lecture de fichiers externes (CSV ou JSON).
-    </p>
-
-    <div class="ax-actions">
-      <button type="button" onclick="showDictPreview('pauvrete')" class="ax-btn">
-        Aperçu Module Pauvreté
-      </button>
-      <button type="button" onclick="showDictPreview('population')" class="ax-btn">
-        Aperçu Module Population
-      </button>
-      <button type="button" onclick="showDictPreview('travail')" class="ax-btn">
-        Aperçu Module Travail
-      </button>
-      <a class="ax-btn" href="hcpdata.py" download>Télécharger data nettoyer</a>
-    </div>
-
-    <pre id="dictOutput" class="ax-code">Cliquez sur un bouton pour afficher l'arborescence du dictionnaire.</pre>
-
-  </div>
-
-  <script>
-    // Fonction pour afficher/masquer le code des étapes de nettoyage (déjà existante)
-    function toggleCode(id, btn){
-      const el = document.getElementById(id);
-      if (!el) return;
-
-      const isHidden = el.classList.toggle("hidden");
-      if (btn){
-        btn.textContent = isHidden ? "Afficher le code" : "Masquer le code";
-      }
-    }
-
-     const pythonSnippets = {
-      'pauvrete': `hcp_data = {
-    "pauvrete": {
-        "Chtouka- Ait Baha": {
-            "Commune": [
-                "Ait Baha (M)", "Biougra (M)", "Ait Mzal", 
-                "Ait Ouadrim", "Aouguenz", "Hilala", "..."
-            ],
-            "Taux de pauvreté 2004": [8.1, 9.0, 23.8, 31.0, 29.7, 27.4, "..."],
-            "Taux de pauvreté 2007": [2.8, 6.5, 12.8, 19.3, 16.8, 13.2, "..."],
-            "Taux de vulnérabilité 2014": [22.06, 7.9, 20.98, 25.51, 23.44, 27.44, "..."]
-        },
-        "Tiznit": {
-            // ... structure identique pour Tiznit
-        },
-        "Tata": {
-            // ... structure identique pour Tata
-        }
-    }
-    // ... autres modules
-}`,
-      'population': `hcp_data = {
-    // ... autres modules
-    "population": {
-        "population_legale": {
-            "Provinces": [
-                "Agadir Ida Outanane", "Inezgane-Aït Melloul", "Chtouka-Aït Baha",
-                "Taroudant", "Tiznit", "Tata", "Souss-Massa"
-            ],
-            "RGPH 2004 – Urbain": [384987, 385612, 239694, 186471, 58613, 39060, 1094437],
-            "RGPH 2014 – Urbain": [508155, 513706, 113531, 248640, 81044, 40820, 1505896],
-            "RGPH 2014 – Total": [600599, 541118, 371102, 838820, 207367, 117841, 2676847]
-        },
-        "estimations_population_milieu": {
-            // ...
-        }
-    }
-}`,
-      'travail': `hcp_data = {
-    // ... autres modules
-    "marche_du_travail": {
-        "taux_chomage_par_province": {
-            "Province": ["Agadir Ida Outanane", "Inezgane Ait Melloul", "Taroudannt", "Région"],
-            "Taux_Activité_Urbain": [41.6, 42.2, 43.9, 41.5],
-            "Taux_Chômage_Urbain": [16.7, 11.8, 13.8, 13.9],
-            "Taux_Activité_Rural": [50.5, 47.0, 57.8, 52.1],
-            "Taux_Chômage_Total": [10.4, 12.0, 5.9, 9.0]
-        },
-        "population_active_occupee_statut": {
-            "Statut": ["Salariés", "Auto-emploi", "Emploi non rémunéré", "Autres", "Total"],
-            "Urbain": [251639, 111477, 12802, 856, 376774],
-            "Rural": [167635, 167668, 143696, 377, 479376]
-        }
-    }
-}`
-    };
-
-    // Fonction qui injecte l'extrait Python dans la balise <pre>
-    function showDictPreview(moduleName){
-      const target = document.getElementById('dictOutput');
-      if(target && pythonSnippets[moduleName]) {
-        target.textContent = pythonSnippets[moduleName];
-      }
-    }
-  </script>
-  
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-<p></p>
-<section id="navigation" class="ax-section">
-  <div class="container">
-
-    <div class="section-head">
-      <h1>Navigation &amp; UI</h1>
-         </div>
-    <p></p>
-
-    <p class="ax-lead">
-      AXIORA est conçu comme une application d’exploration data : navigation stable, interactions rapides et interface
-      structurée. Le cœur de l’UX repose sur une gestion d’état (<code>st.session_state</code>), des callbacks et une
-      organisation UI pensée “produit” (menu hiérarchique, filtres lisibles, composants KPI).
-    </p>
-
-    <!-- ========================================================= -->
-    <!-- 1) MENU PRINCIPAL : texte à côté + bouton code -->
-    <!-- ========================================================= -->
-    <h3 id="menu" class="ax-subtitle"> Menu principal fixe : routage interne (state-driven)</h3>
-
-    <div class="ax-media">
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Au lieu d’une navigation multi-pages classique, j’ai mis en place un <strong>routage interne</strong>
-          piloté par <code>st.session_state</code>. Chaque clic dans la sidebar déclenche un <strong>callback</strong>
-          qui met à jour l’état (<code>page</code> / <code>module</code>), puis l’application rend uniquement le bloc
-          concerné. Ce pattern réduit les ruptures de navigation et garde la sidebar cohérente.
-        </p>
-
-        <ul class="ax-list">
-          <li><strong>State management :</strong> <code>page</code> stocké dans <code>session_state</code>.</li>
-          <li><strong>Callbacks :</strong> fonction <code>go_to()</code> appelée sur clic.</li>
-          <li><strong>UX :</strong> navigation instantanée entre exploration / assistant / reporting sans perdre le contexte.</li>
-        </ul>
-
-        <button type="button" class="ax-btn" onclick="toggleCode('codeNavMenu', this)">Masquer le code</button>
-        <pre id="codeNavMenu" class="ax-code"><code>
-
-import streamlit as st
-
-if "page" not in st.session_state:
-    st.session_state.page = "Accueil"
-
-def go_to(page_name: str):
-    st.session_state.page = page_name
-
-# Sidebar : menu principal
-st.sidebar.markdown("### Menu Principal")
-
-if st.sidebar.button("Accueil"):
-    go_to("Accueil")
-
-if st.sidebar.button("Exploration des Indices"):
-    go_to("Exploration")
-
-if st.sidebar.button("Generateur Rapport & statistiques"):
-    go_to("Reporting")
-
-if st.sidebar.button("assistant axiora data"):
-    go_to("Assistant")
-
-# Render conditionnel
-if st.session_state.page == "Accueil":
-    render_home()
-elif st.session_state.page == "Exploration":
-    render_exploration()
-elif st.session_state.page == "Reporting":
-    render_reporting()
-elif st.session_state.page == "Assistant":
-    render_assistant()
-        </code></pre>
-      </div>
-
-      <div class="ax-media-figure">
-        <img class="ax-img"
-             src="images/side_bare.png"
-             alt="Menu principal Axiora Data (sidebar fixe)">
-          </div>
-    </div>
-
-
-
-    
-    <h3 id="accordeon" class="ax-subtitle"> Accordéon “Exploration des Indices” : navigation scalable</h3>
-
-    <div class="ax-media">
-      <div class="ax-media-text">
-        <p class="ax-text">
-          L’exploration couvre plusieurs domaines (Population, Travail, Habitat, Finance…). Pour éviter une sidebar longue,
-          j’ai implémenté un <strong>menu hiérarchique</strong> en mode accordéon : un état <code>indices_open</code>
-          contrôle l’affichage des sous-menus. Cela améliore la lisibilité, réduit la friction et facilite l’ajout de nouveaux
-          modules sans refactor lourd.
-        </p>
-
-        <ul class="ax-list">
-          <li><strong>UI conditionnelle :</strong> rendu des sous-menus uniquement si <code>indices_open</code> est vrai.</li>
-          <li><strong>Contrôle d’état :</strong> toggle <code>True/False</code> via callback.</li>
-          <li><strong>Scalabilité :</strong> structure extensible (ajout d’un module = 1 entrée).</li>
-        </ul>
-
-        <button type="button" class="ax-btn" onclick="toggleCode('codeNavAccordion', this)">Masquer le code</button>
-        <pre id="codeNavAccordion" class="ax-code"><code>
+<h3>State-driven navigation</h3>
+<p>
+Streamlit reruns the whole script on every interaction, so navigation has to be
+held in explicit state rather than inferred from the call stack. A single
+<code>st.session_state</code> key drives which module is rendered.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 
 if "indices_open" not in st.session_state:
     st.session_state.indices_open = False
@@ -798,35 +297,26 @@ if st.session_state.indices_open:
         go_to("Enseignement")
     if st.sidebar.button("Pauvrete"):
         go_to("Pauvrete")
-        </code></pre>
-      </div>
+        </code></code></pre></details>
+<figure class="shot"><img src="images/side_bare.png" alt="Main navigation menu" loading="lazy" /><figcaption>Main navigation menu</figcaption></figure>
 
-      <div class="ax-media-figure">
-        <img class="ax-img"
-             src="images/side_bare2.png"
-             alt="Accordéon Exploration des Indices (déployé)">
-          </div>
-    </div>
+<h3>Collapsible indicator menu</h3>
+<p>
+Six domains, each with several indicators, would make a flat sidebar unreadable.
+An <code>indices_open</code> flag toggles a nested accordion instead, so adding a
+module costs one entry rather than a redesign.
+</p>
+<figure class="shot"><img src="images/side_bare2.png" alt="Collapsible indicator navigation" loading="lazy" /><figcaption>Collapsible indicator navigation</figcaption></figure>
 
-
-
-
-    
-    <h3 id="filtres" class="ax-subtitle"> Filtres &amp; contrôles : layout 3 zones (contrôle → insight → vérification)</h3>
-
-    <p class="ax-text">
-      Pour éviter un écran surchargé, l’analyse est structurée en trois zones : <strong>contrôles</strong> (filtres),
-      <strong>visualisation</strong> (graphique) et <strong>transparence</strong> (table). Cette organisation est un pattern
-      courant dans les BI tools : elle facilite le raisonnement et limite les erreurs d’interprétation.
-    </p>
-
-    <div class="ax-frame ax-center">
-      <img class="ax-img-wide"
-           src="images/side_bare3.png"
-           alt="Disposition 3 colonnes : filtres, graphique, table">
-     
-      <button type="button" class="ax-btn" onclick="toggleCode('codeNavFilters', this)">Masquer le code</button>
-      <pre id="codeNavFilters" class="ax-code"><code>
+<h3>Three-zone analysis layout</h3>
+<p>
+Each analysis view is split into controls, chart, and the underlying table. Keeping
+the data visible next to its visualisation lets a reader check a value directly
+instead of estimating it from a colour scale — which matters when the figures are
+official statistics.
+</p>
+<figure class="shot"><img src="images/side_bare3.png" alt="Filters, chart and source table side by side" loading="lazy" /><figcaption>Filters, chart and source table side by side</figcaption></figure>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 
 import streamlit as st
 
@@ -846,36 +336,17 @@ with col_chart:
 
 with col_table:
     st.dataframe(df_filtered, use_container_width=True)
-      </code></pre>
-    </div>
+      </code></code></pre></details>
 
-
-
-    
-    <h3 id="components" class="ax-subtitle"> Composants UI réutilisables : Top Bar &amp; KPI cards (HTML/CSS)</h3>
-
-    <p class="ax-text">
-      Pour donner un rendu “dashboard” plus professionnel, j’ai standardisé des composants réutilisables : une
-      <strong>Top Bar</strong> (contexte + navigation) et des <strong>cartes KPI</strong> (synthèse immédiate).
-      Ces composants sont injectés via <code>st.markdown(..., unsafe_allow_html=True)</code> avec CSS dédié.
-    </p>
-
-    <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">Top Bar : repères visuels &amp; cohérence</h4>
-      <img class="ax-img-wide" src="images/side_bare4.png" alt="Top bar Axiora Data">
-    </div>
-
-    <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">KPI cards : synthèse (totaux / régions / indicateurs)</h4>
-      <img class="ax-img-wide" src="images/side_bare5.png" alt="Cartes KPI Axiora Data">
-    </div>
-
-    <div class="ax-frame ax-center">
-      <h4 class="ax-subtitle" style="margin-top:0;">KPI analytiques : min / total / max</h4>
-      <img class="ax-img-wide" src="images/side_bare6.png" alt="KPI min total max Axiora Data">
-
-      <button type="button" class="ax-btn" onclick="toggleCode('codeNavKpiCss', this)">Masquer le code</button>
-    <pre id="codeNavKpiCss" class="ax-code"><code>
+<h3>Reusable components</h3>
+<p>
+A top bar and a set of KPI cards, injected as HTML with dedicated CSS, give every
+module the same visual anchors: which territory, which year, which indicator.
+</p>
+<figure class="shot"><img src="images/side_bare4.png" alt="Top bar" loading="lazy" /><figcaption>Top bar</figcaption></figure>
+<figure class="shot"><img src="images/side_bare5.png" alt="Summary KPI cards" loading="lazy" /><figcaption>Summary KPI cards</figcaption></figure>
+<figure class="shot"><img src="images/side_bare6.png" alt="Analytical KPIs: minimum, total, maximum" loading="lazy" /><figcaption>Analytical KPIs: minimum, total, maximum</figcaption></figure>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 
 import streamlit as st
 
@@ -920,79 +391,25 @@ st.markdown(f"""
   &lt;/div&gt;
 &lt;/div&gt;
 """, unsafe_allow_html=True)
-</code></pre>
-    </div>
+</code></code></pre></details>
+</section>
 
-    
-  </div>
-  </section>
+<!-- ===================== EXPLORATION ===================== -->
+<section class="cs" id="exploration">
+<h2>Indicator modules</h2>
 
+<h3>Population</h3>
+<p>
+The question this module addresses is where demographic pressure is concentrating,
+using the inter-census evolution from 2004 to 2014 and the shift in age structure.
+</p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-<!-- ========================================================= -->
-<!-- EXPLORATION DES INDICES — POPULATION -->
-<!-- ========================================================= -->
-<section id="exploration" class="ax-section">
-  <div class="container">
-
-    <div class="section-head">
-      <h1>Exploration des Indices</h1>
-    </div>
-
-      <em> Rendez-vous sur l'application live pour interagir avec les données.</em>
-    </p>
-    
-     <h3 id="population" class="ax-subtitle"> Population & Dynamique Démographique</h3>
-    
-
-  
-          <strong>L'Enjeu :</strong> Mesurer la pression démographique sur la région Souss-Massa pour anticiper les besoins en infrastructures publiques. L'analyse se concentre sur l'évolution inter-censitaire (2004-2014-2024) et la transition de la structure par âge.
-        </p>
-        <div class="ax-insight-box">
-          <div class="ax-insight-title"> Insight Analytique</div>
-          <p class="ax-insight-text">
-            "Le croisement des données met en lumière la fracture territoriale de la région : une hyper-concentration urbaine sur la côte (Agadir) contrastant avec une vaste dispersion rurale dans les provinces de Tata ou Taroudant, créant deux défis d'aménagement du territoire radicalement différents."
-          </p>
-        </div>
-      </div>
-
-    <!-- ========================================================= -->
-    <!-- 1) Area miroir -->
-    <!-- ========================================================= -->
-    <h3 class="ax-subtitle">1) Area miroir (2004 vs 2014) — pression urbaine & contraste territorial</h3>
-
-    <div class="ax-media ax-media-equal ax-mirror-sameheight">
-
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Cette visualisation est <strong>sur-mesure</strong> : au lieu d’un graphique standard,
-          l’Area miroir place deux recensements en symétrie pour rendre la comparaison instantanée.
-          La partie inférieure utilise des <strong>valeurs négatives</strong> pour créer l’effet miroir.
-        </p>
-
-        <ul class="ax-list">
-          <li><strong>Lecture immédiate :</strong> 2004 ↔ 2014 sur un même axe.</li>
-          <li><strong>connaissances :</strong> repérer où la croissance se concentre dans l’urbain (pression sur habitat et services).</li>
-            </ul>
-
-        <button type="button" class="ax-btn" onclick="toggleCode('codePopMirror', this)">Afficher le code</button>
-        <pre id="codePopMirror" class="ax-code hidden"><code>
+<p>
+Rather than a standard grouped bar chart, the two census years are drawn as a
+mirrored area chart: 2004 above the axis, 2014 below it as negative values. The
+comparison becomes a single shape to read instead of two series to align mentally.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import plotly.graph_objects as go
 
 def area_miroir(df):
@@ -1025,127 +442,46 @@ def area_miroir(df):
         hovermode="x unified"
     )
     return fig
-        </code></pre>
-      </div>
+        </code></code></pre></details>
+<figure class="shot"><img src="images/popparprov.png" alt="Mirrored area chart, 2004 vs 2014 population by province" loading="lazy" /><figcaption>Mirrored area chart, 2004 vs 2014 population by province</figcaption></figure>
 
-      <div class="ax-media-figure">
-        <img class="ax-img" src="images/popparprov.png"
-             alt="Area miroir 2004 vs 2014 (urbain) — Population">
-      </div>
-
-    </div>
-
-
-
-
-
-
-
-
-   <!-- ========================================================= -->
-<!-- EXPLORATION DES INDICES — MARCHE DU TRAVAIL -->
-<!-- ========================================================= -->
-<section id="marche" class="ax-section">
-  <div class="container">
-
-     <div class="section-head">
-      <h3>Marché du travail</h3>
-    </div>
-
-    <p class="ax-lead">
-      Le module <strong>Marché du travail</strong> vise à répondre à une question concrète :
-      <strong>qui participe réellement à l’activité</strong> et <strong>où se situe la vulnérabilité</strong> ?
-      Au-delà des moyennes, l’objectif est de mettre en évidence les <strong>écarts structurels</strong>
-      (genre, milieu urbain/rural, niveau d’éducation) afin d’orienter l’analyse vers des
-      actions ciblées : insertion, formation, politiques publiques et inclusion économique.
-    </p>
-
-   
-
-    <!-- ========================================================= -->
-    <!-- 1) Lecture par sexe (Heatmap) + comparaison multi-milieux -->
-    <!-- ========================================================= -->
-    <h3 class="ax-subtitle">1) Participation à l’activité — lecture par sexe & milieu</h3>
-
-    <!--  2 images sur la même ligne -->
-    <div class="ax-two-img">
-
-      <figure class="ax-figure-card">
-        <h4 class="ax-figure-title">Heatmap — Taux d’activité par sexe (2017–2020)</h4>
-        <img class="ax-figure-img"
-             src="images/newplot (4).png"
-             alt="Heatmap taux d'activité par sexe (2017-2020)">
-      </figure>
-
-      <figure class="ax-figure-card">
-        <h4 class="ax-figure-title">Comparaison — Urbain / Rural / Total (par sexe, multi-années)</h4>
-        <img class="ax-figure-img"
-             src="images/newplot (3).png"
-             alt="Comparaison urbain rural total par sexe et année">
-      </figure>
-
-    </div>
-
-    <div class="card" style="margin-top:14px;">
-      <h3 style="margin-top:0;">Analyse & insights</h3>
-      <p class="ax-text" style="margin-bottom:10px;">
-        Les deux vues se complètent : la <strong>heatmap</strong> donne une lecture rapide de l’écart de participation
-        entre <strong>hommes</strong> et <strong>femmes</strong> au fil des années, tandis que la courbe
-        <strong>Urbain/Rural/Total</strong> montre comment cet écart se manifeste selon le territoire.
-      </p>
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Écart structurel :</strong> la participation masculine reste nettement plus élevée, ce qui pointe un enjeu d’inclusion économique.</li>
-        <li><strong>Effet territorial :</strong> la segmentation <em>urbain vs rural</em> aide à distinguer contraintes d’accès à l’emploi, mobilité et opportunités locales.</li>
-        <li><strong>Lecture actionnable :</strong> ces écarts orientent des mesures ciblées (formation, soutien à l’emploi féminin, services facilitant l’activité).</li>
-      </ul>
-    </div>
-
-  </div>
-</section>
-
-
-
-
-
-
-
-
-
-
-<section id="habitat" class="ax-section">
-  <div class="container">
-
-     <div class="section-head">
-      <h3>Habitat & Infrastructure</h3>
-    </div>
-
-
-<p class="ax-lead">
-  L’habitat est un indicateur direct de <strong>pression urbaine</strong> et de <strong>capacité d’équipement</strong>.
-  L’objectif est d’identifier les écarts territoriaux et les zones atypiques (outliers).
+<p class="reading">
+The region splits into two distinct planning problems: dense urban concentration
+along the coast around Agadir, and wide rural dispersion in Tata and Taroudant.
+Infrastructure needs in one are not comparable to the other.
 </p>
 
-<div class="ax-figure-full">
-  <figure class="ax-figure-card-full">
-    <h4 class="ax-figure-title">Distribution des indicateurs Habitat (2017–2018) — dispersion & outliers</h4>
-    <img class="ax-figure-img-full" src="images/newplot (5).png" alt="Habitat — boxplot">
-  </figure>
-</div>
+<h3>Labour market</h3>
+<p>
+Averages hide the structure that matters here. This module separates participation
+by sex and by urban or rural setting, so that gaps rather than levels become
+visible.
+</p>
+<figure class="shot"><img src="images/newplot (4).png" alt="Activity rate by sex, 2017–2020" loading="lazy" /><figcaption>Activity rate by sex, 2017–2020</figcaption></figure>
+<figure class="shot"><img src="images/newplot (3).png" alt="Urban, rural and total activity rates by sex" loading="lazy" /><figcaption>Urban, rural and total activity rates by sex</figcaption></figure>
 
-<div class="card" style="margin-top:14px;">
- 
-  <ul class="ax-list" style="margin-bottom:0;">
-    <li><strong>Dispersion :</strong> inégalité entre territoires (zones stables vs zones en tension).</li>
-    <li><strong>Outliers :</strong> signal de pression foncière / projets / urbanisation rapide.</li>
-    <li><strong>Décision :</strong> prioriser infrastructures selon la variabilité observée.</li>
-  </ul>
-</div>
+<p class="reading">
+The heatmap reads the gap between male and female participation over time; the
+second view shows how that gap differs between urban and rural territories. Male
+participation remains substantially higher across the whole period, and the
+urban/rural split separates two different sets of constraints — access to
+employment, mobility, and locally available opportunities.
+</p>
 
-<div class="ax-code-actions">
-  <button type="button" class="ax-btn" onclick="toggleCode('codeHabitat', this)">Afficher le code</button>
-</div>
+<h3>Housing</h3>
+<p>
+Housing indicators are a direct proxy for urban pressure and for how well a
+territory is equipped. The distribution view is used to find outliers rather than
+central tendency.
+</p>
+<figure class="shot"><img src="images/newplot (5).png" alt="Distribution of housing indicators, 2017–2018" loading="lazy" /><figcaption>Distribution of housing indicators, 2017–2018</figcaption></figure>
 
-<pre id="codeHabitat" class="ax-code hidden"><code>
+<p class="reading">
+Spread indicates inequality between territories; isolated points usually mark
+rapid urbanisation or a specific development project. Both are more useful for
+prioritisation than the regional average.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
   import plotly.express as px
 import pandas as pd
 import streamlit as st
@@ -1171,49 +507,15 @@ def render_habitat(df_habitat):
     )
 
     st.plotly_chart(fig, use_container_width=True)
-</code></pre>
- </div>
-</section>
+</code></code></pre></details>
 
-
-
-
-
-
-<section id="finance" class="ax-section">
-  <div class="container">
-
-     <div class="section-head">
-      <h3>Finance & Économie locale</h3>
-    </div>
-  
-
-<p class="ax-lead">
-  Ce module compare la structure économique de <strong>Souss-Massa</strong> à l’échelle <strong>nationale</strong>,
-  pour situer le poids sectoriel et détecter les déséquilibres.
+<h3>Local economy</h3>
+<p>
+This module compares the sectoral structure of Souss-Massa against the national
+figures, to see where the region diverges.
 </p>
-
-<div class="ax-figure-full">
-  <figure class="ax-figure-card-full">
-    <h4 class="ax-figure-title">Structure sectorielle — Souss-Massa vs Maroc (2015–2016)</h4>
-    <img class="ax-figure-img-full" src="images/newplot (6).png" alt="Finance — heatmap secteurs">
-  </figure>
-</div>
-
-<div class="card" style="margin-top:14px;">
-  
-  <ul class="ax-list" style="margin-bottom:0;">
-    <li><strong>Comparaison :</strong> vérifier si la région suit la structure nationale ou s’en démarque.</li>
-    <li><strong>Poids sectoriel :</strong> repérer les secteurs dominants / sous-représentés.</li>
-    <li><strong>Évolution :</strong> lire la dynamique 2015→2016 (croissance/ralentissement).</li>
-  </ul>
-</div>
-
-<div class="ax-code-actions">
-  <button type="button" class="ax-btn" onclick="toggleCode('codeFinance', this)">Afficher le code</button>
-</div>
-
-<pre id="codeFinance" class="ax-code hidden"><code>
+<figure class="shot"><img src="images/newplot (6).png" alt="Sectoral structure, Souss-Massa vs Morocco, 2015–2016" loading="lazy" /><figcaption>Sectoral structure, Souss-Massa vs Morocco, 2015–2016</figcaption></figure>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import plotly.express as px
 import pandas as pd
 import streamlit as st
@@ -1238,48 +540,16 @@ def render_finance(df_finance):
     )
 
     st.plotly_chart(fig, use_container_width=True)
-</code></pre>
+</code></code></pre></details>
 
-
- </div>
-</section>
-
-
-<section id="enseignement" class="ax-section">
-  <div class="container">
-
-     <div class="section-head">
-      <h3>Enseignement & Capital Humain</h3>
-    </div>
-  
-
-
-<p class="ax-lead">
-  Le capital humain conditionne l’emploi, la productivité et l’attractivité territoriale.
-  Cette vue compare les <strong>profils</strong> entre provinces sur plusieurs indicateurs.
+<h3>Education</h3>
+<p>
+A multi-indicator profile comparing provinces on several education measures at
+once, which surfaces territories with a consistent deficit rather than a single
+weak figure.
 </p>
-
-<div class="ax-figure-full">
-  <figure class="ax-figure-card-full">
-    <h4 class="ax-figure-title">Profil multi-indicateurs — comparaison territoriale</h4>
-    <img class="ax-figure-img-full" src="images/newplot (7).png" alt="Enseignement — radar">
-  </figure>
-</div>
-
-<div class="card" style="margin-top:14px;">
-  
-  <ul class="ax-list" style="margin-bottom:0;">
-    <li><strong>Lecture multi-dimensions :</strong> repérer rapidement provinces fortes/faibles.</li>
-    <li><strong>Écarts structurels :</strong> zones avec déficit d’accès/capacité.</li>
-    <li><strong>Décision :</strong> prioriser investissement & actions (infrastructure, soutien, qualité).</li>
-  </ul>
-</div>
-
-<div class="ax-code-actions">
-  <button type="button" class="ax-btn" onclick="toggleCode('codeEdu', this)">Afficher le code</button>
-</div>
-
-<pre id="codeEdu" class="ax-code hidden"><code>
+<figure class="shot"><img src="images/newplot (7).png" alt="Multi-indicator profile by province" loading="lazy" /><figcaption>Multi-indicator profile by province</figcaption></figure>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import plotly.graph_objects as go
 import streamlit as st
 
@@ -1306,82 +576,45 @@ def render_enseignement(categories, values_dict):
     )
 
     st.plotly_chart(fig, use_container_width=True)
-</code></pre>
-
-
- </div>
+</code></code></pre></details>
 </section>
-   
 
+<!-- ===================== MAPS ===================== -->
+<section class="cs" id="maps">
+<h2>Geographic mapping</h2>
 
+<p>
+Mapping is the most direct way to locate territorial disparity, but it required the
+most work. The difficulty is not drawing the map — it is joining two datasets that
+were never designed to be joined.
+</p>
 
+<h3>Reconciling two data structures</h3>
 
+<p>
+On one side, HCP statistical tables identify a territory by its name as written in
+the spreadsheet. On the other, the official boundary shapefiles identify the same
+territory by their own naming convention. A direct join fails on most rows.
+</p>
 
-
-
-
-
-
-<section id="cartes" class="ax-section">
-  <div class="container">
-
-    <div class="section-head">
-      <h1>Cartes géographiques</h1>
-    </div>
-
-    <p class="ax-lead">
-      Dans l'analyse des données publiques, la cartographie ne doit pas être simplement décorative. Elle est le meilleur outil pour <strong>localiser les disparités territoriales</strong>. Pour Axiora Data, j'ai mis en place un pipeline géospatial complet transformant des tableaux de données brutes en cartes choroplèthes interactives.
-    </p>
-
-    <div class="card" style="margin-top:20px; background: rgba(59, 130, 246, 0.05);">
-      <h3 > Le Défi : Réconcilier deux mondes de données</h3>
-      <p class="ax-text" style="margin-bottom:0;">
-        La complexité de ce module réside dans la fusion de données structurellement incompatibles : les tableaux statistiques (HCP) et les polygones géométriques (Shapefiles). Une simple jointure SQL échoue souvent à cause des différences de nommage. Il a fallu développer un algorithme de nettoyage pour garantir une jointure spatiale parfaite.
-      </p>
-    </div>
-
-   <div class="ax-compare-grid">
-      <div class="ax-compare-card">
-        <h4> Données Statistiques (HCP)</h4>
-        <div class="ax-excel-wrap">
-          <table class="ax-excel-table">
-            <thead>
-              <tr>
-                <th>Province</th>
-                <th>Commune</th>
-                <th>Milieu</th>
-                <th>Population</th>
-                <th>Pauvreté (%)</th>
-                <th>Vulnérab. (%)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Agadir Ida Ou Tanane</td><td>Agadir (M)</td><td>Urbain</td><td>421 844</td><td>0.39</td><td>3.10</td></tr>
-              <tr><td>Agadir Ida Ou Tanane</td><td>Amskroud</td><td>Rural</td><td>10 020</td><td>10.09</td><td>15.60</td></tr>
-              <tr><td>Agadir Ida Ou Tanane</td><td>Drargua</td><td>Rural</td><td>70 793</td><td>6.84</td><td>12.40</td></tr>
-              <tr><td>Agadir Ida Ou Tanane</td><td>Tiqqi</td><td>Rural</td><td>8 773</td><td>18.50</td><td>24.30</td></tr>
-              <tr><td>Chtouka- Ait Baha</td><td>Biougra (M)</td><td>Urbain</td><td>37 933</td><td>6.50</td><td>7.90</td></tr>
-              <tr><td>Chtouka- Ait Baha</td><td>Ait Amira</td><td>Rural</td><td>76 646</td><td>8.20</td><td>14.10</td></tr>
-              <tr><td>Chtouka- Ait Baha</td><td>Massa</td><td>Rural</td><td>17 579</td><td>9.10</td><td>11.20</td></tr>
-              <tr><td>Chtouka- Ait Baha</td><td>Sidi Bibi</td><td>Rural</td><td>39 042</td><td>5.40</td><td>9.50</td></tr>
-              <tr><td>Inezgane-Ait Melloul</td><td>Inezgane (M)</td><td>Urbain</td><td>130 333</td><td>1.20</td><td>4.50</td></tr>
-              <tr><td>Inezgane-Ait Melloul</td><td>Ait Melloul (M)</td><td>Urbain</td><td>171 847</td><td>2.10</td><td>5.80</td></tr>
-              <tr><td>Taroudannt</td><td>Taroudannt (M)</td><td>Urbain</td><td>80 149</td><td>4.50</td><td>8.20</td></tr>
-              <tr><td>Taroudannt</td><td>Aoulouz (M)</td><td>Urbain</td><td>17 409</td><td>8.70</td><td>12.10</td></tr>
-              <tr><td>Taroudannt</td><td>Taliouine (M)</td><td>Urbain</td><td>6 727</td><td>12.50</td><td>18.40</td></tr>
-              <tr><td>Tiznit</td><td>Tiznit (M)</td><td>Urbain</td><td>74 699</td><td>1.80</td><td>4.10</td></tr>
-              <tr><td>Tiznit</td><td>Tafraout (M)</td><td>Urbain</td><td>4 931</td><td>2.10</td><td>5.30</td></tr>
-              <tr><td>Tata</td><td>Tata (M)</td><td>Urbain</td><td>18 611</td><td>8.40</td><td>14.20</td></tr>
-              <tr><td>Tata</td><td>Akka (M)</td><td>Urbain</td><td>6 870</td><td>12.30</td><td>19.80</td></tr>
-              <tr><td>Tata</td><td>Foum Zguid (M)</td><td>Urbain</td><td>8 986</td><td>14.50</td><td>22.10</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="ax-compare-card">
-        <h4>Données Spatiales (Shapefile / XML)</h4>
-        <pre class="ax-xml-box"><code>&lt;metadata <span class="attr">xml:lang</span>=<span class="val">"en"</span>&gt;
+<div class="twocol">
+<div>
+<h4>Statistical data (HCP)</h4>
+<table class="minitable">
+<thead><tr><th>Commune</th><th>Setting</th><th>Population</th><th>Poverty %</th></tr></thead>
+<tbody>
+<tr><td>Agadir (M)</td><td>Urban</td><td>421 844</td><td>0.39</td></tr>
+<tr><td>Amskroud</td><td>Rural</td><td>10 020</td><td>10.09</td></tr>
+<tr><td>Drargua</td><td>Rural</td><td>70 793</td><td>6.84</td></tr>
+<tr><td>Tiqqi</td><td>Rural</td><td>8 773</td><td>18.50</td></tr>
+<tr><td>Biougra (M)</td><td>Urban</td><td>37 933</td><td>6.50</td></tr>
+<tr><td>Ait Amira</td><td>Rural</td><td>76 646</td><td>8.20</td></tr>
+</tbody>
+</table>
+</div>
+<div>
+<h4>Spatial data (shapefile metadata)</h4>
+<details class="codebox"><summary>Show code</summary><pre><code class="xml"><code>&lt;metadata <span class="attr">xml:lang</span>=<span class="val">"en"</span>&gt;
   <span class="comment">&lt;!-- Architecture de projection spatiale --&gt;</span>
   &lt;Esri&gt;
     &lt;CreaDate&gt;<span class="val">20230925</span>&lt;/CreaDate&gt;
@@ -1425,22 +658,24 @@ def render_enseignement(categories, values_dict):
       &lt;/attr&gt;
     &lt;/detailed&gt;
   &lt;/eainfo&gt;
-&lt;/metadata&gt;</code></pre>
-      </div>
-    </div>
+&lt;/metadata&gt;</code></code></pre></details>
+</div>
+</div>
 
-    <br>
+<p>
+The mismatches are systematic: accents, hyphens, the <code>(M)</code> suffix marking
+a municipality, and inconsistent spacing. Normalising the join key on both sides —
+stripping diacritics, separators and suffixes — is what makes the spatial join
+succeed on every row instead of most of them.
+</p>
 
-    <h3 id="choropleth" class="ax-subtitle"> Cartes choroplèthes</h3>
-
-    <div class="ax-media ax-media-equal">
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Une fois les clés de jointure standardisées (retrait des accents, tirets, mentions "(M)"), j'utilise <code>GeoPandas</code> pour fusionner le <code>DataFrame</code> statistique avec le <code>GeoDataFrame</code>. Cette étape génère la <strong>carte choroplèthe</strong> où l'intensité de la couleur reflète directement la valeur de l'indicateur sélectionné.
-        </p>
-
-        <button type="button" class="ax-btn" onclick="toggleCode('codeMapBuild', this)">Afficher le pipeline GeoPandas</button>
-        <pre id="codeMapBuild" class="ax-code hidden"><code>
+<h3>Choropleth rendering</h3>
+<p>
+Once the keys match, GeoPandas merges the statistical DataFrame with the
+GeoDataFrame and Plotly renders the result, colour intensity mapping to the
+selected indicator.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
@@ -1478,197 +713,55 @@ def render_choropleth(df_indic):
         color_continuous_scale="Blues"
     )
     return fig_map
-        </code></pre>
-      </div>
+        </code></code></pre></details>
+<figure class="shot"><img src="images/newplot (11).png" alt="Choropleth map of poverty rate by commune" loading="lazy" /><figcaption>Choropleth map of poverty rate by commune</figcaption></figure>
 
-      <div class="ax-media-figure" style="display: flex;">
-        <img class="ax-img ax-img-nocrop" src="images/newplot (11).png" alt="Carte choroplèthe du Souss-Massa">
-      </div>
-    </div>
+<h3>Interaction</h3>
+<ul>
+  <li><strong>Tooltips</strong> — hovering a territory shows its name and exact value, so a reader never has to infer a number from a colour scale.</li>
+  <li><strong>Framing</strong> — the view is pre-centred on Souss-Massa (lat 30.2, lon −9.0) at a zoom level that fits the region on load.</li>
+  <li><strong>Filtering</strong> — year, indicator and granularity (province or commune) are driven by <code>st.session_state</code>; each change recomputes the join and redraws the map with a colour scale rescaled to the filtered data.</li>
+</ul>
 
-    <br><br>
-
-    <h3 id="tooltips" class="ax-subtitle"> Tooltips & zoom</h3>
-
-    <p class="ax-text">
-      Pour transformer cette carte en véritable outil d'exploration, j'ai exploité l'API de <code>Plotly Mapbox</code> afin d'optimiser l'expérience utilisateur (UX Spatiale) :
-    </p>
-
-    <div class="card" style="margin-top:12px;">
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Tooltips (Info-bulles) :</strong> Configurés via <code>hover_name</code>. Au survol d'une commune ou d'une province, la carte révèle instantanément le nom du territoire et la valeur exacte, évitant de devoir décrypter l'échelle de couleurs.</li>
-        <li><strong>Zoom automatique :</strong> Les coordonnées sont pré-centrées sur la région Souss-Massa (<code>lat: 30.2, lon: -9.0</code>) avec un zoom optimisé (<code>zoom=6.5</code>) dès le chargement de la page.</li>
-      </ul>
-    </div>
-
-    <br><br>
-
-    <h3 id="filtrage" class="ax-subtitle"> Filtrage par année / zone</h3>
-    
-      <div class="ax-two-img">
-
-      <figure class="ax-figure-card">
-        <h4 class="ax-figure-title">nouveau inscrit 2017</h4>
-        <img class="ax-figure-img"
-             src="images/newplot (9).png"
-             alt="">
-      </figure>
-
-      <figure class="ax-figure-card">
-        <h4 class="ax-figure-title">Comparaison avec 2018</h4>
-        <img class="ax-figure-img"
-             src="images/newplot (10).png"
-             alt="">
-      </figure>
-
-    </div>
-    
-      
-      <div class="ax-media-text" style="flex: 60%;">
-        <p class="ax-text">
-          La carte n'est pas statique ; elle est entièrement réactive et pilotée par l'état global de l'application (<code>st.session_state</code>).
-        </p>
-        <p class="ax-text">
-          L'utilisateur interagit avec des filtres pour modifier dynamiquement <strong>l'Année étudiée</strong>, <strong>l'Indicateur</strong>, ou la <strong>Zone de granularité</strong> (Province vs Commune). À chaque interaction, le script Python recalcule le DataFrame, met à jour la jointure spatiale en arrière-plan, et redessine la carte instantanément avec la nouvelle échelle colorimétrique adaptée aux données filtrées.
-        </p>
-      </div>
-    </div>
-
-  </div>
+<figure class="shot"><img src="images/newplot (9).png" alt="New school enrolments, 2017" loading="lazy" /><figcaption>New school enrolments, 2017</figcaption></figure>
+<figure class="shot"><img src="images/newplot (10).png" alt="Same indicator, 2018" loading="lazy" /><figcaption>Same indicator, 2018</figcaption></figure>
 </section>
 
-   
+<!-- ===================== FORECASTING ===================== -->
+<section class="cs" id="forecasting">
+<h2>Trend projection</h2>
 
+<p>
+The exploration modules describe what has happened. This module extrapolates the
+observed trend forward, so that a reader can see the direction and rough magnitude
+of change rather than only its current level.
+</p>
 
+<h3>Why linear regression</h3>
 
+<p>
+The choice is dictated by the data, not by preference. Census indicators are
+published roughly every ten years, and the annual series rarely exceed six points.
+On series that short, a flexible model fits noise and produces projections that
+look confident and mean nothing.
+</p>
 
+<ul>
+  <li><strong>Sample size</strong> — a handful of temporal observations cannot support a model with many parameters</li>
+  <li><strong>Interpretability</strong> — a slope coefficient can be stated plainly: this indicator changes by <em>x</em> per year over the observed period</li>
+  <li><strong>Inertia</strong> — demographic quantities move slowly, so a linear trend is a defensible first approximation</li>
+</ul>
 
+<h3>Pipeline</h3>
 
+<ol class="pipeline">
+  <li><strong>Preparation</strong> — series reshaped with <code>pd.melt</code> to isolate year as the independent variable from the target indicator.</li>
+  <li><strong>Temporal split</strong> — train and test split chronologically, with no shuffling. Shuffling a time series would train on future points and test on past ones, which inflates the score without improving the model.</li>
+  <li><strong>Fit and evaluate</strong> — the model is fitted on the earlier portion and scored on the held-out later portion using mean absolute error.</li>
+  <li><strong>Projection</strong> — future years are generated and passed through the fitted model to produce the displayed curve.</li>
+</ol>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<section id="ml" class="ax-section">
-  <div class="container">
-
-    <div class="section-head">
-      <h1>Prévision & Machine Learning</h1>
-    </div>
-
-    <p class="ax-lead">
-      L'exploration des données permet de comprendre le passé, mais la véritable valeur de la Data Science réside dans sa capacité à <strong>éclairer l'avenir</strong>. Pour faire d'AXIORA un véritable outil d'aide à la décision, j'ai implémenté un module de prévision (Forecasting) basé sur <code>Scikit-Learn</code> pour anticiper les trajectoires socio-économiques de la région Souss-Massa.
-    </p>
-
-    <h3 id="objectif-prevision" class="ax-subtitle" style="margin-top: 40px;"> Objectifs des prévisions</h3>
-    
-    <div class="card" style="margin-top:15px; border-left: 4px solid #8082a8; background: rgba(16, 185, 129, 0.05);">
-      <p class="ax-text" style="margin-top: 0;">
-        <strong>Passer d'une posture réactive à une posture proactive.</strong> 
-        Au lieu de constater l'exode rural ou le vieillissement de la population après coup, les modèles prédictifs permettent aux décideurs publics de :
-      </p>
-      <ul class="ax-list" style="margin-bottom: 0;">
-        <li><strong>Anticiper les besoins en infrastructures :</strong> Prévoir le dimensionnement des écoles, hôpitaux ou réseaux d'eau pour les 5 à 10 prochaines années.</li>
-        <li><strong>Allouer les budgets efficacement :</strong> Cibler de manière préventive les communes où le modèle détecte une trajectoire d'appauvrissement.</li>
-        <li><strong>Scénariser l'avenir :</strong> Fixer des objectifs quantifiables pour les politiques de développement régional.</li>
-      </ul>
-    </div>
-
-    <br>
-
-    <h3 id="modele" class="ax-subtitle"> Modèle utilisé (Régression linéaire)</h3>
-
-    <div class="ax-media" style="align-items: center; gap: 30px;">
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Face à la tentation d'utiliser des modèles "boîtes noires" complexes, j'ai délibérément choisi un modèle de <strong>Régression Linéaire</strong>. C'est un choix d'ingénierie assumé, dicté par la nature des données du HCP :
-        </p>
-        <ul class="ax-list">
-          <li><strong>Prévention de l'Overfitting :</strong> Les données de recensement sont historiquement espacées (10 ans). Un modèle complexe sur-apprendrait sur un si petit nombre de points temporels. La régression linéaire capture parfaitement la tendance macro-économique de fond.</li>
-          <li><strong>Interprétabilité totale :</strong> Les décideurs publics doivent comprendre <em>pourquoi</em> un modèle prédit un chiffre. Les coefficients linéaires offrent une transparence absolue.</li>
-          <li><strong>Stabilité démographique :</strong> Les phénomènes de population ont une forte inertie. La modélisation linéaire est mathématiquement très robuste pour prolonger ces trajectoires.</li>
-        </ul>
-      </div>
-    </div>
-
-    <br><br>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    <h3 id="pipeline" class="ax-subtitle"> Pipeline de prévision</h3>
-
-    <p class="ax-text">
-      Pour automatiser les prédictions à la volée selon les filtres choisis par l'utilisateur, j'ai architecturé un pipeline de Machine Learning complet garantissant l'intégrité des résultats :
-    </p>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 20px;">
-      
-      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
-        <h4 style="color:#8082a8; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Data Prep</h4>
-        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          Nettoyage des séries temporelles et transformation des formats (<code>pd.melt</code>) pour isoler la variable indépendante (Année) de la cible.
-        </p>
-      </div>
-
-      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
-        <h4 style="color: #8082a8; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Split Temporel</h4>
-        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          Séparation Train/Test <strong>sans mélange aléatoire (No Shuffle)</strong> pour respecter la chronologie et éviter la fuite de données (<em>Data Leakage</em>).
-        </p>
-      </div>
-
-      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
-        <h4 style="color: #8082a8; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Entraînement</h4>
-        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          Apprentissage du modèle sur les données passées et évaluation via la métrique <strong>MAE (Mean Absolute Error)</strong> sur le jeu de test.
-        </p>
-      </div>
-
-      <div class="card" style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);">
-        <h4 style="color:#8082a8; margin-top: 0; display: flex; align-items: center; gap: 8px;"> Inférence</h4>
-        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          Génération des horizons temporels futurs (tableaux NumPy) et projection du modèle pour alimenter l'interface utilisateur.
-        </p>
-      </div>
-
-    </div>
-      <div style="margin-top: 25px;">
-      <button type="button" class="ax-btn" onclick="toggleCode('codeMLPipeline', this)">Afficher le code du Pipeline ML (Scikit-Learn)</button>
-      <pre id="codeMLPipeline" class="ax-code hidden"><code>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -1724,193 +817,90 @@ def forecast_metric(df_hist, target_col="Population", horizon=3):
 
 
     return model, df_future, mae
-      </code></pre>
-    </div>
-    <br><br>
+      </code></code></pre></details>
 
-    <h3 id="visualisation-pred" class="ax-subtitle"> Visualisation des prédictions</h3>
+<h3>What the projections show</h3>
 
-
-  <!-- ========================================================= -->
-<!-- 4) Prévision (ML) — grille 3x3 + analyse globale -->
-<!-- ========================================================= -->
-
-<p class="ax-text">
-  L’objectif ici n’est pas seulement de “prédire une courbe”, mais de transformer l’exploration en
-  <strong>capacité d’anticipation</strong> : identifier les provinces qui accélèrent, mesurer l’écart
-  <strong>réel vs prédit</strong>, et disposer d’un signal exploitable pour planifier
-  infrastructures, services publics et besoins urbains.
+<p>
+Each view plots observed values against fitted and projected values, so the gap
+between the two is visible rather than hidden behind a single extrapolated line.
 </p>
 
-<div class="card" style="margin-top:12px;">
- 
-  <ul class="ax-list" style="margin-bottom:0;">
-    <li><strong>Split temporel strict</strong> (pas de shuffle) : on teste sur la fin de série pour éviter toute fuite d’information.</li>
-    <li><strong>Baseline solide</strong> (régression) : modèle simple, interprétable, parfait pour un premier forecasting + comparaison.</li>
-    <li><strong>Validation</strong> : métriques (ex. MAE/MAPE) + lecture visuelle des écarts pour juger la stabilité.</li>
-    <li><strong>Scénarios</strong> : urbain / rural / total → lecture opérationnelle (pression urbaine, exode rural, besoins équipements).</li>
-  </ul>
+<figure class="shot"><img src="images/tot_pr.png" alt="Total population — observed vs predicted" loading="lazy" /><figcaption>Total population — observed vs predicted</figcaption></figure>
+<figure class="shot"><img src="images/urb_pr.png" alt="Urban population — observed vs predicted" loading="lazy" /><figcaption>Urban population — observed vs predicted</figcaption></figure>
+<figure class="shot"><img src="images/rurale_pr.png" alt="Rural population — observed vs predicted" loading="lazy" /><figcaption>Rural population — observed vs predicted</figcaption></figure>
+<figure class="shot"><img src="images/cercle_pr.png" alt="District level — observed vs predicted" loading="lazy" /><figcaption>District level — observed vs predicted</figcaption></figure>
+<figure class="shot"><img src="images/cercle_ev.png" alt="Structural evolution by district" loading="lazy" /><figcaption>Structural evolution by district</figcaption></figure>
+<figure class="shot"><img src="images/pop.png" alt="Population comparison across provinces" loading="lazy" /><figcaption>Population comparison across provinces</figcaption></figure>
+<figure class="shot"><img src="images/pop-pro.png" alt="Provincial trend detail" loading="lazy" /><figcaption>Provincial trend detail</figcaption></figure>
+<figure class="shot"><img src="images/popannee_pr.png" alt="Comparative projection" loading="lazy" /><figcaption>Comparative projection</figcaption></figure>
+<figure class="shot"><img src="images/population_pr.png" alt="Residuals and stability" loading="lazy" /><figcaption>Residuals and stability</figcaption></figure>
+
+<p class="reading">
+Read together, the total, urban and rural trajectories show concentration rather
+than uniform growth: some provinces absorb increase faster than others, which
+translates into pressure on housing, mobility and public facilities in those
+territories specifically.
+</p>
+
+<h3 class="limits-head">Limitations</h3>
+
+<div class="limits">
+<p>
+These projections extrapolate an observed trend. They are not forecasts in the
+statistical sense, and the following constraints should be read alongside every
+figure produced by this module:
+</p>
+<ul>
+  <li><strong>Short series.</strong> Most indicators offer between four and six temporal points. Confidence intervals on a regression fitted to so few observations are wide, and are not displayed on these charts.</li>
+  <li><strong>No structural change modelled.</strong> A linear fit assumes the mechanism producing the trend continues unchanged. It cannot represent a policy shift, an economic shock, or a change in census methodology.</li>
+  <li><strong>Univariate.</strong> Each indicator is projected from its own history alone. No exogenous variable — climate, public investment, migration — enters the model.</li>
+  <li><strong>Held-out error only.</strong> Evaluation uses mean absolute error on the final portion of each series. With series this short, that estimate is itself unstable.</li>
+</ul>
+<p class="limits-note">
+The module is intended to make the direction of change legible, not to produce
+figures suitable for planning decisions on their own.
+</p>
 </div>
 
-<!--  9 visuels (3 par ligne) -->
-<div class="ax-pred-grid-3">
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Total (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/tot_pr.png" alt="Prévision Total">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Urbain (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/urb_pr.png" alt="Prévision Urbain">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Rural (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/rurale_pr.png" alt="Prévision Rural">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Cercles (réel vs prédit)</h4>
-    <img class="ax-pred-img" src="images/cercle_pr.png" alt="Prévision Cercles">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Évolution structurelle — Cercles</h4>
-    <img class="ax-pred-img" src="images/cercle_ev.png" alt="Évolution Cercles">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Population — comparaison multi-provinces</h4>
-    <img class="ax-pred-img" src="images/pop.png" alt="Population multi-provinces">
-  </figure>
-
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Population — focus tendance (provinces)</h4>
-    <img class="ax-pred-img" src="images/pop-pro.png" alt="Population provinces trend">
-  </figure>
-
-  <!--  (8/9) Mets ici ta prochaine capture (garde le nom, ou change-le si tu veux) -->
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Comparatif (option)</h4>
-    <img class="ax-pred-img" src="images/popannee_pr.png" alt="Prévision comparatif">
-  </figure>
-
-  <!--  (9/9) Mets ici ta prochaine capture -->
-  <figure class="ax-pred-card">
-    <h4 class="ax-pred-title">Prévision — Erreurs / stabilité (option)</h4>
-    <img class="ax-pred-img" src="images/population_pr.png" alt="Prévision par annees">
-  </figure>
-
-</div>
-
-
-<div class="card" style="margin-top:14px;">
-  <p class="ax-text" style="margin-bottom:0;">
-    La lecture croisée des trajectoires (<strong>Total / Urbain / Rural</strong>) met en évidence la dynamique de
-    concentration et ses effets : certaines provinces absorbent la croissance plus rapidement, ce qui se traduit par
-    une pression sur l’habitat, la mobilité et les équipements. Le bloc “prévision” apporte une dimension
-    <strong>pilotage</strong> : comparer le réel au prédit, quantifier l’écart et produire une projection court terme
-    pour orienter priorisation et scénarios (urbanisation vs maintien rural).
-  </p>
-</div>
-   
-
-
-  </div>
+<h3>Possible extensions</h3>
+<ul>
+  <li><strong>Seasonal models.</strong> If HCP publishes at monthly frequency, a model handling seasonality (such as Prophet) would apply to the CPI series, which already has monthly granularity.</li>
+  <li><strong>Multivariate models.</strong> Composite indicators such as poverty depend on several measured quantities; a gradient-boosted model over multiple features would fit that structure better than a univariate line.</li>
+  <li><strong>Exogenous variables.</strong> Adding geospatial or external data — climate, public investment programmes — as features, provided enough observations exist to justify the added parameters.</li>
+</ul>
 </section>
 
-    
-    <br><br>
+<!-- ===================== ASSISTANT ===================== -->
+<section class="cs" id="assistant">
+<h2>Question answering assistant</h2>
 
-    <h3 id="extensions" class="ax-subtitle"> Extensions possibles</h3>
+<p>
+Charts have a limit: they answer the question they were designed for. A reader who
+wants a specific figure, or a comparison nobody anticipated, has to hunt for it.
+The assistant exists to close that gap — not as a general-purpose chatbot, but as
+a module restricted to the loaded dataset.
+</p>
 
-    <p class="ax-text">
-      L'architecture analytique d'AXIORA a été conçue de manière modulaire. Bien que la régression linéaire réponde parfaitement au besoin actuel, voici la <em>roadmap</em> technique pour enrichir la capacité prédictive du système :
-    </p>
+<h3>How it is constrained</h3>
 
-    <div class="card" style="margin-top: 15px;">
-      <ul class="ax-list" style="margin-bottom: 0;">
-        <li><strong>Séries temporelles avancées (Prophet) :</strong> Si le HCP publie des données à fréquence mensuelle, l'intégration de Prophet (Meta) permettra de modéliser les effets de saisonnalité intra-annuelle.</li>
-        <li><strong>Machine Learning Non-Linéaire (XGBoost) :</strong> Pour modéliser des indicateurs complexes (comme l'indice de pauvreté) en intégrant de multiples variables croisées (multivarié) plutôt qu'une simple série temporelle univariée.</li>
-        <li><strong>Variables Exogènes :</strong> Améliorer la précision des prévisions en injectant des données géospatiales ou externes (données climatiques, investissements publics INDH) comme nouvelles <em>Features</em> dans le modèle d'apprentissage.</li>
-      </ul>
-    </div>
+<p>
+Every request sends the cleaned indicator dictionary from <code>hcpdata.py</code>
+to the model as context, together with a system prompt instructing it to answer
+only from that context. The model is therefore working from the same numbers the
+charts use, in the same structure.
+</p>
 
-  </div>
-</section>
+<p class="note">
+Grounding the model in a fixed dataset substantially reduces the risk of invented
+figures, because the correct values are present in the prompt and the model is
+instructed not to go beyond them. It does not eliminate it: a language model can
+still misread a nested structure or mis-attribute a value, and answers on
+consequential figures should be checked against the tables, which the interface
+displays alongside every chart for exactly this reason.
+</p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   <section id="assistant" class="ax-section">
-  <div class="container">
-
-    <div class="section-head">
-      <h1>Assistant IA (Chatbot)</h1>
-    </div>
-
-    <p class="ax-lead">
-      La data visualisation a ses limites face à des décideurs non-techniques ou lorsqu'il s'agit d'obtenir une information précise instantanément. Pour combler ce fossé, j'ai intégré l'<strong>API Google Gemini</strong> pour créer un véritable analyste virtuel. L'objectif n'est pas de proposer un chatbot généraliste, mais un <strong>Agent Expert restreint (Data-Grounded)</strong>.
-    </p>
-
-    <h3 id="role-assistant" class="ax-subtitle" style="margin-top: 40px;">Rôle de l’assistant</h3>
-
-    <div class="ax-media ax-media-equal">
-      <div class="ax-media-text">
-        <p class="ax-text">
-          Le chatbot d'AXIORA a été conçu avec une approche stricte de <strong>Context Injection</strong> (Injection de contexte). Lors de chaque requête, l'intégralité du dictionnaire structuré contenant les indicateurs nettoyés (<code>hcpdata.py</code>) est fournie au modèle en arrière-plan.
-        </p>
-        <p class="ax-text">
-          <strong>L'impact métier :</strong> L'IA est "enfermée" dans le périmètre de la région Souss-Massa. Elle interprète les tableaux complexes, calcule des écarts à la volée, et rédige des synthèses fiables <strong>sans aucun risque d'hallucination</strong> (inventer de fausses statistiques).
-        </p>
-
-        <button type="button" class="ax-btn" onclick="toggleCode('codeSystemPrompt', this)">Afficher le code (Prompt Engineering & API)</button>
-        <pre id="codeSystemPrompt" class="ax-code hidden"><code>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import streamlit as st
 import google.generativeai as genai
 from hcpdata import hcp_data
@@ -1938,230 +928,119 @@ def ask_axiora_assistant(user_prompt):
     response = model.generate_content(full_prompt)
     
     return response.text
-        </code></pre>
-      </div>
+        </code></code></pre></details>
 
-     
-    </div>
+<h3>Question types</h3>
 
-    <br><br>
+<div class="qa">
+<div>
+<h4>Direct lookup</h4>
+<p class="q">"What was the poverty rate in Drargua in 2014?"</p>
+<p>The model locates the value in the injected structure and returns it.</p>
+</div>
+<div>
+<h4>Comparison</h4>
+<p class="q">"Which three provinces have the highest urban unemployment?"</p>
+<p>Values are compared and ranked across the relevant table.</p>
+</div>
+<div>
+<h4>Summary</h4>
+<p class="q">"Summarise rural housing conditions in Tata in three points."</p>
+<p>Several columns are aggregated into a short written synthesis.</p>
+</div>
+</div>
 
-    <h3 id="questions" class="ax-subtitle">Types de questions supportées</h3>
-
-    <p class="ax-text">
-      Grâce à la structuration méticuleuse du contexte de données, l'assistant est capable de répondre à trois niveaux de complexité analytique :
-    </p>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
-      <div class="card">
-        <h4 style="color:#5d6d87; margin-top: 0;"> 1. Interrogation directe</h4>
-        <p class="ax-text" style="font-size: 14px;"><em>"Quel est le taux de pauvreté dans la commune de Drargua en 2014 ?"</em></p>
-        <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">Le modèle parcourt l'arborescence du dictionnaire injecté et retourne la valeur exacte instantanément.</p>
-      </div>
-      
-      <div class="card">
-        <h4 style="color: #5d6d87; margin-top: 0;"> 2. Calcul et Comparaison</h4>
-        <p class="ax-text" style="font-size: 14px;"><em>"Quelles sont les 3 provinces avec le taux de chômage urbain le plus élevé ?"</em></p>
-        <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">L'IA compare les données entre elles, effectue des tris logiques, et hiérarchise l'information.</p>
-      </div>
-
-      <div class="card">
-        <h4 style="color:#5d6d87; margin-top: 0;"> 3. Synthèse et Insight</h4>
-        <p class="ax-text" style="font-size: 14px;"><em>"Fais-moi un résumé en 3 points de la situation de l'habitat rural à Tata."</em></p>
-        <p class="ax-text" style="font-size: 13px; color: #64748b; margin-bottom: 0;">Le modèle agrège plusieurs colonnes disparates pour rédiger un paragraphe d'aide à la décision stratégique.</p>
-      </div>
-    </div>
-
-    <br><br>
-
-    <h3 id="reponses" class="ax-subtitle">Réponses enrichies & Interface conversationnelle</h3>
-
-    <div class="card" style="border-left: 4px solid #71658c; background: rgba(139, 92, 246, 0.05);">
-      <p class="ax-text" style="margin-top:0;">
-        <strong>L'interface conversationnelle ne se contente pas d'afficher du texte brut.</strong> 
-        Elle a été développée en utilisant les composants natifs <code>st.chat_message</code> et <code>st.chat_input</code> de Streamlit pour offrir une expérience utilisateur fluide et moderne.
-      </p>
-      <ul class="ax-list" style="margin-bottom:0;">
-        <li><strong>Mémoire contextuelle :</strong> L'historique des échanges est stocké dans le <code>st.session_state</code>. L'IA se souvient de la conversation en cours, permettant à l'utilisateur de poser des questions de suivi (ex: <em>"Et comment cette valeur a-t-elle évolué par rapport à 2004 ?"</em>).</li>
-        <li><strong>Formatage Markdown natif :</strong> L'assistant est instruit via le prompt système pour renvoyer ses réponses pré-formatées (génération de tableaux Markdown, listes à puces, mise en gras des <em>KPIs</em>). Streamlit interprète nativement ce format.</li>
-      </ul>
-    </div>
-
-    <div style="margin-top: 25px; display: flex; justify-content: center;">
-      <a href="https://axiora-data.streamlit.app/" target="_blank" class="ax-btn" style="background-color: #626d80; color: white; padding: 12px 24px; font-size: 16px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
-         Interagir avec l'Assistant IA en direct
-      </a>
-    </div>
-
-  </div>
+<h3>Conversation handling</h3>
+<ul>
+  <li><strong>History</strong> — exchanges are stored in <code>st.session_state</code>, so follow-up questions ("and how did that change since 2004?") resolve against the previous turn.</li>
+  <li><strong>Formatting</strong> — the system prompt asks for Markdown, which Streamlit renders natively as tables and lists rather than a wall of text.</li>
+</ul>
 </section>
 
+<!-- ===================== REPORTING ===================== -->
+<section class="cs" id="reporting">
+<h2>Automated PDF reporting</h2>
 
+<p>
+An analysis that cannot be circulated has limited use in an administrative
+setting. This module turns a selected dataset into a formatted PDF document,
+assembled without manual editing.
+</p>
 
+<h3>Report contents</h3>
+<ul>
+  <li><strong>Descriptive statistics</strong> — mean, standard deviation and quartiles computed per numeric column, with top and bottom ten rankings to expose disparity between localities.</li>
+  <li><strong>Charts</strong> — Plotly and Matplotlib figures exported as images and embedded in the document flow.</li>
+  <li><strong>Structure</strong> — a generated table of contents, automatic pagination, and section headings, built by extending the <code>FPDF</code> class with custom header, footer and TOC handling.</li>
+</ul>
 
+<h3>Export</h3>
+<ul>
+  <li><strong>Encoding</strong> — latin-1 handling so French text and locality names render correctly.</li>
+  <li><strong>Naming</strong> — files are named <code>Title_Date.pdf</code> automatically, which keeps successive exports sortable.</li>
+  <li><strong>Delivery</strong> — <code>st.download_button</code> streams the in-memory buffer straight to the browser, with no server-side storage.</li>
+</ul>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<section id="report" class="ax-section">
-  <div class="container">
-
-    <div class="section-head">
-      <h1>Générateur automatique de rapports</h1>
-    </div>
-
-    <p class="ax-lead">
-      La valeur d'une analyse réside dans sa capacité à être partagée et archivée. J'ai développé un moteur de rendu <strong>PDF "Data-to-Doc"</strong> permettant de transformer instantanément les explorations interactives en rapports administratifs structurés. Le système automatise l'extraction, le nettoyage et la mise en forme pour fournir des documents prêts pour l'impression ou la diffusion institutionnelle.
-    </p>
-
-    <h3 id="contenu-pdf" class="ax-subtitle" style="margin-top: 40px;">Contenu du PDF (Analyse & DataViz)</h3>
-    <p class="ax-text">
-      Le rapport est construit selon les standards académiques. J'ai étendu la classe FPDF pour gérer des mises en page complexes incluant des résumés exécutifs et des tables des matières interactives.
-    </p>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
-      <div class="card">
-        <h4 style="color:#5d6d87; margin-top: 0;">Analyse Statistique</h4>
-        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          Calcul automatique des indicateurs descriptifs (Moyenne, Écart-type, Quartiles) et identification précise des <strong>Top/Bottom 10</strong> des localités pour souligner les disparités.
-        </p>
-      </div>
-
-      <div class="card">
-        <h4 style="color:#5d6d87; margin-top: 0;">Intégration Visuelle</h4>
-        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          Exportation haute résolution des graphiques Plotly et Matplotlib injectés dynamiquement dans le flux du document pour illustrer les tendances.
-        </p>
-      </div>
-
-      <div class="card">
-        <h4 style="color:#5d6d87; margin-top: 0;">Structure Dynamique</h4>
-        <p class="ax-text" style="font-size: 14px; margin-bottom: 0;">
-          Pagination automatique et sections d'analyses textuelles générées (Abstract, Introduction, Conclusion) pour faciliter la lecture décisionnelle.
-        </p>
-      </div>
-    </div>
-
-    <br><br>
-
-    <h3 id="export" class="ax-subtitle">Export & nommage automatique (Industrialisation)</h3>
-    <div class="card">
-      <p class="ax-text">
-        Le système gère l'exportation de manière entièrement automatisée, garantissant un livrable professionnel sans intervention manuelle supplémentaire.
-      </p>
-      <ul class="ax-list">
-        <li><strong>Encodage robuste :</strong> Gestion native des caractères spéciaux (latin-1) pour assurer la parfaite lisibilité des textes en français et des noms de localités.</li>
-        <li><strong>Smart Naming :</strong> Le fichier est automatiquement nommé selon le format <code>Titre_Projet_Date.pdf</code> pour un classement archivistique optimal.</li>
-        <li><strong>Téléchargement instantané :</strong> Utilisation du composant <code>st.download_button</code> pour transférer directement le buffer mémoire vers le poste client sans stockage serveur inutile.</li>
-      </ul>
-    </div>
-    
-    <div style="margin-top: 40px; text-align: center;">
-      <a href="Rapport_automatique_RGPH.pdf" target="_blank" class="ax-btn" style="border: 2px solid #5d6d87; background: transparent; color:#5d6d87; padding: 15px 30px; text-decoration: none; border-radius: 5px;">
-        Voir l'exemple complet : Rapport d'analyse RGPH 2014 (PDF)
-      </a>
-    </div>
-
-  </div>
+<p><a class="btn" href="Rapport_automatique_RGPH.pdf" target="_blank" rel="noopener">See a generated report (PDF)</a></p>
 </section>
 
+<!-- ===================== OUTCOME ===================== -->
+<section class="cs" id="outcome">
+<h2>Outcome</h2>
 
-   <section id="resultats" class="ax-section">
-  <div class="container">
-    <div class="section-head">
-      <h1>Résultats & points forts</h1>
-    </div>
+<p>
+The platform is deployed and publicly accessible. It consolidates fifteen HCP
+spreadsheets across six domains into a single interface where an indicator can be
+filtered, mapped, compared and extrapolated without reopening a source file.
+</p>
 
-    <div class="grid-2">
-      <div class="card">
-        <h4 style="color:#5d6d87;">Transformation Digitale</h4>
-        <p class="ax-text">
-          Passage d'une donnée publique statique et complexe de HCP à une plateforme interactive "Self-Service BI". L'utilisateur n'est plus spectateur mais acteur de son exploration territoriale.
-        </p>
-      </div>
+<p>
+Three parts of the work were the most technically demanding, and are the ones I
+would defend:
+</p>
 
-      <div class="card">
-        <h4 style="color:#5d6d87;"> IA Métier & Fiabilité</h4>
-        <p class="ax-text">
-          Mise en place d'un assistant IA "Grounded" sur un dictionnaire de données unifié (<code>hcpdata.py</code>), garantissant des analyses sans hallucinations et une interprétation immédiate des KPIs.
-        </p>
-      </div>
+<ul>
+  <li><strong>The cleaning pipeline.</strong> The failure modes of these spreadsheets are silent rather than loud — a column read as text still sorts, a subtotal row still averages. Handling them explicitly is what makes every downstream figure reliable.</li>
+  <li><strong>The spatial join.</strong> Reconciling statistical tables with boundary geometry required normalising territorial keys on both sides; without it, the maps would simply have been missing rows.</li>
+  <li><strong>Constraining the assistant.</strong> Injecting the cleaned dictionary as context, rather than letting a general model answer from its own knowledge, is what keeps the answers tied to the published data.</li>
+</ul>
 
-      <div class="card">
-        <h4 style="color:#5d6d87;"> Visualisation Avancée</h4>
-        <p class="ax-text">
-          Utilisation combinée de cartes choroplèthes, graphiques miroirs et radars pour rendre visibles les disparités socio-économiques et la pression urbaine dans la région Souss-Massa.
-        </p>
-      </div>
-
-      <div class="card">
-        <h4 style="color:#5d6d87;">Automatisation de Reporting</h4>
-        <p class="ax-text">
-          Réduction drastique du temps de rédaction administrative grâce au moteur PDF "Data-to-Doc", capable de générer un rapport structuré de 10 pages en moins de 5 secondes[cite: 2].
-        </p>
-      </div>
-    </div>
-  </div>
+<h3>What I would do differently</h3>
+<p>
+The forecasting module is the weakest part of the project, and knowingly so: the
+data does not support more than trend extrapolation. If I revisited it, I would
+display confidence intervals rather than a single line, and state the held-out
+error next to each projection in the interface itself — not only in the code.
+</p>
 </section>
-<br><br>
-<section id="conclusion" class="ax-section">
-  <div class="container">
-    <div class="card" style="border-top: 4px solid #5d6d87;">
-      <h2 style="margin-top:0;">Conclusion</h2>
-      <p class="ax-text">
-        Axiora Data démontre ma capacité à piloter un projet Data complexe de bout en bout : de l'ingestion de fichiers Excel hétérogènes au déploiement d'une application web analytique intégrant du Machine Learning et de l'IA Générative. 
-      </p>
-      <p class="ax-text">
-        Ce projet s'inscrit dans une volonté de démocratiser l'accès à l'information territoriale et de fournir aux décideurs de l'ENSA Agadir et de la région des outils modernes, prédictifs et opérationnels pour orienter les politiques de développement.
-      </p>
+
+<!-- ===================== ROADMAP ===================== -->
+<section class="cs" id="roadmap">
+<h2>Next steps</h2>
+<ol class="pipeline">
+  <li><strong>2024 census integration.</strong> Load the new demographic and socio-economic indicators as HCP publishes them, extending every series by one census point.</li>
+  <li><strong>Forecasting.</strong> Move to seasonal and multivariate models where series length allows, and surface uncertainty in the interface.</li>
+  <li><strong>Deployment.</strong> Containerise the application with Docker for institutional servers, and add a caching layer for larger data volumes.</li>
+</ol>
+</section>
+
+</div><!-- /.case -->
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://axiora-data.streamlit.app/" target="_blank" rel="noopener">Open the live app</a>
+      <a class="btn" href="https://github.com/mounjimallak-bit/Axiora-data-app" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="../../index.html#work">All projects</a>
     </div>
   </div>
 </section>
 
-<section id="roadmap" class="ax-section">
-  <div class="container">
-    <div class="section-head">
-      <h1>Roadmap & Évolutions</h1>
-    </div>
+</main>
 
-    <div class="ax-step">
-      <div class="ax-step-title">Phase 1 : Actualisation RGPH 2024</div>
-      <p class="ax-text">Intégration automatisée des nouveaux indicateurs démographiques et socio-économiques dès leur publication officielle par le HCP pour un suivi en temps réel de la décennie.</p>
-    </div>
+<footer class="foot">
+  <div class="wrap"><p>Malak Mounji — ENSA Agadir, Morocco</p></div>
+</footer>
 
-    <div class="ax-step">
-      <div class="ax-step-title">Phase 2 : Forecasting Avancé</div>
-      <p class="ax-text">Transition vers des modèles de séries temporelles plus complexes (Prophet, XGBoost) pour affiner les prévisions de pauvreté et de chômage en intégrant des variables exogènes.</p>
-    </div>
-
-    <div class="ax-step">
-      <div class="ax-step-title">Phase 3 : Industrialisation & Docker</div>
-      <p class="ax-text">Conteneurisation de l'application via Docker pour faciliter le déploiement sur serveurs institutionnels et optimisation du pipeline de cache pour gérer des volumes de données plus massifs.</p>
-    </div>
-  </div>
-</section>
-     </main>
-    <footer class="footer">
-      © 2026 — Malak Mounji
-    </footer>
- 
 </body>
 </html>
