@@ -3,7 +3,25 @@
    Long-form reading: narrow measure, quiet figures, code folded away.
    ================================================================ */
 
-.case{ padding-bottom: var(--gap); }
+.case{
+  padding-bottom: var(--gap);
+  /* one reading column for the whole case study: text, figures, tables and
+     code all align on the same left edge and share the same right edge. */
+  --col: min(100%, 760px);
+}
+
+/* every direct child of a section sits in that column, no exceptions */
+.cs > *,
+.cs .shot,
+.cs .shot-grid,
+.cs .shot-pair,
+.cs .shot-duo,
+.cs .codebox,
+.cs .srctable,
+.cs .minitable,
+.cs .twocol,
+.cs .qa,
+.cs .limits{ max-width: var(--col); }
 
 .case-hero{ padding-bottom: clamp(2rem, 5vw, 3.5rem); }
 
@@ -15,7 +33,7 @@
   margin: 0 0 1.4rem;
 }
 
-.case-hero .lede{ max-width: var(--measure); margin: 0 0 1.8rem; }
+.case-hero .lede{ max-width: 760px; margin: 0 0 1.8rem; }
 
 /* ---- section rhythm ---- */
 .cs{
@@ -48,7 +66,7 @@
 
 .cs p,
 .cs ul,
-.cs ol{ max-width: var(--measure); }
+.cs ol{ max-width: var(--col); }
 
 .cs li{ margin-bottom: .4rem; }
 
@@ -75,7 +93,7 @@
 .srctable,
 .minitable{
   width: 100%;
-  max-width: var(--measure);
+  max-width: var(--col);
   border-collapse: collapse;
   font-size: .87rem;
   margin: 1rem 0 1.6rem;
@@ -111,7 +129,7 @@
    Images render at natural size, capped by the column. */
 .shot img{
   display: block;
-  width: auto;
+  width: 100%;
   max-width: 100%;
   height: auto;
   border: 1px solid var(--rule);
@@ -124,12 +142,12 @@
 /* two narrow portrait screenshots read as a pair, not a queue */
 .shot-pair{
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 220px));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.2rem;
   margin: 1.4rem 0 2rem;
 }
 .shot-pair .shot{ margin: 0; }
-.shot-pair img{ width: 100%; }
+.shot-pair img{ width: 100%; max-width: 336px; }
 
 /* same indicator, two years: side by side or the comparison is lost */
 .shot-duo{
@@ -150,7 +168,7 @@
 
 /* ---- folded code ---- */
 .codebox{
-  max-width: var(--measure);
+  max-width: var(--col);
   border: 1px solid var(--rule);
   margin: 1rem 0 1.8rem;
   background: var(--paper-alt);
@@ -191,7 +209,7 @@
 .limits-head{ margin-top: 2.6rem !important; }
 
 .limits{
-  max-width: var(--measure);
+  max-width: var(--col);
   border: 1px solid var(--anomaly);
   border-left-width: 3px;
   padding: 1.2rem 1.4rem .4rem;
@@ -253,7 +271,7 @@
 .shot-grid{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.4rem 1.2rem;
+  gap: 1.2rem .9rem;
   margin: 1.4rem 0 2rem;
 }
 
