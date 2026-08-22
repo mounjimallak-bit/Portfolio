@@ -298,7 +298,7 @@ if st.session_state.indices_open:
     if st.sidebar.button("Pauvrete"):
         go_to("Pauvrete")
         </code></code></pre></details>
-<figure class="shot"><img src="images/side_bare.png" alt="Main navigation menu" loading="lazy" /><figcaption>Main navigation menu</figcaption></figure>
+<div class="shot-pair"><figure class="shot"><img src="images/side_bare.png" alt="Main navigation menu" loading="lazy" /><figcaption>Main navigation menu</figcaption></figure><figure class="shot"><img src="images/side_bare2.png" alt="Collapsible indicator navigation" loading="lazy" /><figcaption>Collapsible indicator navigation</figcaption></figure></div>
 
 <h3>Collapsible indicator menu</h3>
 <p>
@@ -306,7 +306,7 @@ Six domains, each with several indicators, would make a flat sidebar unreadable.
 An <code>indices_open</code> flag toggles a nested accordion instead, so adding a
 module costs one entry rather than a redesign.
 </p>
-<figure class="shot"><img src="images/side_bare2.png" alt="Collapsible indicator navigation" loading="lazy" /><figcaption>Collapsible indicator navigation</figcaption></figure>
+
 
 <h3>Three-zone analysis layout</h3>
 <p>
@@ -315,7 +315,7 @@ the data visible next to its visualisation lets a reader check a value directly
 instead of estimating it from a colour scale — which matters when the figures are
 official statistics.
 </p>
-<figure class="shot"><img src="images/side_bare3.png" alt="Filters, chart and source table side by side" loading="lazy" /><figcaption>Filters, chart and source table side by side</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/side_bare3.png" alt="Filters, chart and source table side by side" loading="lazy" /><figcaption>Filters, chart and source table side by side</figcaption></figure>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 
 import streamlit as st
@@ -343,9 +343,9 @@ with col_table:
 A top bar and a set of KPI cards, injected as HTML with dedicated CSS, give every
 module the same visual anchors: which territory, which year, which indicator.
 </p>
-<figure class="shot"><img src="images/side_bare4.png" alt="Top bar" loading="lazy" /><figcaption>Top bar</figcaption></figure>
-<figure class="shot"><img src="images/side_bare5.png" alt="Summary KPI cards" loading="lazy" /><figcaption>Summary KPI cards</figcaption></figure>
-<figure class="shot"><img src="images/side_bare6.png" alt="Analytical KPIs: minimum, total, maximum" loading="lazy" /><figcaption>Analytical KPIs: minimum, total, maximum</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/side_bare4.png" alt="Top bar" loading="lazy" /><figcaption>Top bar</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/side_bare5.png" alt="Summary KPI cards" loading="lazy" /><figcaption>Summary KPI cards</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/side_bare6.png" alt="Analytical KPIs: minimum, total, maximum" loading="lazy" /><figcaption>Analytical KPIs: minimum, total, maximum</figcaption></figure>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 
 import streamlit as st
@@ -474,7 +474,7 @@ Housing indicators are a direct proxy for urban pressure and for how well a
 territory is equipped. The distribution view is used to find outliers rather than
 central tendency.
 </p>
-<figure class="shot"><img src="images/newplot (5).png" alt="Distribution of housing indicators, 2017–2018" loading="lazy" /><figcaption>Distribution of housing indicators, 2017–2018</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/newplot (5).png" alt="Distribution of housing indicators, 2017–2018" loading="lazy" /><figcaption>Distribution of housing indicators, 2017–2018</figcaption></figure>
 
 <p class="reading">
 Spread indicates inequality between territories; isolated points usually mark
@@ -514,7 +514,7 @@ def render_habitat(df_habitat):
 This module compares the sectoral structure of Souss-Massa against the national
 figures, to see where the region diverges.
 </p>
-<figure class="shot"><img src="images/newplot (6).png" alt="Sectoral structure, Souss-Massa vs Morocco, 2015–2016" loading="lazy" /><figcaption>Sectoral structure, Souss-Massa vs Morocco, 2015–2016</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/newplot (6).png" alt="Sectoral structure, Souss-Massa vs Morocco, 2015–2016" loading="lazy" /><figcaption>Sectoral structure, Souss-Massa vs Morocco, 2015–2016</figcaption></figure>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import plotly.express as px
 import pandas as pd
@@ -548,7 +548,7 @@ A multi-indicator profile comparing provinces on several education measures at
 once, which surfaces territories with a consistent deficit rather than a single
 weak figure.
 </p>
-<figure class="shot"><img src="images/newplot (7).png" alt="Multi-indicator profile by province" loading="lazy" /><figcaption>Multi-indicator profile by province</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/newplot (7).png" alt="Multi-indicator profile by province" loading="lazy" /><figcaption>Multi-indicator profile by province</figcaption></figure>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
 import plotly.graph_objects as go
 import streamlit as st
@@ -723,8 +723,7 @@ def render_choropleth(df_indic):
   <li><strong>Filtering</strong> — year, indicator and granularity (province or commune) are driven by <code>st.session_state</code>; each change recomputes the join and redraws the map with a colour scale rescaled to the filtered data.</li>
 </ul>
 
-<figure class="shot"><img src="images/newplot (9).png" alt="New school enrolments, 2017" loading="lazy" /><figcaption>New school enrolments, 2017</figcaption></figure>
-<figure class="shot"><img src="images/newplot (10).png" alt="Same indicator, 2018" loading="lazy" /><figcaption>Same indicator, 2018</figcaption></figure>
+<div class="shot-duo"><figure class="shot"><img src="images/newplot (9).png" alt="New school enrolments, 2017" loading="lazy" /><figcaption>New school enrolments, 2017</figcaption></figure><figure class="shot"><img src="images/newplot (10).png" alt="Same indicator, 2018" loading="lazy" /><figcaption>Same indicator, 2018</figcaption></figure></div>
 </section>
 
 <!-- ===================== FORECASTING ===================== -->
