@@ -285,3 +285,82 @@
   .shot-pair,
   .shot-duo{ grid-template-columns: 1fr; }
 }
+
+/* ---- table of contents ----
+   Sits in the left margin on wide screens, so it costs no reading width.
+   Collapses to a compact block above the text when the margin disappears. */
+.toc{
+  font-size: .82rem;
+  border-top: 1px solid var(--ink);
+  padding-top: .8rem;
+  margin: 0 0 2.5rem;
+}
+
+.toc-head{
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 .7rem;
+}
+
+.toc ol{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: toc;
+}
+
+.toc li{
+  counter-increment: toc;
+  margin: 0;
+  padding: .22rem 0;
+}
+
+.toc li::before{
+  content: counter(toc, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: .7rem;
+  color: var(--ink-soft);
+  margin-right: .6rem;
+}
+
+.toc a{
+  text-decoration: none;
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+}
+
+.toc a:hover{ border-bottom-color: var(--signal); color: var(--signal); }
+
+/* wide screens: park it in the margin and let it follow the scroll */
+@media (min-width: 1180px){
+  .toc{
+    position: fixed;
+    top: 7.5rem;
+    left: calc(50% - 380px - 210px);
+    width: 180px;
+    margin: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+@media print{ .toc{ display: none; } }
+
+/* code shown unfolded when it is the evidence for a claim */
+.codebox-static{
+  border: 1px solid var(--rule);
+  background: #fff;
+  margin: 1rem 0 1.4rem;
+}
+.codebox-static pre{ margin: 0; padding: .9rem; overflow-x: auto; }
+.codebox-static code{
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 1.6;
+  background: none;
+  padding: 0;
+  white-space: pre;
+}
