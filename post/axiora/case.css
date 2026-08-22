@@ -107,13 +107,40 @@
 /* ---- screenshots ---- */
 .shot{ margin: 1.4rem 0 2rem; }
 
+/* Never upscale: a 336px screenshot blown up to 1080px is just blurry.
+   Images render at natural size, capped by the column. */
 .shot img{
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
   border: 1px solid var(--rule);
   background: #fff;
 }
+
+/* wide screenshots and strips: full column width is the point */
+.shot--wide img{ width: 100%; }
+
+/* two narrow portrait screenshots read as a pair, not a queue */
+.shot-pair{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  gap: 1.2rem;
+  margin: 1.4rem 0 2rem;
+}
+.shot-pair .shot{ margin: 0; }
+.shot-pair img{ width: 100%; }
+
+/* same indicator, two years: side by side or the comparison is lost */
+.shot-duo{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin: 1.4rem 0 2rem;
+  max-width: var(--measure);
+}
+.shot-duo .shot{ margin: 0; }
+.shot-duo img{ width: 100%; }
 
 .shot figcaption{
   margin-top: .55rem;
@@ -233,6 +260,7 @@
 .shot-grid .shot{ margin: 0; }
 
 .shot-grid .shot img{
+  width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: contain;
   padding: .4rem;
@@ -250,3 +278,8 @@
 
 /* safety net: never let a figure exceed its column, even unstyled-adjacent */
 .cs img{ max-width: 100%; height: auto; }
+
+@media (max-width: 560px){
+  .shot-pair,
+  .shot-duo{ grid-template-columns: 1fr; }
+}
