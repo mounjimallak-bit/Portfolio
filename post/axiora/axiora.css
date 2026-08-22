@@ -221,3 +221,32 @@
   .codebox{ display: none; }
   .shot img{ max-height: 9cm; object-fit: contain; }
 }
+
+/* ---- gallery: nine projection charts read as a set, not a queue ---- */
+.shot-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem 1.2rem;
+  margin: 1.4rem 0 2rem;
+}
+
+.shot-grid .shot{ margin: 0; }
+
+.shot-grid .shot img{
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  padding: .4rem;
+}
+
+.shot-grid figcaption{ font-size: .74rem; }
+
+@media (max-width: 900px){
+  .shot-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px){
+  .shot-grid{ grid-template-columns: 1fr; }
+}
+
+/* safety net: never let a figure exceed its column, even unstyled-adjacent */
+.cs img{ max-width: 100%; height: auto; }
