@@ -321,7 +321,10 @@ code{
   gap: var(--gap) clamp(2rem, 5vw, 4rem);
 }
 
-.proj-grid .project{ max-width: none; }
+.proj-grid .project{
+  border-left: 1px solid var(--rule);
+  padding-left: clamp(1rem, 2.2vw, 1.6rem);
+}
 
 /* links */
 .proj-links{ display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.4rem; }
