@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Photovoltaic Anomaly Detection — Case study · Malak Mounji</title>
-<meta name="description" content="Case study: unsupervised anomaly detection on photovoltaic time series. Sensor cleaning, feature engineering validated by ablation, chronological splitting, Isolation Forest, dense and LSTM autoencoder ensembles fused by rank, and a real-time Kafka to TimescaleDB to Grafana scoring pipeline." />
+<meta name="description" content="Case study: unsupervised anomaly detection on photovoltaic time series. Raw sensor inspection, cleaning, feature engineering validated by ablation, chronological splitting, Isolation Forest, dense and LSTM autoencoder ensembles fused by rank, and a real-time Kafka to TimescaleDB to Grafana scoring pipeline." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -39,15 +38,15 @@
     </p>
     <p class="lede">
       This page follows the work in the order it was done — including the parts that
-      did not work. Three million raw rows reduced to a study period, a feature set
-      chosen by ablation rather than intuition, a baseline that was later removed
-      from the final system, two autoencoders combined by rank, a threshold that
-      encodes an economic judgement, and a single opening of the test partition at
-      the very end.
+      did not work. Three million raw sensor rows reduced to a study period, a
+      feature set chosen by ablation rather than intuition, a baseline that was later
+      removed from the final system, two autoencoders combined by rank, a threshold
+      that encodes an economic judgement, and a single opening of the test partition
+      at the very end.
     </p>
     <div class="proj-links">
       <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/pfa-photovoltaique" target="_blank" rel="noopener">View source</a>
-      <a class="btn" href="https://zenodo.org/records/7358042" target="_blank" rel="noopener">Dataset (Zenodo)</a>
+      <a class="btn" href="../../index.html#work">All projects</a>
     </div>
   </div>
 </section>
@@ -58,7 +57,7 @@
   <p class="toc-head">On this page</p>
   <ol>
     <li><a href="#objective">Objective</a></li>
-    <li><a href="#raw">The raw data</a></li>
+    <li><a href="#raw">First look at the data</a></li>
     <li><a href="#merge">Merging two clocks</a></li>
     <li><a href="#cleaning">Cleaning</a></li>
     <li><a href="#eda">Exploration</a></li>
@@ -116,37 +115,132 @@ final fusion ranks against a frozen reference rather than against the current da
 
 <!-- ===================== RAW ===================== -->
 <section class="cs" id="raw">
-<h2>The raw data</h2>
+<h2>First look at the data</h2>
 
 <p>
-The source is an open dataset from a grid-connected plant in La Réunion, published
-on Zenodo. It arrives as two files recorded by two different acquisition systems,
-which is the first problem to solve.
+The dataset was provided by the project supervisor: sensor logs from a
+grid-connected photovoltaic installation, exported from the plant's acquisition
+system as two separate files recorded by two separate subsystems. Reconciling them
+is the first problem to solve.
 </p>
 
 <table class="srctable">
 <thead><tr><th>File</th><th>Contents</th><th>Volume</th></tr></thead>
 <tbody>
-<tr><td><strong>dt1</strong> — meteorological</td><td>Diffuse and global irradiance (DTI, GTI), ambient and panel temperature (TA, TPV)</td><td>2.14 GB, sampled every second</td></tr>
-<tr><td><strong>dt2</strong> — electrical</td><td>Inverter and grid currents and voltages (Ia, Ig, Va, Vg), power (Pg), energy (Eg), frequency (Fg), plus the <code>Fault</code> label</td><td>193 MB, 2,988,814 rows</td></tr>
+<tr><td><strong>dt1</strong> — meteorological</td><td>Diffuse and global irradiance (DTI, GTI), ambient and panel temperature (TA, TPV)</td><td>2.14 GB, one row per second</td></tr>
+<tr><td><strong>dt2</strong> — electrical</td><td>Inverter and grid currents and voltages (Ia, Ig, Va, Vg), power (Pg), energy (Eg), frequency (Fg), and the <code>Fault</code> label</td><td>193 MB, 2,988,814 rows</td></tr>
 </tbody>
 </table>
 
-<h3>What the labels actually contain</h3>
-<p>
-The <code>Fault</code> column is not binary. It encodes a fault taxonomy, and the
-distribution across the raw file is extremely uneven: type 4.0 — intermittent
-shading — accounts for 61,297 of the 84,525 flagged seconds, while type 3.1 appears
-only 2,717 times. That imbalance between fault <em>types</em>, not just between
-healthy and faulty, returns at the very end of the project: the test partition
-happens to contain only type 3.1.
+<h3>The meteorological file, first rows</h3>
+
+<table class="minitable">
+<thead><tr><th>time</th><th>DTI</th><th>GTI</th><th>TA</th><th>TPV</th></tr></thead>
+<tbody>
+<tr><td>2021-10-28 16:37:45+04:00</td><td>148.8</td><td>193.8</td><td>26.99</td><td>31.03</td></tr>
+<tr><td>2021-10-28 16:37:46+04:00</td><td>148.8</td><td>193.8</td><td>26.94</td><td>31.00</td></tr>
+<tr><td>2021-10-28 16:37:47+04:00</td><td>148.8</td><td>193.8</td><td>26.93</td><td>31.01</td></tr>
+<tr><td>2021-10-28 16:37:48+04:00</td><td>151.5</td><td>193.8</td><td>26.98</td><td>31.02</td></tr>
+<tr><td>2021-10-28 16:37:49+04:00</td><td>148.8</td><td>193.8</td><td>27.02</td><td>31.01</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+Three things are visible in five rows. The sampling is per second, and irradiance
+barely moves across four of them — the sensor's effective resolution is far coarser
+than its sampling rate, which is the first argument for resampling rather than
+modelling at this granularity. Temperatures do move, at the second scale, which is
+noise rather than physics. And the timestamp carries a <code>+04:00</code> offset
+stored as text: parsed naïvely, one file would end up shifted four hours against the
+other and every measurement would be joined to the wrong weather. Both files were
+checked on this point before any join was attempted.
 </p>
 
-<p class="note">
-Both files carry timestamps as strings with a <code>+04:00</code> offset — La
-Réunion time. Parsing them without normalising to UTC would have shifted one stream
-against the other by four hours and joined every measurement to the wrong weather.
-The format was checked explicitly on both sides before any join was attempted.
+<h3>The electrical file, structure and completeness</h3>
+
+<table class="minitable">
+<thead><tr><th>Column</th><th>Type</th><th>Missing</th></tr></thead>
+<tbody>
+<tr><td>time</td><td>object (text)</td><td>0</td></tr>
+<tr><td>Fault</td><td>float64</td><td>6</td></tr>
+<tr><td>Ia, Ig, Eg, Fg, Pg, Va, Vg</td><td>float64</td><td>10 each</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+Sixteen missing values in three million rows — the acquisition chain is
+exceptionally complete, which rules out imputation strategy as a topic and lets the
+project move straight to the harder problem. Note that <code>Fault</code> is stored
+as a float and has its own six gaps: it is not a clean binary column but a numeric
+code with missing entries, which matters when resampling it.
+</p>
+
+<h3>Descriptive statistics, before any processing</h3>
+
+<table class="minitable">
+<thead><tr><th>Statistic</th><th>Fault</th><th>Ia</th><th>Ig</th><th>Eg</th><th>Fg</th></tr></thead>
+<tbody>
+<tr><td>count</td><td>2,988,808</td><td>2,988,804</td><td>2,988,804</td><td>2,988,804</td><td>2,988,804</td></tr>
+<tr><td>mean</td><td>0.0996</td><td>3.841</td><td>2.731</td><td>3.424</td><td>49.910</td></tr>
+<tr><td>std</td><td>0.603</td><td>2.895</td><td>2.020</td><td>2.633</td><td>1.928</td></tr>
+<tr><td>min</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.000</td><td>0.000</td></tr>
+<tr><td>25%</td><td>0.000</td><td>1.100</td><td>0.800</td><td>0.861</td><td>49.950</td></tr>
+<tr><td>50%</td><td>0.000</td><td>3.200</td><td>2.300</td><td>3.226</td><td>49.980</td></tr>
+<tr><td>75%</td><td>0.000</td><td>6.500</td><td>4.600</td><td>5.633</td><td>50.000</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+The grid frequency column is the interesting one. Its quartiles sit within 0.05 Hz
+of each other around 50 Hz — a perfectly regulated grid — yet its minimum is zero
+and its standard deviation is 1.93, two orders of magnitude above the interquartile
+spread. A frequency of exactly zero is not a low reading; it is a sensor that is not
+reading. That single line predicted the disconnection artefact found during
+cleaning, before any plot was drawn.
+</p>
+
+<table class="minitable">
+<thead><tr><th>Statistic</th><th>DTI</th><th>GTI</th><th>TA</th><th>TPV</th></tr></thead>
+<tbody>
+<tr><td>mean</td><td>91.63</td><td>106.60</td><td>23.88</td><td>26.80</td></tr>
+<tr><td>std</td><td>143.40</td><td>180.90</td><td>2.95</td><td>8.23</td></tr>
+<tr><td>min</td><td>1.34</td><td>1.38</td><td>20.64</td><td>20.35</td></tr>
+<tr><td>50%</td><td>5.37</td><td>6.88</td><td>23.23</td><td>22.25</td></tr>
+<tr><td>75%</td><td>124.70</td><td>144.40</td><td>26.40</td><td>30.64</td></tr>
+<tr><td>max</td><td>609.00</td><td>1583.00</td><td>31.76</td><td>57.47</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+Irradiance has a median of 6.88 W/m² and a maximum of 1,583 — the median sits near
+zero because most of the record is night. Any statistic computed over the full file
+therefore describes darkness, not operation. That is why the working set is later
+restricted to daylight, and it is also why the panel temperature spread (20.35 to
+57.47 °C) is far wider than the ambient one: the panel heats under sun and cools to
+air temperature at night, while the air barely moves.
+</p>
+
+<h3>The label is a taxonomy, not a flag</h3>
+
+<table class="minitable">
+<thead><tr><th>Fault code</th><th>Rows (raw, per second)</th></tr></thead>
+<tbody>
+<tr><td>0.0 — normal</td><td>2,904,289</td></tr>
+<tr><td>1.0 — uniform shading</td><td>6,318</td></tr>
+<tr><td>2.1 / 2.2 / 2.3</td><td>2,148 / 2,460 / 3,287</td></tr>
+<tr><td>3.1 — partial shading</td><td>2,717</td></tr>
+<tr><td>3.2 — partial shading</td><td>6,292</td></tr>
+<tr><td>4.0 — intermittent shading</td><td>61,297</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+Type 4.0 alone accounts for 61,297 of the 84,525 flagged seconds, while type 3.1
+appears 2,717 times — a twenty-three-fold imbalance <em>between fault types</em>,
+on top of the imbalance between healthy and faulty. This is not a detail: it
+determines which types can be studied, which cannot, and — because of where they
+fall in time — which type ends up alone in the test partition at the end of the
+project.
 </p>
 </section>
 
@@ -156,24 +250,59 @@ The format was checked explicitly on both sides before any join was attempted.
 
 <p>
 The two files cannot be joined as they stand. They start on different dates, they
-are sampled at different rates, and neither guarantees a measurement at any given
-instant. Joining on exact timestamps would return almost nothing.
+are sampled differently, and neither guarantees a measurement at any given instant.
+Joining on exact timestamps would return almost nothing.
 </p>
 
 <p>
-Both streams are therefore resampled onto a common five-minute grid by averaging
-within each bucket, then joined on that grid. Five minutes is short enough to catch
-the onset of an episode — the shortest incident in the dataset lasts about six
-minutes — and long enough to smooth acquisition noise and make 2.3 GB of raw input
-tractable.
+Both streams are therefore resampled onto a common five-minute grid, then joined on
+that grid. Five minutes is short enough to catch the onset of an episode — the
+shortest incident in the dataset lasts about six minutes — and long enough to smooth
+acquisition noise and make 2.3 GB of raw input tractable.
+</p>
+
+<p>
+The numeric channels are averaged within each bucket. The <code>Fault</code> label
+cannot be: averaging the codes 3.2 and 4.0 would produce 3.6, a fault type that does
+not exist. It is aggregated by mode instead — the dominant code in the bucket wins.
+</p>
+
+<details class="codebox"><summary>Show code — resampling and joining the two streams</summary><pre><code class="python"># dt1 is 2.14 GB: read in chunks, index, then resample before anything else
+chunks = []
+for chunk in pd.read_csv(FICHIER_DT1, chunksize=500_000):
+    chunk["time"] = pd.to_datetime(chunk["time"], utc=True)   # normalise the +04:00 offset
+    chunks.append(chunk.set_index("time").sort_index())
+dt1 = pd.concat(chunks)
+del chunks                     # free the list, otherwise two copies coexist
+
+dt1_5min = dt1.resample("5min").mean().dropna()
+del dt1                        # free ~1 GB before continuing
+
+# the Fault code is categorical: mode, never mean
+fault_5min = dt2["Fault"].resample("5min").apply(
+    lambda x: x.mode().iloc[0] if len(x) > 0 and not x.mode().empty else np.nan
+)
+dt2_numeric = dt2.drop(columns=["Fault"]).resample("5min").mean()
+dt2_5min = dt2_numeric.join(fault_5min).dropna()
+
+df = dt1_5min.join(dt2_5min, how="inner")   # inner join on the time index
+df = df[df["GTI"] > 50].copy()              # daylight only</code></pre></details>
+
+<p class="reading">
+Two details in this block matter more than they look. The explicit
+<code>del</code> statements are not stylistic — resampling a 2.14 GB frame while the
+original is still referenced holds both in memory at once, which is what made the
+first attempts fail. And the daylight filter <code>GTI &gt; 50</code> is applied
+here rather than later: a plant produces nothing at night, and a reconstruction
+model trained on darkness learns to predict zeros extremely well while learning
+nothing about faults.
 </p>
 
 <p>
 The result is 53,016 rows across 12 columns, spanning 28 October 2021 to 13 April
-2023. Because the merge takes ten minutes and needs both raw files, its output is
-cached in the repository; a clone without the 2.3 GB of raw CSVs reloads the cache
-and continues from there, and the notebook detects and announces which of the two
-situations it is running in.
+2023. Because this step takes ten minutes and needs both raw files, its output is
+cached; the notebook detects whether the raw files are present and reloads the cache
+otherwise, announcing which of the two situations it is in.
 </p>
 </section>
 
@@ -198,9 +327,25 @@ statistical one.
 The first pass checks values against physics rather than against quantiles: negative
 power, irradiance above 1,500 W/m², sub-zero panel temperature. All three came back
 empty. One check did not: 57 rows carry <code>Va = Vg = Fg = 0</code>
-simultaneously. A grid-connected inverter cannot have zero voltage and zero
-frequency while the sun is up — that is a disconnected acquisition unit, not a plant
-state. Those 57 rows were removed, leaving 52,959.
+simultaneously — the artefact the descriptive statistics had already hinted at. A
+grid-connected inverter cannot have zero voltage and zero frequency while the sun is
+up. That is a disconnected acquisition unit, not a plant state.
+</p>
+
+<details class="codebox"><summary>Show code — removing disconnected-sensor rows</summary><pre><code class="python">avant = len(df)
+df = df[~((df["Va"] == 0) & (df["Vg"] == 0) & (df["Fg"] == 0))]
+print(f"Removed: {avant - len(df)} rows (disconnected sensor: Va=Vg=Fg=0)")
+print(f"Remaining: {len(df):,} rows")
+
+# Removed: 57 rows (disconnected sensor: Va=Vg=Fg=0)
+# Remaining: 52,959 rows</code></pre></details>
+
+<p class="reading">
+The condition is a conjunction of all three channels, not a filter on any one of
+them. <code>Va == 0</code> alone would also remove genuine inverter shutdowns, which
+are plant states worth detecting. Requiring voltage, grid voltage and frequency to
+be simultaneously zero identifies the acquisition failure specifically — 57 rows out
+of 53,016, leaving 52,959.
 </p>
 
 <h3>Statistical outliers, deliberately kept</h3>
@@ -306,7 +451,7 @@ than a raw level.
 </figure>
 
 <p class="reading">
-This is the most consequential plot in the exploration. The dataset runs to April
+This is the most consequential plot in the exploration. The record runs to April
 2023, but the last labelled anomaly occurs on 19 May 2022. Everything after it —
 35,684 rows, 67% of the record — is pure normal operation. A chronological split
 over the full series would have placed the entire test partition in that empty zone,
@@ -326,8 +471,9 @@ Zooming to a week shows the day/night cycle and, more importantly, that night is
 simply absent from the record — consecutive rows can be five minutes apart or twelve
 hours apart. Any operation walking consecutive rows would silently build an
 evening-to-morning transition that never happened. This is where the seven-minute
-gap rule was introduced; it reappears in the episode segmentation, the LSTM sequence
-builder, and the streaming buffer of the deployed consumer.
+gap rule was introduced; it reappears in the episode segmentation, the rolling
+features, the LSTM sequence builder, and the streaming buffer of the deployed
+consumer.
 </p>
 
 <h3>When faults happen</h3>
@@ -410,9 +556,27 @@ depression looks unremarkable and only the trajectory is abnormal.
 Because faults are episodes, point metrics alone misrepresent operational value. An
 incident lasting forty measurements and caught on the third is an operational
 success, even though thirty-seven points were "missed". Every model in this project
-is therefore scored twice: at point level, and at episode level — an incident counts
-as detected if at least one of its points crosses the threshold, with the detection
-delay recorded in five-minute steps.
+is therefore scored twice: at point level, and at episode level.
+</p>
+
+<details class="codebox"><summary>Show code — episode segmentation</summary><pre><code class="python">def decouper_episodes(index, y):
+    """Contiguous anomaly blocks, never spanning a night (gap > 7 min)."""
+    ruptures = np.flatnonzero((index.to_series().diff() > pd.Timedelta("7min")).values)
+    bornes = [0, *ruptures.tolist(), len(index)]
+    eps = []
+    for a, b in [(a, b) for a, b in zip(bornes[:-1], bornes[1:]) if b > a]:
+        k = np.flatnonzero(np.diff(np.r_[0, y[a:b], 0]) != 0)
+        eps += [(a + s, a + f) for s, f in zip(k[::2], k[1::2])]
+    return eps</code></pre></details>
+
+<p class="reading">
+The function finds block boundaries by differencing a padded label vector, which is
+why the zeros appear on both sides of <code>y[a:b]</code>: padding turns "the series
+starts inside an anomaly" into an ordinary transition instead of a special case. The
+night rule is applied first, so an episode can never be reported as spanning an
+overnight gap. An incident then counts as detected if at least one of its points
+crosses the threshold, and the delay to that first crossing is recorded in
+five-minute steps.
 </p>
 </section>
 
@@ -433,6 +597,41 @@ to detection. The split is therefore strictly chronological — and, further, th
 points are constrained to fall on days no incident touches. Of the 155 days in the
 study period, 23 are occupied by an incident; the 132 remaining days are the only
 legal cut positions.
+</p>
+
+<details class="codebox"><summary>Show code — choosing cut points on incident-free days</summary><pre><code class="python">def cutoff_libre(cible):
+    """Day closest to `cible` (as a share of observations) that is NOT inside an incident."""
+    idx_cible = int(np.argmin(np.abs(cumul.values - cible)))
+    for delta in range(0, len(jours)):
+        for j in (idx_cible - delta, idx_cible + delta):
+            if 0 <= j < len(jours) and jours[j].date() not in jours_incidents:
+                return jours[j].date()
+    raise ValueError("No incident-free day found")
+
+# cut_train: COMPUTED — nearest free day to 60% of observations
+cut_train = cutoff_libre(0.60)
+
+# cut_val: CHOSEN BY HAND, and stated as such.
+# cutoff_libre(0.80) would return 2022-04-23, pushing the two Fault 3.2 incidents
+# of 25 and 27 April into the TEST set. Test would then contain 3.1 AND 3.2, and
+# would no longer measure generalisation to a fault type NEVER SEEN — which is the
+# central claim of the final section. The cutoff is pushed to 2022-04-28 to keep
+# both 3.2 incidents in validation. This is a PROTOCOL constraint, not a measured
+# optimum, and it is recorded in data/split_meta.json.
+cut_val = pd.Timestamp("2022-04-28").date()
+
+assert cut_train not in jours_incidents, "cut_train falls inside an incident"
+assert cut_val   not in jours_incidents, "cut_val falls inside an incident"</code></pre></details>
+
+<p class="reading">
+This block is the one I would show first if asked what the project's methodology
+looks like. The search expands symmetrically outward from the target percentage
+until it finds a legal day, so the split is as close to 60/20/20 as the incident
+structure allows rather than exactly on it. And the second cutoff is set manually —
+with the reason written into the code, not into a report. Left automatic, it would
+have pushed the two type-3.2 incidents into the test set, and the final evaluation
+would have measured something weaker. Both cutoffs are then subject to the same
+assertion, whether they were computed or chosen.
 </p>
 
 <figure class="shot shot--wide">
@@ -479,12 +678,38 @@ by how sensible it sounds.
 </p>
 
 <h3>Phase 1: four physical indicators</h3>
+
+<details class="codebox"><summary>Show code — the four Phase 1 features</summary><pre><code class="python"># day segments: a break as soon as a gap > 7 min appears
+_seg_jour = (df.index.to_series().diff() > pd.Timedelta("7min")).cumsum()
+
+# (1) instantaneous yield: power produced per unit of irradiance
+df["ratio_pg_gti"] = df["Pg"] / df["GTI"].replace(0, np.nan)
+
+# (2) panel heating above ambient air
+df["delta_tpv_ta"] = df["TPV"] - df["TA"]
+
+# (3) temporal variation of power, first difference WITHIN a day segment
+df["pg_diff"] = df.groupby(_seg_jour)["Pg"].transform(lambda s: s.diff())
+
+# (4) local instability of the yield: 6-point (30 min) rolling std, per segment
+df["ratio_std_30min"] = (
+    df.groupby(_seg_jour)["ratio_pg_gti"]
+      .transform(lambda s: s.rolling(6, min_periods=2).std())
+)</code></pre></details>
+
+<p class="reading">
+Every rolling operation is wrapped in a <code>groupby(_seg_jour)</code>. Without it,
+<code>diff()</code> on the last measurement of a day would subtract the first
+measurement of the next morning — a twelve-hour jump reported as a five-minute
+variation, and a spectacular false anomaly every single evening. The
+<code>replace(0, np.nan)</code> on irradiance serves the same purpose: it turns a
+division by zero into an explicit missing value rather than an infinity that
+propagates silently through everything downstream.
+</p>
+
 <p>
-Four candidates were built first: yield <code>ratio_pg_gti</code> (power over
-irradiance), thermal gap <code>delta_tpv_ta</code> (panel minus ambient
-temperature), short-term power variation <code>pg_diff</code>, and rolling
-variability <code>ratio_std_30min</code>. Each was scored by a Kolmogorov–Smirnov
-test measuring how far apart the healthy and faulty distributions sit.
+Each candidate was then scored by a Kolmogorov–Smirnov test measuring how far apart
+the healthy and faulty distributions sit.
 </p>
 
 <table class="minitable">
@@ -520,10 +745,44 @@ is not finished — which is what motivated Phase 2.
 <h3>Phase 2: seven candidates for the subtle faults</h3>
 <p>
 Type 3 faults — smooth partial shading — are the ones the Phase 1 space misses. Seven
-further candidates were built specifically for them, all fitted on healthy training
-points only: a power residual against an expected value, a voltage deviation, a
-temperature-corrected efficiency, a current-to-irradiance ratio, a one-hour rolling
-yield, a local deviation, and a grid-to-inverter voltage ratio.
+further candidates were built specifically for them.
+</p>
+
+<details class="codebox"><summary>Show code — the seven Phase 2 candidates</summary><pre><code class="python"># every parameter is fitted on HEALTHY TRAINING POINTS ONLY
+train_normal = train[train["Fault"] == 0.0]        # 9,618 points
+
+# power residual: what the plant should produce at this irradiance, minus what it does
+lr = LinearRegression().fit(train_normal[["GTI"]], train_normal["Pg"])
+CANDIDATES["pg_residual"] = df["Pg"] - lr.predict(df[["GTI"]])
+
+# voltage deviation from the healthy median
+_med_va = train_normal["Va"].median()
+CANDIDATES["va_deviation"] = (df["Va"] - _med_va).abs()
+
+# yield corrected for the panel's temperature coefficient (-0.4%/°C above 25°C)
+CANDIDATES["efficiency_corrigee"] = (
+    df["Pg"] / (df["GTI"] * (1 - 0.004 * (df["TPV"] - 25))).replace(0, np.nan)
+)
+
+CANDIDATES["ratio_ia_gti"] = df["Ia"] / df["GTI"].replace(0, np.nan)
+
+# one-hour rolling yield, and the deviation of the current point from it
+CANDIDATES["ratio_mean_1h"] = (
+    df.groupby(_segments_jour)["ratio_pg_gti"]
+      .transform(lambda s: s.rolling(12, min_periods=1).mean())
+)
+CANDIDATES["ratio_local_dev"] = df["ratio_pg_gti"] - CANDIDATES["ratio_mean_1h"]
+CANDIDATES["vg_va_ratio"]     = df["Vg"] / df["Va"].replace(0, np.nan)</code></pre></details>
+
+<p class="reading">
+The first three lines carry the anti-leakage discipline of the whole project. The
+regression defining "expected power", and the median defining "normal voltage", are
+both fitted on healthy <em>training</em> points and then applied to the entire
+dataset. Fit them on everything and the reference would already contain the faults
+the features are meant to expose; fit them on all of training and they would be
+contaminated by the 1,245 anomalies in that window. The temperature correction is
+the one piece of domain physics in the block: silicon loses roughly 0.4% of its
+efficiency per degree above 25 °C, so a hot panel producing less is not a fault.
 </p>
 
 <figure class="shot shot--wide">
@@ -531,8 +790,37 @@ yield, a local deviation, and a grid-to-inverter voltage ratio.
   <figcaption>Two rankings side by side: on type 3 faults, and on all anomalies</figcaption>
 </figure>
 
+<details class="codebox"><summary>Show code — Kolmogorov–Smirnov ranking</summary><pre><code class="python">groupes = {
+    "Fault 3":       dev[(dev["Fault"] >= 3.0) & (dev["Fault"] < 4.0)],
+    "Fault 4":       dev[dev["Fault"] == 4.0],
+    "All anomalies": dev[dev["Fault"] != 0],
+}
+
+results = []
+for feat in all_test:
+    n_data = normal[feat].dropna()
+    ligne = {"Feature": feat}
+    for nom, grp in groupes.items():
+        f_data = grp[feat].dropna()
+        ligne[f"KS {nom}"] = round(stats.ks_2samp(n_data, f_data).statistic, 3)
+    # second, scale-free reading: median gap expressed in healthy std deviations
+    ligne["Median gap (σ)"] = round(
+        abs(n_data.median() - groupes["All anomalies"][feat].dropna().median())
+        / n_data.std(), 3)
+    results.append(ligne)</code></pre></details>
+
 <p class="reading">
-The two rankings do not agree, and the disagreement is the finding.
+The KS statistic is used rather than a difference of means because it compares whole
+distributions and needs no normality assumption — it is the largest vertical gap
+between two cumulative distributions. The second metric exists as a cross-check: KS
+saturates near 1 and stops discriminating between very good features, while the
+median gap in units of healthy standard deviation keeps separating them. On
+<code>va_deviation</code> the two disagree usefully — KS 0.702, median gap 5.6σ,
+the largest in the table.
+</p>
+
+<p class="reading">
+The two rankings in the figure do not agree, and the disagreement is the finding.
 <code>vg_va_ratio</code> and <code>va_deviation</code> lead on type 3 faults
 (KS 0.921 and 0.920) but fall to sixth and fifth on all anomalies;
 <code>ratio_mean_1h</code> leads overall (0.861) and is only third on type 3.
@@ -571,10 +859,11 @@ by hand.
 
 <p class="reading">
 Two pairs are near-duplicates: <code>efficiency_corrigee</code> correlates at 0.944
-with <code>ratio_pg_gti</code>, and <code>ratio_ia_gti</code> is essentially a
-restatement of the 0.978 correlation between current and irradiance. Keeping both
-members of a pair would double-weight one physical phenomenon in a model that
-averages contributions. Both were dropped in favour of the simpler member.
+with <code>ratio_pg_gti</code> — the temperature correction changes less than the
+physics suggested — and <code>ratio_ia_gti</code> is essentially a restatement of the
+0.978 correlation between current and irradiance. Keeping both members of a pair
+would double-weight one physical phenomenon in a model that averages contributions.
+Both were dropped in favour of the simpler member.
 </p>
 
 <figure class="shot shot--wide">
@@ -673,19 +962,39 @@ this is what that ablation looks like.
 
 <p>
 A short section with consequences out of proportion to its length. Two normalisation
-strategies were compared, and they differ in what the scaler is fitted on.
+strategies were compared, and they differ only in what the scaler is fitted on.
 </p>
 
-<ul>
-  <li><strong>Outlier framing</strong> — fit the scaler, and the model, on everything. The model learns a mixture of healthy and faulty behaviour and is asked which points are unusual within it.</li>
-  <li><strong>Novelty framing</strong> — fit on the 9,618 healthy training points only. The model learns healthy operation as a reference, and any new point is measured against it.</li>
-</ul>
+<details class="codebox"><summary>Show code — two scalers, two framings</summary><pre><code class="python"># healthy subset of the training partition — the basis of the Novelty framing
+train_sain_c = train_c[train_c["Fault"] == 0]
 
-<p>
-Novelty is the correct framing for this problem, and it is also the one matching
-deployment: a plant in service produces a healthy baseline first and faults later. It
-was still measured rather than assumed — the next section quantifies the gap at more
-than a factor of two.
+scaler_novelty = StandardScaler().fit(train_sain_c[FEATURES_IF])   # healthy only
+scaler_outlier = StandardScaler().fit(train_c[FEATURES_IF])        # whole training set
+
+X = {
+    "Novelty": {
+        "fit":  scaler_novelty.transform(train_sain_c[FEATURES_IF]),
+        "val":  scaler_novelty.transform(val_c[FEATURES_IF]),
+        "test": scaler_novelty.transform(test_c[FEATURES_IF]),
+    },
+    "Outlier": {
+        "fit":  scaler_outlier.transform(train_c[FEATURES_IF]),
+        "val":  scaler_outlier.transform(val_c[FEATURES_IF]),
+        "test": scaler_outlier.transform(test_c[FEATURES_IF]),
+    },
+}
+# in BOTH cases val and test are only transformed, never fitted:
+# no validation or test statistic leaks into the normalisation</code></pre></details>
+
+<p class="reading">
+The whole comparison is two lines apart, and the structure makes the guarantee
+visible: <code>fit</code> appears exactly twice in the block, both times on training
+data, and <code>transform</code> everywhere else. Under the novelty framing the model
+learns a pure normality and measures every new point against it; under the outlier
+framing it learns a mixture and only assumes anomalies are rare. Novelty is also the
+framing that matches deployment, since a plant in service produces a healthy baseline
+first and faults later. It was still measured rather than assumed — the next section
+quantifies the gap at more than a factor of two.
 </p>
 
 <p class="note">
@@ -723,6 +1032,31 @@ values, at fixed tree parameters, is 0.000000, so the 72-point grid contains onl
 distinct configurations. Contamination only moves scikit-learn's internal decision
 boundary, and PR-AUC reads the ranking, not the boundary. Reporting the grid as 72
 configurations would have overstated the search fourfold.
+</p>
+
+<details class="codebox"><summary>Show code — final model and its decision threshold</summary><pre><code class="python">if_final = IsolationForest(
+    n_estimators=int(_cfg_if.n_estimators),
+    max_samples=int(_cfg_if.max_samples),
+    contamination=_cont,
+    random_state=42, n_jobs=-1,
+).fit(X[STRAT_BEST]["fit"])            # healthy training points only
+
+# anomaly score = -score_samples : larger means more abnormal
+score_fit = -if_final.score_samples(X[STRAT_BEST]["fit"])
+score_val = -if_final.score_samples(X[STRAT_BEST]["val"])
+
+# threshold = 99.5th percentile of the FITTING scores
+# (defined on the fitting set, never on val/test -> no leakage)
+SEUIL = float(np.quantile(score_fit, 0.995))</code></pre></details>
+
+<p class="reading">
+Two choices are encoded here. The sign flip on <code>score_samples</code> makes the
+score increase with abnormality, so that every detector in the project shares one
+orientation and can be compared and fused later without a mental inversion. And the
+threshold is a quantile of the <em>fitting</em> scores, not of the validation
+scores — it answers "how unusual would this be for a healthy plant?" using only data
+the model was allowed to see. The same principle, applied to the fused system, later
+becomes the frozen rank reference.
 </p>
 
 <h3>Choosing an operating point</h3>
@@ -818,6 +1152,36 @@ perfect autoencoder is a useless detector. Shallow beats deep throughout, which 
 unsurprising on six input variables.
 </p>
 
+<details class="codebox"><summary>Show code — the deployed architecture</summary><pre><code class="python"># scaler fitted on HEALTHY training rows only
+scaler_ae_save = MinMaxScaler().fit(_tr_sain_ae[FEATURES_AE])
+Xtr_ae_save    = scaler_ae_save.transform(_tr_sain_ae[FEATURES_AE])
+
+def _build_ae_save(seed):
+    tf.random.set_seed(seed); np.random.seed(seed)
+    e = keras.Input(shape=(_nf,))                                # 6 features in
+    x = layers.Dense(_AE_CODE_DIM, activation="relu")(e)         # bottleneck: 4 units
+    o = layers.Dense(_nf, activation="sigmoid")(x)               # 6 features out
+    m = keras.Model(e, o)
+    m.compile(optimizer=keras.optimizers.Adam(_AE_LR), loss="mse")
+    return m
+
+for s in range(N_ENS):                                           # 5 seeds
+    m = _build_ae_save(s)
+    m.fit(Xtr_ae_save, Xtr_ae_save, epochs=200, batch_size=64, validation_split=0.15,
+          callbacks=[keras.callbacks.EarlyStopping(monitor="val_loss", patience=15,
+                                                   restore_best_weights=True)], verbose=0)
+    m.save(f"model_final/ae/ae_{s}.keras")</code></pre></details>
+
+<p class="reading">
+The network is deliberately tiny: six inputs, four hidden units, six outputs. That is
+the point — capacity is the enemy here, because a model able to reconstruct anything
+reconstructs faults too and the error stops discriminating. The
+<code>sigmoid</code> output pairs with the <code>MinMaxScaler</code>, both bounded to
+[0, 1], so the network never has to learn an output scale. And the target is the input
+itself (<code>fit(X, X)</code>), which is what makes the whole thing unsupervised: no
+label appears anywhere in this block.
+</p>
+
 <h3>An ensemble, and an honest discrepancy</h3>
 <p>
 A single autoencoder is unstable. Five identical architectures on five seeds gave
@@ -883,11 +1247,39 @@ reconstructs sequences instead of points — an LSTM encoder compresses a window
 consecutive measurements into a latent code, and an LSTM decoder rebuilds the window.
 </p>
 
-<p>
-Sequences are built with the same seven-minute rule as everything else: a window is
-valid only if its points are contiguous in real time, so none of them straddles a
-night. That costs 1,209 healthy training points at segment edges, which is the price
-of not fabricating transitions that never happened.
+<details class="codebox"><summary>Show code — sequence builder with the night rule</summary><pre><code class="python">def fabriquer_sequences(df_partition, features, seq_len, gap_min=7):
+    """
+    Cut one partition into sliding windows of length seq_len, WITHOUT spanning a
+    night (break as soon as a gap > gap_min appears). To be called on ONE partition
+    at a time: that is what guarantees no window crosses a train/val/test boundary.
+
+    Returns:
+      - X_seq   : array (n_sequences, seq_len, n_features)
+      - idx_fin : timestamp of the LAST point of each window (used to align the
+                  score at point level and to retrieve the label)
+    """
+    X_list, idx_list = [], []
+    seg = (df_partition.index.to_series().diff() > pd.Timedelta(f"{gap_min}min")).cumsum()
+    for _, bloc in df_partition.groupby(seg):
+        vals = bloc[features].values
+        n = len(bloc)
+        if n < seq_len:
+            continue   # segment too short to produce a single window
+        for start in range(n - seq_len + 1):
+            X_list.append(vals[start:start + seq_len])
+            idx_list.append(bloc.index[start + seq_len - 1])
+    return np.array(X_list), pd.DatetimeIndex(idx_list)</code></pre></details>
+
+<p class="reading">
+Three guarantees are enforced by structure rather than by checking afterwards.
+Windows are built per day segment, so none straddles a night. The function is called
+on one partition at a time, so none straddles a train/test boundary — the leak that
+would be invisible in the metrics and fatal to their meaning. And each window is
+labelled by its <em>last</em> point, never its middle: a window ending at time
+<em>t</em> contains only information available at <em>t</em>, which is what makes the
+same code usable in the streaming consumer. Short segments are skipped, which is why
+1,209 healthy training points are lost at segment edges — the price of not fabricating
+transitions that never happened.
 </p>
 
 <h3>Viability first</h3>
@@ -964,6 +1356,27 @@ means the configuration is a real optimum on this data, and also that it may not
 transfer to a plant with a different sampling rate.
 </p>
 
+<details class="codebox"><summary>Show code — the deployed sequence architecture</summary><pre><code class="python">def _build_lstm_save(seed):
+    tf.random.set_seed(seed); np.random.seed(seed)
+    e = keras.Input(shape=(_LSTM_SEQ, _nf))                              # (6 steps, 6 features)
+    x = layers.LSTM(_LSTM_U, activation="tanh", return_sequences=False)(e)   # encode -> 64
+    x = layers.Dense(_LSTM_C, activation="relu")(x)                          # latent code -> 16
+    x = layers.RepeatVector(_LSTM_SEQ)(x)                                    # re-spread over time
+    x = layers.LSTM(_LSTM_U, activation="tanh", return_sequences=True)(x)    # decode
+    o = layers.TimeDistributed(layers.Dense(_nf, activation="sigmoid"))(x)   # rebuild each step
+    m = keras.Model(e, o)
+    m.compile(optimizer=keras.optimizers.Adam(3e-3), loss="mse")
+    return m</code></pre></details>
+
+<p class="reading">
+<code>RepeatVector</code> is the hinge of this architecture. The encoder collapses the
+whole window into a single 16-number code, discarding its time axis; the decoder has
+to rebuild six time steps from that code alone. Copying the code six times and letting
+the decoder LSTM differentiate them forces the latent representation to carry the
+window's <em>shape</em>, not just its average level. That is precisely what a slow
+shading episode corrupts, and what a point-wise autoencoder cannot see.
+</p>
+
 <h3>The deployed ensemble</h3>
 <p>
 As with the dense autoencoder, five networks on five seeds rather than one. Members
@@ -1016,7 +1429,9 @@ This is where the streaming constraint from the first section becomes a line of 
 The natural way to rank is <code>rankdata</code> over the batch — but in production the
 batch is one point, and its rank among itself is always 1.0, so every measurement would
 be an alarm. Ranking against a frozen reference produces a score meaning the same thing
-whether it is computed on four thousand points or on one.
+whether it is computed on four thousand points or on one. The reference is sorted once
+at load time, so <code>searchsorted</code> makes each scoring a binary search rather
+than a re-ranking.
 </p>
 
 <figure class="shot shot--wide">
@@ -1072,6 +1487,26 @@ check a healthy string; a false negative leaves a fault running for weeks. The
 threshold is therefore selected by maximising F2 on validation — the F-measure
 weighting recall twice as heavily as precision — rather than F1, which treats the two
 as equals.
+</p>
+
+<details class="codebox"><summary>Show code — selecting the threshold by F2</summary><pre><code class="python">_prec, _rec, _thr = precision_recall_curve(_y, score_fusion_val)
+_prec_t, _rec_t = _prec[:-1], _rec[:-1]
+
+# F2 = (1+4)*P*R / (4*P + R) ; beta=2 weights recall twice as heavily
+_beta2 = 2**2
+_f2 = (1 + _beta2) * _prec_t * _rec_t / (_beta2 * _prec_t + _rec_t + 1e-9)
+
+_i_f2 = int(np.argmax(_f2))
+SEUIL_CANDIDAT = float(_thr[_i_f2])      # 0.9460</code></pre></details>
+
+<p class="reading">
+The threshold is read off the precision–recall curve rather than searched for, so
+every attainable operating point is considered exactly once. The <code>[:-1]</code>
+slicing is not cosmetic: <code>precision_recall_curve</code> returns one more
+precision and recall value than it returns thresholds — the final point corresponds to
+no threshold at all — and forgetting to trim it misaligns the argmax by one position.
+The <code>1e-9</code> guards the degenerate case where precision and recall are both
+zero.
 </p>
 
 <figure class="shot shot--wide">
@@ -1149,8 +1584,8 @@ test partition is opened.
 <h3>The saved networks reproduce the reported scores</h3>
 <p>
 The five reloaded autoencoders, scored on the 4,219 validation points, reproduce the
-section 9 scores with a maximum deviation of <strong>0.00e+00</strong>. The five LSTMs
-do the same on 4,006 sequences. Not "close" — bit-identical.
+earlier scores with a maximum deviation of <strong>0.00e+00</strong>. The five LSTMs do
+the same on 4,006 sequences. Not "close" — bit-identical.
 </p>
 
 <h3>Why the rank references had to be recomputed</h3>
@@ -1197,8 +1632,8 @@ Validation performance of the final system at the 0.9460 threshold: 128 true pos
 <p class="note">
 A guard cell runs immediately before the test is opened, verifying that no test metric
 has been computed anywhere earlier in the notebook. The test scores exist as arrays from
-section 10 onwards — they were never confronted with their labels. The cell also reports
-what the test contains: 3 episodes, all of type 3.1, a type absent from every
+the LSTM section onwards — they were never confronted with their labels. The cell also
+reports what the test contains: 3 episodes, all of type 3.1, a type absent from every
 development partition.
 </p>
 </section>
@@ -1280,6 +1715,42 @@ the same night rule as in the notebook, now enforced on a live stream rather tha
 dataframe.
 </p>
 
+<details class="codebox"><summary>Show code — the streaming window buffer</summary><pre><code class="python">class TamponGlissant:
+    """
+    Accumulates recent measurements to rebuild an LSTM sequence.
+
+    The detector works in batches and needs seq_len contiguous points, while Kafka
+    delivers them one at a time. The buffer is reset as soon as a gap exceeds
+    gap_minutes: without that, we would fabricate evening -> morning transitions
+    that do not exist in the data, since night is never measured.
+    """
+
+    def __init__(self, seq_len: int, gap_minutes: int):
+        self.seq_len = seq_len
+        self.gap = pd.Timedelta(f"{gap_minutes}min")
+        self.points = deque(maxlen=seq_len)
+
+    def ajouter(self, horodatage, mesure: dict):
+        """Returns a seq_len-row DataFrame once the window is complete."""
+        if self.points and horodatage - self.points[-1][0] > self.gap:
+            self.points.clear()
+        self.points.append((horodatage, mesure))
+
+        if len(self.points) < self.seq_len:
+            return None
+        return pd.DataFrame([m for _, m in self.points],
+                            index=pd.DatetimeIndex([t for t, _ in self.points]))</code></pre></details>
+
+<p class="reading">
+A <code>deque</code> with <code>maxlen</code> makes the sliding window free: pushing a
+seventh point evicts the first automatically, with no index arithmetic to get wrong.
+The gap check happens <em>before</em> the append, so the incoming point starts the new
+segment rather than being discarded with the old one. This class is the streaming
+counterpart of <code>fabriquer_sequences</code>, and the final validation verifies that
+both produce identical scores — the batch path and the one-message-at-a-time path agree
+to 0.00e+00.
+</p>
+
 <p class="reading">
 Of the 2,975 replayed points, 2,813 receive a score. The other 162 are the five first
 points of each daylight segment, which have no complete window behind them. They are
@@ -1308,7 +1779,7 @@ many from a single process.
 
 <div class="limits">
 <ul>
-  <li><strong>One plant, one dataset.</strong> Everything here comes from a single installation in La Réunion. The pipeline transfers; the threshold does not, and would have to be re-derived from a healthy period on any new site.</li>
+  <li><strong>One plant, one dataset.</strong> Everything here comes from a single installation. The pipeline transfers; the threshold does not, and would have to be re-derived from a healthy period on any new site.</li>
   <li><strong>Three test episodes.</strong> 3/3 detected is a good result on a small sample. The point-level metrics rest on 2,813 measurements and are far more informative than the episode count.</li>
   <li><strong>ROC-AUC is flattering.</strong> 0.9964 looks conclusive and largely reflects the 2.6% positive rate. PR-AUC at 0.7765 — a lift of ×29.9 over the base rate — is the figure to compare against.</li>
   <li><strong>Recall hits a wall.</strong> The operating-point table shows precision collapsing from 0.731 to 0.283 for seven points of extra recall. Some faults are simply not separable in this feature space, and no threshold fixes that.</li>
@@ -1323,7 +1794,7 @@ many from a single process.
   <li>Batch the ten networks into a single vectorised call and drop per-point latency by an order of magnitude.</li>
   <li>Monitor drift on the reference distributions, and define a re-calibration procedure recomputing references and threshold together.</li>
   <li>Attribute each alarm to a feature — which of the six sensors drove the reconstruction error — so an alert says where to look, not only when.</li>
-  <li>Validate on a second plant, which is the only real test of whether the approach generalises.</li>
+  <li>Validate on a second installation, which is the only real test of whether the approach generalises.</li>
 </ul>
 </section>
 
@@ -1333,7 +1804,6 @@ many from a single process.
   <div class="wrap">
     <div class="proj-links">
       <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/pfa-photovoltaique" target="_blank" rel="noopener">View source</a>
-      <a class="btn" href="https://zenodo.org/records/7358042" target="_blank" rel="noopener">Dataset (Zenodo)</a>
       <a class="btn" href="../../index.html#work">All projects</a>
     </div>
   </div>
