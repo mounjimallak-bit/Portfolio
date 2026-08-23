@@ -1,1 +1,1349 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Photovoltaic Anomaly Detection — Case study · Malak Mounji</title>
+<meta name="description" content="Case study: unsupervised anomaly detection on photovoltaic time series. Sensor cleaning, feature engineering validated by ablation, chronological splitting, Isolation Forest, dense and LSTM autoencoder ensembles fused by rank, and a real-time Kafka to TimescaleDB to Grafana scoring pipeline." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../styles.css" />
+<link rel="stylesheet" href="case.css" />
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <a class="wordmark" href="../../index.html">Malak&nbsp;Mounji</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="../../index.html#work">All work</a>
+      <a href="https://github.com/mounjimallak-bit/pfa-photovoltaique" target="_blank" rel="noopener">Source</a>
+      <a class="nav-cv" href="../../malak.pdf">CV (PDF)</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero case-hero">
+  <div class="wrap">
+    <p class="eyebrow">Case study · Final-year project — Albarray Consulting · Individual · 2026</p>
+    <h1>Photovoltaic anomaly detection</h1>
+    <p class="standfirst">
+      Detecting inverter and shading faults on a solar plant without ever training
+      on a labelled fault, then scoring incoming measurements as they arrive.
+    </p>
+    <p class="lede">
+      This page follows the work in the order it was done — including the parts that
+      did not work. Three million raw rows reduced to a study period, a feature set
+      chosen by ablation rather than intuition, a baseline that was later removed
+      from the final system, two autoencoders combined by rank, a threshold that
+      encodes an economic judgement, and a single opening of the test partition at
+      the very end.
+    </p>
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/pfa-photovoltaique" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="https://zenodo.org/records/7358042" target="_blank" rel="noopener">Dataset (Zenodo)</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap case">
+
+<nav class="toc" aria-label="On this page">
+  <p class="toc-head">On this page</p>
+  <ol>
+    <li><a href="#objective">Objective</a></li>
+    <li><a href="#raw">The raw data</a></li>
+    <li><a href="#merge">Merging two clocks</a></li>
+    <li><a href="#cleaning">Cleaning</a></li>
+    <li><a href="#eda">Exploration</a></li>
+    <li><a href="#period">Study period and incidents</a></li>
+    <li><a href="#split">The chronological split</a></li>
+    <li><a href="#features">Feature engineering</a></li>
+    <li><a href="#normalisation">Normalisation and leakage</a></li>
+    <li><a href="#if">Isolation Forest</a></li>
+    <li><a href="#ae">Dense autoencoder</a></li>
+    <li><a href="#lstm">LSTM autoencoder</a></li>
+    <li><a href="#fusion">Fusion</a></li>
+    <li><a href="#threshold">Decision threshold</a></li>
+    <li><a href="#packaging">Packaging the system</a></li>
+    <li><a href="#validation">Final validation</a></li>
+    <li><a href="#test">The test partition</a></li>
+    <li><a href="#streaming">Running system</a></li>
+    <li><a href="#limits">Limits and next steps</a></li>
+  </ol>
+</nav>
+
+<!-- ===================== OBJECTIVE ===================== -->
+<section class="cs" id="objective">
+<h2>Objective</h2>
+
+<p>
+Photovoltaic plants fail quietly. Soiling, partial shading and inverter faults do
+not stop production; they bend it downward by a few percent, for days or weeks,
+until someone compares an invoice to an expectation. The output still looks like
+output.
+</p>
+
+<p>
+The obvious answer — train a classifier on past faults — collides with the reason
+the problem exists. Operators rarely keep labelled fault archives, and when they do,
+the archive covers the failures that were noticed. So the system is built the other
+way round: learn what a healthy plant looks like, and flag departures from it. No
+fault is ever shown during training.
+</p>
+
+<h3>Constraints that shaped every later decision</h3>
+<ul>
+  <li><strong>No labels at training time.</strong> Labels exist in this dataset, but they are used only to select a threshold and to report results — never to fit a model.</li>
+  <li><strong>Recall over precision.</strong> A missed fault costs weeks of production; a false alarm costs one technician one look.</li>
+  <li><strong>Early detection.</strong> A fault caught on its first measurement is worth far more than the same fault caught on its fortieth.</li>
+  <li><strong>Streaming.</strong> The system must score one five-minute measurement at a time, without access to the batch it belongs to.</li>
+</ul>
+
+<p class="note">
+That last constraint shaped more of the design than any modelling choice. A score
+that depends on the batch it is computed in is easy to obtain offline and
+meaningless in production, where the batch is a single point. It is the reason the
+final fusion ranks against a frozen reference rather than against the current data.
+</p>
+</section>
+
+<!-- ===================== RAW ===================== -->
+<section class="cs" id="raw">
+<h2>The raw data</h2>
+
+<p>
+The source is an open dataset from a grid-connected plant in La Réunion, published
+on Zenodo. It arrives as two files recorded by two different acquisition systems,
+which is the first problem to solve.
+</p>
+
+<table class="srctable">
+<thead><tr><th>File</th><th>Contents</th><th>Volume</th></tr></thead>
+<tbody>
+<tr><td><strong>dt1</strong> — meteorological</td><td>Diffuse and global irradiance (DTI, GTI), ambient and panel temperature (TA, TPV)</td><td>2.14 GB, sampled every second</td></tr>
+<tr><td><strong>dt2</strong> — electrical</td><td>Inverter and grid currents and voltages (Ia, Ig, Va, Vg), power (Pg), energy (Eg), frequency (Fg), plus the <code>Fault</code> label</td><td>193 MB, 2,988,814 rows</td></tr>
+</tbody>
+</table>
+
+<h3>What the labels actually contain</h3>
+<p>
+The <code>Fault</code> column is not binary. It encodes a fault taxonomy, and the
+distribution across the raw file is extremely uneven: type 4.0 — intermittent
+shading — accounts for 61,297 of the 84,525 flagged seconds, while type 3.1 appears
+only 2,717 times. That imbalance between fault <em>types</em>, not just between
+healthy and faulty, returns at the very end of the project: the test partition
+happens to contain only type 3.1.
+</p>
+
+<p class="note">
+Both files carry timestamps as strings with a <code>+04:00</code> offset — La
+Réunion time. Parsing them without normalising to UTC would have shifted one stream
+against the other by four hours and joined every measurement to the wrong weather.
+The format was checked explicitly on both sides before any join was attempted.
+</p>
+</section>
+
+<!-- ===================== MERGE ===================== -->
+<section class="cs" id="merge">
+<h2>Merging two clocks</h2>
+
+<p>
+The two files cannot be joined as they stand. They start on different dates, they
+are sampled at different rates, and neither guarantees a measurement at any given
+instant. Joining on exact timestamps would return almost nothing.
+</p>
+
+<p>
+Both streams are therefore resampled onto a common five-minute grid by averaging
+within each bucket, then joined on that grid. Five minutes is short enough to catch
+the onset of an episode — the shortest incident in the dataset lasts about six
+minutes — and long enough to smooth acquisition noise and make 2.3 GB of raw input
+tractable.
+</p>
+
+<p>
+The result is 53,016 rows across 12 columns, spanning 28 October 2021 to 13 April
+2023. Because the merge takes ten minutes and needs both raw files, its output is
+cached in the repository; a clone without the 2.3 GB of raw CSVs reloads the cache
+and continues from there, and the notebook detects and announces which of the two
+situations it is running in.
+</p>
+</section>
+
+<!-- ===================== CLEANING ===================== -->
+<section class="cs" id="cleaning">
+<h2>Cleaning</h2>
+
+<p>
+Cleaning an anomaly detection dataset is a delicate exercise, because the standard
+cleaning move — remove the outliers — removes exactly what the project is trying to
+find. Every filter here had to be justified by a physical argument rather than a
+statistical one.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_3_1_boxplots.png" alt="Boxplots of the ten sensor variables showing their dispersion and tails" loading="lazy" />
+  <figcaption>Dispersion of the ten sensors — the long tails are the subject, not the noise</figcaption>
+</figure>
+
+<h3>Physical plausibility</h3>
+<p>
+The first pass checks values against physics rather than against quantiles: negative
+power, irradiance above 1,500 W/m², sub-zero panel temperature. All three came back
+empty. One check did not: 57 rows carry <code>Va = Vg = Fg = 0</code>
+simultaneously. A grid-connected inverter cannot have zero voltage and zero
+frequency while the sun is up — that is a disconnected acquisition unit, not a plant
+state. Those 57 rows were removed, leaving 52,959.
+</p>
+
+<h3>Statistical outliers, deliberately kept</h3>
+<p>
+Two standard detectors were then run purely as diagnostics, and their results are
+worth reading against each other.
+</p>
+
+<table class="minitable">
+<thead><tr><th>Sensor</th><th>Z-score &gt; 3</th><th>IQR rule</th></tr></thead>
+<tbody>
+<tr><td>Va</td><td>689 (1.30%)</td><td>1,389 (2.62%)</td></tr>
+<tr><td>DTI</td><td>431 (0.81%)</td><td>1,470 (2.77%)</td></tr>
+<tr><td>Vg</td><td>73 (0.14%)</td><td>1,438 (2.71%)</td></tr>
+<tr><td>Fg</td><td>73 (0.14%)</td><td>1,343 (2.53%)</td></tr>
+<tr><td>GTI, TPV, Ia, Ig, Pg</td><td>0</td><td>0</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+The two methods disagree by a factor of twenty on Vg, which is itself informative:
+the Z-score assumes an approximately normal distribution, and grid voltage is not
+normal. But the decisive point is the sensor at the top of both columns. Va —
+inverter output voltage — is where the anomalies live, flagged at a rate close to
+the 2.8% fault rate of the dataset. Deleting those rows would have deleted the
+signal. Nothing was removed on statistical grounds, and <code>va_deviation</code>
+later became one of the four most discriminating engineered features.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_3_6_sensor_correlation.png" alt="Correlation matrix across the ten sensor variables" loading="lazy" />
+  <figcaption>Sensor correlation: the electrical block is highly redundant</figcaption>
+</figure>
+
+<p class="reading">
+Several sensors carry the same information twice — irradiance and generated power
+correlate at 0.98, and the current channels track each other closely. For a
+reconstruction model this matters: a redundant input is an easy reconstruction
+target that inflates apparent performance without contributing detection power. This
+matrix is the first argument for the ablation studies that follow, rather than for
+feeding everything to the model.
+</p>
+</section>
+
+<!-- ===================== EDA ===================== -->
+<section class="cs" id="eda">
+<h2>Exploration</h2>
+
+<p>
+Six views, each of which changed a later decision. This is where the project's
+constraints stopped being assumptions and became measurements.
+</p>
+
+<h3>How rare is a fault, and which kind</h3>
+<figure class="shot shot--wide">
+  <img src="images/eda_01_desequilibre.png" alt="Class imbalance and breakdown by fault type" loading="lazy" />
+  <figcaption>97.18% normal — and the anomalies themselves are unevenly distributed</figcaption>
+</figure>
+
+<p class="reading">
+After resampling, 51,465 of 52,959 measurements are normal. The 1,494 anomalies
+break down into 1,124 points of intermittent shading (type 4) and between 36 and 114
+points for every other type. Two consequences follow. First, accuracy is useless
+here — flagging nothing scores 97.2%. Every number on this page is therefore PR-AUC,
+area under the precision–recall curve, quoted against the base rate of its
+partition. Second, the rare fault types have so few points that no model can be
+tuned on them individually.
+</p>
+
+<h3>The relationship the whole project rests on</h3>
+<figure class="shot shot--wide">
+  <img src="images/eda_02_gti_pg.png" alt="Global irradiance plotted against generated power, with anomalies highlighted" loading="lazy" />
+  <figcaption>Power against irradiance: anomalies sit below the healthy line</figcaption>
+</figure>
+
+<p class="reading">
+Power and irradiance correlate at 0.98 along a near-linear relation — and the
+anomalies form a distinct cloud <em>underneath</em> it. At equal available light, a
+degraded plant produces less. That single observation is the physical basis of the
+project, and it directly motivated the yield feature <code>ratio_pg_gti</code> built
+two sections later. Neither variable alone shows anything; their ratio does.
+</p>
+
+<h3>Where else the fault shows up</h3>
+<figure class="shot shot--wide">
+  <img src="images/eda_03_distributions_capteurs.png" alt="Distribution of each sensor, normal versus anomalous" loading="lazy" />
+  <figcaption>Per-sensor distributions, normal against anomalous</figcaption>
+</figure>
+
+<p class="reading">
+Most sensors overlap almost completely between the two classes — which is why a
+single-variable threshold rule was never a candidate. Two exceptions stand out: the
+AC voltage Va and the currents Ia and Ig show a visible shift. That observation
+produced <code>va_deviation</code>, and the shape of the shift — a spread rather
+than a translation — suggested measuring a deviation from an expected value rather
+than a raw level.
+</p>
+
+<h3>The finding that saved the split</h3>
+<figure class="shot shot--wide">
+  <img src="images/eda_05_anomalies_temps.png" alt="Generated power across the full recording period with anomalies marked in red" loading="lazy" />
+  <figcaption>The full series: every anomaly falls in the first third</figcaption>
+</figure>
+
+<p class="reading">
+This is the most consequential plot in the exploration. The dataset runs to April
+2023, but the last labelled anomaly occurs on 19 May 2022. Everything after it —
+35,684 rows, 67% of the record — is pure normal operation. A chronological split
+over the full series would have placed the entire test partition in that empty zone,
+and the final evaluation would have been run on a period containing no faults at
+all: a perfect, meaningless score. The study period had to be truncated, and this
+figure is why.
+</p>
+
+<h3>Day, night, and why sequences must break</h3>
+<figure class="shot shot--wide">
+  <img src="images/eda_06_zoom_semaine.png" alt="One week of measurements at five-minute resolution" loading="lazy" />
+  <figcaption>One week: production cycles with no measurements at night</figcaption>
+</figure>
+
+<p class="reading">
+Zooming to a week shows the day/night cycle and, more importantly, that night is
+simply absent from the record — consecutive rows can be five minutes apart or twelve
+hours apart. Any operation walking consecutive rows would silently build an
+evening-to-morning transition that never happened. This is where the seven-minute
+gap rule was introduced; it reappears in the episode segmentation, the LSTM sequence
+builder, and the streaming buffer of the deployed consumer.
+</p>
+
+<h3>When faults happen</h3>
+<figure class="shot shot--wide">
+  <img src="images/eda_07_profils.png" alt="Anomaly profiles by hour of day and by month, with power comparison" loading="lazy" />
+  <figcaption>Anomalies by hour and by month, and the production deficit at each hour</figcaption>
+</figure>
+
+<p class="reading">
+Anomalies concentrate in daylight, peaking around 07:00 UTC, and cluster in
+February–May 2022 with a strong March peak. The right-hand panel is the useful one:
+at every hour of the day, anomalous power sits below normal power. The deficit is
+present regardless of the sun's position, confirming that a sun-normalised yield —
+rather than raw power — is the right quantity to model.
+</p>
+</section>
+
+<!-- ===================== PERIOD ===================== -->
+<section class="cs" id="period">
+<h2>Study period and incidents</h2>
+
+<p>
+Following the exploration, the record was restricted to the period that actually
+contains faults: 28 October 2021 to 26 May 2022. That is 18,057 rows, 34.1% of the
+cleaned dataset, containing all 1,494 anomalies. The 34,903 rows dropped contain
+exactly zero.
+</p>
+
+<h3>Faults are episodes, not points</h3>
+<p>
+Within that window the anomalies group into 17 contiguous incidents. They are not
+scattered outliers — each is a run of degraded measurements with a beginning and an
+end, lasting from six minutes to 78 hours.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_5_2_incidents_timeline.png" alt="Timeline of the 17 identified incidents by type and duration" loading="lazy" />
+  <figcaption>The 17 incidents: type, duration and position in the record</figcaption>
+</figure>
+
+<table class="minitable">
+<thead><tr><th>Type</th><th>Incidents</th><th>Duration range</th></tr></thead>
+<tbody>
+<tr><td>4.0 — intermittent shading</td><td>5</td><td>4.5 h – 78.8 h</td></tr>
+<tr><td>3.2 — partial shading</td><td>4</td><td>1.6 h – 3.1 h</td></tr>
+<tr><td>3.1 — partial shading (test only)</td><td>3</td><td>a few hours</td></tr>
+<tr><td>2.1 / 2.2 / 2.3</td><td>3</td><td>2.9 h – 4.5 h</td></tr>
+<tr><td>1.0 — uniform shading</td><td>2</td><td>6 min and 4.7 h</td></tr>
+</tbody>
+</table>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_5_2_incidents_over_power.png" alt="Incidents overlaid on the power curve" loading="lazy" />
+  <figcaption>Incidents overlaid on generated power</figcaption>
+</figure>
+
+<p class="reading">
+Overlaying the incidents on the production curve shows how varied the signature is.
+Some episodes carve an obvious notch out of the daily curve; others are barely
+distinguishable from a passing cloud at this scale. That variety is the argument
+against a single detector — a model tuned to catch abrupt drops will not catch the
+subtle ones, and the reverse.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_5_2_incidents_zoom.png" alt="Individual zoom on each incident" loading="lazy" />
+  <figcaption>Each incident individually, at its own time scale</figcaption>
+</figure>
+
+<p class="reading">
+Zoomed one by one, two families appear. Type 4 episodes are jagged — the shading
+comes and goes within the episode itself. Type 3 episodes are smooth depressions
+maintained over hours. A point-wise model can catch the first family; the second is
+what motivated adding a sequence model, since any single point inside a smooth
+depression looks unremarkable and only the trajectory is abnormal.
+</p>
+
+<h3>Episode-level evaluation</h3>
+<p>
+Because faults are episodes, point metrics alone misrepresent operational value. An
+incident lasting forty measurements and caught on the third is an operational
+success, even though thirty-seven points were "missed". Every model in this project
+is therefore scored twice: at point level, and at episode level — an incident counts
+as detected if at least one of its points crosses the threshold, with the detection
+delay recorded in five-minute steps.
+</p>
+</section>
+
+<!-- ===================== SPLIT ===================== -->
+<section class="cs" id="split">
+<h2>The chronological split</h2>
+
+<p>
+With incidents identified, the split becomes a constraint satisfaction problem
+rather than a call to <code>train_test_split</code>.
+</p>
+
+<p>
+A random split would place the first half of an incident in training and the second
+half in test. The model would then be evaluated on a fault whose neighbouring
+minutes it had already memorised, and would score beautifully for reasons unrelated
+to detection. The split is therefore strictly chronological — and, further, the cut
+points are constrained to fall on days no incident touches. Of the 155 days in the
+study period, 23 are occupied by an incident; the 132 remaining days are the only
+legal cut positions.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_5_3_chronological_split.png" alt="Chronological train, validation and test split with incidents marked" loading="lazy" />
+  <figcaption>The split, with incident positions marked — no incident crosses a boundary</figcaption>
+</figure>
+
+<table class="minitable">
+<thead><tr><th>Partition</th><th>Rows</th><th>Share</th><th>Anomalies</th><th>Period</th></tr></thead>
+<tbody>
+<tr><td>Train</td><td>10,863</td><td>60.2%</td><td>1,245 (11.5%)</td><td>2021-10-28 → 2022-03-22</td></tr>
+<tr><td>Validation</td><td>4,219</td><td>23.4%</td><td>176 (4.2%)</td><td>2022-03-23 → 2022-04-28</td></tr>
+<tr><td>Test</td><td>2,975</td><td>16.5%</td><td>73 (2.5%)</td><td>2022-04-29 → 2022-05-26</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+The verification that matters: <strong>zero incidents cut</strong> across a boundary.
+Note also that the training partition contains 1,245 anomalies and that none of them
+is used — training runs on the 9,618 healthy training points only. The anomalies in
+the training window are simply discarded, which is what "trained on healthy data"
+has to mean in practice.
+</p>
+
+<p class="note">
+One property of this split is uncomfortable and was kept deliberately: the three test
+incidents are all of type 3.1, a type appearing <em>nowhere</em> in training or
+validation. The final evaluation is therefore on a fault family the system has never
+encountered in any form. That is harder than a random split, and closer to what
+deployment on a new plant looks like.
+</p>
+</section>
+
+<!-- ===================== FEATURES ===================== -->
+<section class="cs" id="features">
+<h2>Feature engineering</h2>
+
+<p>
+The raw sensors describe the plant's state; they do not describe whether that state
+is <em>normal for the conditions</em>. A power of 3 kW is excellent at dawn and
+alarming at noon. This section builds variables carrying that comparison internally
+and — more importantly — validates each one by its effect on detection rather than
+by how sensible it sounds.
+</p>
+
+<h3>Phase 1: four physical indicators</h3>
+<p>
+Four candidates were built first: yield <code>ratio_pg_gti</code> (power over
+irradiance), thermal gap <code>delta_tpv_ta</code> (panel minus ambient
+temperature), short-term power variation <code>pg_diff</code>, and rolling
+variability <code>ratio_std_30min</code>. Each was scored by a Kolmogorov–Smirnov
+test measuring how far apart the healthy and faulty distributions sit.
+</p>
+
+<table class="minitable">
+<thead><tr><th>Feature</th><th>KS (all faults)</th><th>KS (type 3)</th><th>Decision</th></tr></thead>
+<tbody>
+<tr><td><strong>ratio_pg_gti</strong></td><td><strong>0.82</strong></td><td><strong>0.82</strong></td><td>Kept</td></tr>
+<tr><td>delta_tpv_ta</td><td>0.18</td><td>0.39</td><td>Dropped</td></tr>
+<tr><td>ratio_std_30min</td><td>0.10</td><td>0.32</td><td>Dropped</td></tr>
+<tr><td>pg_diff</td><td>0.08</td><td>0.22</td><td>Dropped</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+Three of the four physically motivated features failed the 0.35 threshold. The
+thermal gap in particular is the kind of variable that sounds authoritative in a
+report and carries almost no separation here. Keeping it would have cost nothing
+visible and quietly diluted the model — which is why the test was run before the
+model, not after.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_6_1_1_tsne_phase1.png" alt="t-SNE projection of the Phase 1 feature space, healthy versus anomalous" loading="lazy" />
+  <figcaption>t-SNE on the Phase 1 space: anomalies still mixed into the healthy mass</figcaption>
+</figure>
+
+<p class="reading">
+Projected in two dimensions, the anomalies do not yet form a separable region. Some
+structure exists at the edges, but the bulk of the faulty points sits inside the
+healthy cloud. Read as a diagnosis rather than a result, this says the feature space
+is not finished — which is what motivated Phase 2.
+</p>
+
+<h3>Phase 2: seven candidates for the subtle faults</h3>
+<p>
+Type 3 faults — smooth partial shading — are the ones the Phase 1 space misses. Seven
+further candidates were built specifically for them, all fitted on healthy training
+points only: a power residual against an expected value, a voltage deviation, a
+temperature-corrected efficiency, a current-to-irradiance ratio, a one-hour rolling
+yield, a local deviation, and a grid-to-inverter voltage ratio.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_6_2_2_ks_ranking.png" alt="KS ranking of the seven candidate features, on type 3 faults and on all anomalies" loading="lazy" />
+  <figcaption>Two rankings side by side: on type 3 faults, and on all anomalies</figcaption>
+</figure>
+
+<p class="reading">
+The two rankings do not agree, and the disagreement is the finding.
+<code>vg_va_ratio</code> and <code>va_deviation</code> lead on type 3 faults
+(KS 0.921 and 0.920) but fall to sixth and fifth on all anomalies;
+<code>ratio_mean_1h</code> leads overall (0.861) and is only third on type 3.
+Choosing a winner therefore depends entirely on which subgroup you look at. The
+decision was made on the full anomaly set — the subgroup is too small to justify
+optimising for it — and this figure is the record of that being a choice rather than
+an oversight.
+</p>
+
+<p class="note">
+A protocol detail that constrained this whole section: type 3.1 has
+<strong>zero</strong> points in the development set. It exists only in the test
+partition. Features could therefore be designed against type 3.2 but never against
+3.1 — which is exactly the guarantee needed for the final evaluation to mean
+anything.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_fe_02_distributions.png" alt="Distribution of each candidate feature, normal versus type 3 faults" loading="lazy" />
+  <figcaption>Each candidate: healthy distribution against type 3 faults</figcaption>
+</figure>
+
+<p class="reading">
+Reading the distributions rather than the KS numbers shows <em>how</em> each feature
+separates. Some shift their entire mass; others keep the same centre and grow a tail.
+That difference matters for a reconstruction model, which is sensitive to tails, and
+less so for a tree-based model, which is sensitive to partitions. Both labels on this
+figure — the KS cut and the redundancy flag — are computed at run time, not written
+by hand.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_6_2_4_candidate_correlation.png" alt="Correlation matrix between the candidate features" loading="lazy" />
+  <figcaption>Redundancy check between candidates</figcaption>
+</figure>
+
+<p class="reading">
+Two pairs are near-duplicates: <code>efficiency_corrigee</code> correlates at 0.944
+with <code>ratio_pg_gti</code>, and <code>ratio_ia_gti</code> is essentially a
+restatement of the 0.978 correlation between current and irradiance. Keeping both
+members of a pair would double-weight one physical phenomenon in a model that
+averages contributions. Both were dropped in favour of the simpler member.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_6_2_5_scatter_fault3.png" alt="Scatter plots separating fault 3.1 from 3.2 in the retained candidate space" loading="lazy" />
+  <figcaption>Types 3.1 and 3.2 in the retained feature space</figcaption>
+</figure>
+
+<p class="reading">
+The two subtypes occupy different regions, which is a warning as much as a result: a
+feature set separating 3.2 well may not separate 3.1, and 3.1 is what the test
+partition contains. This figure is the reason the project never claimed that tuning
+on 3.2 would transfer — that claim is only settled at the very end, on the test.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_6_2_6_boxplots_candidates.png" alt="Boxplots of the candidate features across normal, fault 3.1 and fault 3.2" loading="lazy" />
+  <figcaption>Normal, type 3.1 and type 3.2 compared feature by feature</figcaption>
+</figure>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_zoom_temporel.png" alt="Temporal zoom on each candidate feature during a type 3 fault period" loading="lazy" />
+  <figcaption>Behaviour of each candidate during a type 3 episode</figcaption>
+</figure>
+
+<p class="reading">
+This is the most useful figure of the section. A feature that works should visibly
+break away inside the shaded fault window — and comparing the two columns shows that
+<em>no single candidate reacts cleanly to both fault types</em>. One responds to the
+abrupt family, another to the smooth family, none to both. That observation, made
+here at feature level, is the earliest justification for the model fusion built seven
+sections later.
+</p>
+
+<h3>Validating the selection by ablation</h3>
+<p>
+KS scores rank features in isolation. They say nothing about how a set of features
+behaves inside a model. So the selection was settled by ablation: twelve candidate
+sets, each fed to the same Isolation Forest, scored by PR-AUC on validation — with a
+guard rail rejecting any set that misses an entire fault episode, regardless of its
+score.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_if_ablation.png" alt="Ablation of feature sets measured by Isolation Forest PR-AUC" loading="lazy" />
+  <figcaption>Twelve feature sets, ranked by their effect on detection</figcaption>
+</figure>
+
+<table class="minitable">
+<thead><tr><th>Feature set</th><th>n</th><th>PR-AUC (val)</th><th>Lift</th></tr></thead>
+<tbody>
+<tr><td>Ten raw sensors</td><td>10</td><td>0.206 ± 0.022</td><td>×4.9</td></tr>
+<tr><td>Sensors + all Phase 1</td><td>14</td><td>0.191 ± 0.030</td><td>×4.5</td></tr>
+<tr><td>Sensors + ratio_pg_gti</td><td>11</td><td>0.278 ± 0.034</td><td>×6.6</td></tr>
+<tr><td>Reduced sensor set</td><td>10</td><td>0.545 ± 0.016</td><td>×12.9</td></tr>
+<tr><td><strong>Four engineered features</strong></td><td><strong>4</strong></td><td><strong>0.564 ± 0.006</strong></td><td>×13.3</td></tr>
+<tr><td>The four + ratio_ia_gti</td><td>7</td><td>0.529 ± 0.016</td><td>×12.5</td></tr>
+<tr><td>The four + both rejected</td><td>8</td><td>0.474 ± 0.027</td><td>×11.2</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+Four features beat fourteen by a factor of three. The engineered variables do not
+merely add information — they let the model <em>stop looking</em> at ten raw channels
+whose variation is dominated by the sun rather than by the plant's health. Note the
+standard deviations too: the four-feature set is not only the best, it is the most
+stable across seeds (±0.006 against ±0.030), which matters more than the mean when a
+single model will be deployed. Adding a rejected candidate back in costs 0.035
+PR-AUC, confirming the redundancy analysis quantitatively.
+</p>
+
+<p>
+The retained set is <code>pg_residual</code>, <code>ratio_pg_gti</code>,
+<code>va_deviation</code> and <code>vg_va_ratio</code>. One audit was run before
+freezing it: <code>va_deviation</code> reaches values up to 181, far beyond its
+median of 5.4, which would normally signal a broken sensor. Of the 53 points above
+the 99.9th percentile, 52 are labelled anomalies. The extreme values are the signal.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_tsne_avant_apres.png" alt="t-SNE before and after feature engineering, side by side" loading="lazy" />
+  <figcaption>The same points, projected from ten raw sensors and from four engineered features</figcaption>
+</figure>
+
+<p class="reading">
+Left, ten raw sensors: anomalies dispersed through the healthy mass. Right, four
+engineered features: coherent anomalous regions. The caveat is stated in the notebook
+and repeated here — t-SNE is stochastic and does not preserve global distances, so
+this is an intuition aid, not evidence. The evidence is the ablation table above;
+this is what that ablation looks like.
+</p>
+</section>
+
+<!-- ===================== NORMALISATION ===================== -->
+<section class="cs" id="normalisation">
+<h2>Normalisation and leakage</h2>
+
+<p>
+A short section with consequences out of proportion to its length. Two normalisation
+strategies were compared, and they differ in what the scaler is fitted on.
+</p>
+
+<ul>
+  <li><strong>Outlier framing</strong> — fit the scaler, and the model, on everything. The model learns a mixture of healthy and faulty behaviour and is asked which points are unusual within it.</li>
+  <li><strong>Novelty framing</strong> — fit on the 9,618 healthy training points only. The model learns healthy operation as a reference, and any new point is measured against it.</li>
+</ul>
+
+<p>
+Novelty is the correct framing for this problem, and it is also the one matching
+deployment: a plant in service produces a healthy baseline first and faults later. It
+was still measured rather than assumed — the next section quantifies the gap at more
+than a factor of two.
+</p>
+
+<p class="note">
+Leakage guards were made explicit and asserted in code rather than trusted: train
+strictly precedes validation, which strictly precedes test; the scaler sees healthy
+training rows only; no statistic computed on validation or test ever flows back into
+a fitting step. In a project where the model never sees a label, leakage is the
+failure mode hardest to notice — an unrealistically good score looks like success.
+</p>
+</section>
+
+<!-- ===================== IF ===================== -->
+<section class="cs" id="if">
+<h2>Isolation Forest</h2>
+
+<p>
+Before any neural network, a baseline. Isolation Forest isolates unusual points by
+random partitioning: an outlier needs fewer splits to separate from the rest. It
+assumes nothing about distribution shape and trains in seconds, which makes it the
+right instrument for testing the feature set — and, as it turned out, for testing the
+framing.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/8_1_tuning_isolation_forest.png" alt="Isolation Forest hyperparameter grid across strategy, estimators, sample size and contamination" loading="lazy" />
+  <figcaption>72 configurations: two strategies × trees × sample size × contamination</figcaption>
+</figure>
+
+<p class="reading">
+Two results, one expected and one not. The expected one: novelty framing reaches
+0.570 PR-AUC against 0.268 for outlier framing — more than double, confirming the
+previous section quantitatively. The unexpected one: the <code>contamination</code>
+parameter has <em>no effect whatsoever</em>. Maximum PR-AUC spread across all its
+values, at fixed tree parameters, is 0.000000, so the 72-point grid contains only 18
+distinct configurations. Contamination only moves scikit-learn's internal decision
+boundary, and PR-AUC reads the ranking, not the boundary. Reporting the grid as 72
+configurations would have overstated the search fourfold.
+</p>
+
+<h3>Choosing an operating point</h3>
+<figure class="shot shot--wide">
+  <img src="images/fig_if_seuil_operationnel.png" alt="Comparison of threshold criteria on the precision-recall curve" loading="lazy" />
+  <figcaption>Three threshold criteria compared on validation</figcaption>
+</figure>
+
+<p class="reading">
+Maximum F1 and the elbow criterion select the same threshold, 0.7476, at precision
+0.794 and recall 0.699. The retained criterion — highest recall subject to precision
+≥ 0.80 — gives 0.7515, trading 0.011 of recall for the guarantee that four alarms in
+five are real. All three land within 0.004 of each other, which is itself worth
+knowing: on this detector the criterion barely matters. On the fused system, later, it
+will matter a great deal.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_if_novelty_vs_outlier.png" alt="Novelty versus outlier strategies with precision-recall curves" loading="lazy" />
+  <figcaption>Final Isolation Forest: 0.581 PR-AUC, ×13.9 over baseline, 4/4 episodes detected</figcaption>
+</figure>
+
+<h3>Why the baseline is not in the final system</h3>
+<p>
+The Isolation Forest performs respectably — 0.581 PR-AUC, all four validation episodes
+detected, median delay zero. It was still removed. Every fusion tested later shows the
+same thing: AE + LSTM scores 0.7234, and adding the forest brings it down to 0.6871.
+It correlates 0.628 with the dense autoencoder — both judge points in isolation — so
+it contributes little independent signal while diluting the sequence model's
+contribution. It remains in the notebook as what it was built to be: a reference point
+that made the feature ablation possible.
+</p>
+</section>
+
+<!-- ===================== AE ===================== -->
+<section class="cs" id="ae">
+<h2>Dense autoencoder</h2>
+
+<p>
+An autoencoder compresses each measurement through a narrow code and rebuilds it.
+Trained on healthy data only, it becomes good at reconstructing normal operation and
+bad at reconstructing anything else — so the reconstruction error is itself the
+anomaly score, with no threshold learned and no label involved.
+</p>
+
+<h3>A result that contradicted the previous section</h3>
+<figure class="shot shot--wide">
+  <img src="images/9_1_ablation_features_ae.png" alt="Feature ablation for the dense autoencoder across four candidate sets" loading="lazy" />
+  <figcaption>Feature ablation, repeated for the autoencoder</figcaption>
+</figure>
+
+<table class="minitable">
+<thead><tr><th>Feature set</th><th>n</th><th>PR-AUC (val)</th><th>Lift</th></tr></thead>
+<tbody>
+<tr><td>All ten raw sensors</td><td>10</td><td>0.380 ± 0.20</td><td>×9.1</td></tr>
+<tr><td>Redundant sensors removed</td><td>7</td><td>0.355 ± 0.22</td><td>×8.5</td></tr>
+<tr><td><strong>Electrical + irradiance</strong></td><td><strong>6</strong></td><td><strong>0.661 ± 0.02</strong></td><td>×15.9</td></tr>
+<tr><td>Sensors + engineered features</td><td>14</td><td>0.464 ± 0.01</td><td>×11.1</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+The ablation was repeated rather than reused — and it gave a different answer. The
+Isolation Forest wanted four <em>engineered</em> features; the autoencoder does best
+on six <em>raw</em> sensors, <code>GTI, Pg, Va, Vg, Ia, TPV</code>, and adding the
+engineered features on top actively hurts (0.464 against 0.661). The explanation is
+structural: an engineered ratio is a relationship between sensors made explicit, and
+a reconstruction network learns those relationships itself from the raw channels.
+Handing it both the ingredients and the recipe gives it correlated inputs it must
+waste capacity reproducing. Reusing the forest's feature set without re-testing would
+have cost roughly 0.20 PR-AUC.
+</p>
+
+<p class="note">
+Read the standard deviations again: ±0.20 on the ten-sensor set. Those runs disagree
+with each other almost as much as they disagree with the winner. A single run on that
+set could have reported anything between 0.18 and 0.58 — which is why every line of
+these ablations is three seeds rather than one.
+</p>
+
+<h3>Hyperparameters</h3>
+<figure class="shot shot--wide">
+  <img src="images/9_2_tuning_ae_hyperparams.png" alt="Autoencoder hyperparameter grid over architecture depth, code dimension and learning rate" loading="lazy" />
+  <figcaption>24 configurations over depth, code dimension and learning rate; top ten shown</figcaption>
+</figure>
+
+<p class="reading">
+The code dimension dominates: 4 units in the bottleneck outperforms both 3 and 5. Too
+narrow and the network cannot reconstruct healthy operation either — normal points
+get high errors and precision collapses. Too wide and it reconstructs anomalies just
+as well as normal points, which is the failure mode specific to autoencoders: a
+perfect autoencoder is a useless detector. Shallow beats deep throughout, which is
+unsurprising on six input variables.
+</p>
+
+<h3>An ensemble, and an honest discrepancy</h3>
+<p>
+A single autoencoder is unstable. Five identical architectures on five seeds gave
+0.693, 0.666, 0.537, 0.656 and 0.691 — a spread of 0.156 between the luckiest and
+unluckiest run. Reporting the best would be a choice, not a result. The deployed
+detector averages the reconstruction errors of all five, reaching
+<strong>0.6848</strong>, ×16.4 over baseline.
+</p>
+
+<p class="reading">
+The ensemble does not beat its best member (0.6848 against 0.693), and was never
+expected to. It beats the <em>expected</em> member — the mean of 0.6486 ± 0.0576 —
+which is what you actually get when you train once and deploy. Ensembling trades the
+chance of a lucky seed for the certainty of avoiding an unlucky one.
+</p>
+
+<p class="note">
+One discrepancy is documented rather than hidden. The hyperparameter grid ranks
+<code>lr = 1e-2</code> first, at 0.700 against 0.672 for <code>lr = 1e-3</code>. The
+deployed ensemble uses 1e-3. The gap of 0.028 is of the same order as the seed-to-seed
+standard deviations on both configurations (0.010 and 0.010 across three seeds each),
+and 1e-3 converged far more regularly. An assertion in the notebook compares the
+documented learning rate against the one written in the deployed config file and fails
+loudly if they ever diverge.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_ae_dense_evaluation.png" alt="Six-panel autoencoder evaluation: score separation, PR curve, ROC curve, confusion matrix, correlation with Isolation Forest" loading="lazy" />
+  <figcaption>Dense autoencoder on validation: separation, curves, confusion matrix, correlation with the baseline</figcaption>
+</figure>
+
+<p class="reading">
+Two panels deserve attention. The ROC curve reads 0.8469 while the PR curve reads
+0.6848 — the familiar gap on imbalanced data, and the reason ROC appears here with a
+warning rather than as a headline. And the correlation with the Isolation Forest is
+0.628: high enough to confirm the two models see the same phenomena, which is what
+later made the forest redundant in the fusion.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_ae_learning_curve.png" alt="Training and validation loss curves showing early stopping behaviour" loading="lazy" />
+  <figcaption>Learning curves: 200 epochs, best validation loss at the last one</figcaption>
+</figure>
+
+<p class="reading">
+Training and validation losses descend together and stay close — 0.00037 against
+0.00043 at the end — with no divergence, so the network is not memorising its training
+set. The best validation epoch is the last one, meaning early stopping never triggered
+within the 200-epoch budget and the model was still improving when it stopped. The
+honest reading is that the ceiling here is the architecture, not the training time.
+</p>
+</section>
+
+<!-- ===================== LSTM ===================== -->
+<section class="cs" id="lstm">
+<h2>LSTM autoencoder</h2>
+
+<p>
+The dense autoencoder judges each measurement in isolation. That works for abrupt
+faults and poorly for smooth ones: a slow shading episode is unremarkable at every
+individual point and abnormal only as a trajectory. The second detector therefore
+reconstructs sequences instead of points — an LSTM encoder compresses a window of
+consecutive measurements into a latent code, and an LSTM decoder rebuilds the window.
+</p>
+
+<p>
+Sequences are built with the same seven-minute rule as everything else: a window is
+valid only if its points are contiguous in real time, so none of them straddles a
+night. That costs 1,209 healthy training points at segment edges, which is the price
+of not fabricating transitions that never happened.
+</p>
+
+<h3>Viability first</h3>
+<p>
+Before investing in a hyperparameter search, one question: does a sequence model see
+anything the point models miss? A first LSTM at 60-minute windows scored a
+disappointing <strong>0.398</strong> PR-AUC — well below the Isolation Forest's 0.581
+and the autoencoder's 0.685.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/10_2_fusion_rangs.png" alt="First exploratory fusion of the three detectors by rank averaging" loading="lazy" />
+  <figcaption>First fusion attempt: three detectors, all combinations, on their common support</figcaption>
+</figure>
+
+<p class="reading">
+This figure records a negative result that was kept rather than deleted. On the 3,786
+common points, the best fusion (AE + LSTM, 0.6851) is <em>worse</em> than the best
+single detector (AE alone, 0.6920). Fusion was not paying off. But one number
+justified continuing: the best fusion <em>with</em> the LSTM scores 0.6851 against
+0.6518 for the best fusion <em>without</em> it. The LSTM was contributing something
+real while being individually weak — and the correlations confirmed it, at 0.482 with
+the forest and 0.581 with the autoencoder, both well below the 0.628 the two
+point-wise models share. That is what justified the tuning that follows, and it is the
+moment the project could have taken the wrong turn.
+</p>
+
+<h3>Phase A: which lever actually matters</h3>
+<figure class="shot shot--wide">
+  <img src="images/fig_lstm_tuning_phaseA.png" alt="Phase A grid: 36 configurations across sequence length, units and code dimension" loading="lazy" />
+  <figcaption>Phase A: 36 configurations screened across three levers</figcaption>
+</figure>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_lstm_tuning_phaseA_levers.png" alt="Median PR-AUC by value of each hyperparameter lever" loading="lazy" />
+  <figcaption>Median PR-AUC per lever value — sequence length dominates</figcaption>
+</figure>
+
+<p class="reading">
+The second figure is the one worth reading. Taking the median PR-AUC across every
+configuration sharing a lever value isolates each lever's effect: sequence length
+spans 0.301 between its best and worst value, code dimension 0.193, and the number of
+units only 0.063. Shorter windows win decisively — a median of 0.505 at six steps
+against 0.204 at thirty-six. A long window dilutes a localised anomaly across many
+normal steps and loses points at every segment boundary. The best configuration
+reaches 0.6891, and three configurations hit the 400-epoch ceiling without early
+stopping, so their scores are flagged as underestimates rather than quietly ranked.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_lstm93_fusion.png" alt="Correlation between detectors and fusion performance after Phase A" loading="lazy" />
+  <figcaption>After Phase A: correlations between the three detectors, and what each fusion gives</figcaption>
+</figure>
+
+<p class="reading">
+With a properly tuned LSTM the picture inverts: fusion now beats the best single
+detector, 0.7341 against 0.6903, a gain of +0.0438. But the correlation panel raises a
+flag — the tuned LSTM correlates 0.896 with the dense autoencoder, against 0.581 for
+the untuned one. Tuning made it stronger and, simultaneously, more redundant. The
+fusion still gains, so the two are not interchangeable, but the margin narrowed with
+every point of performance added.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_lstm_phaseB.png" alt="Phase B refinement grid around the winning region" loading="lazy" />
+  <figcaption>Phase B: 27 configurations refining the winning region</figcaption>
+</figure>
+
+<p class="reading">
+Phase B searched around the Phase A winner and confirmed it: six steps, 64 units, code
+dimension 16, at 0.7205. Everything nearby is worse — 96 units gives 0.6904, 128 gives
+0.6823, nine steps gives 0.6821. A plateau would have been comfortable; a sharp peak
+means the configuration is a real optimum on this data, and also that it may not
+transfer to a plant with a different sampling rate.
+</p>
+
+<h3>The deployed ensemble</h3>
+<p>
+As with the dense autoencoder, five networks on five seeds rather than one. Members
+score 0.600, 0.676, 0.598, 0.639 and 0.645 — mean 0.6316 ± 0.0294 — and the ensemble
+reaches <strong>0.6583</strong>.
+</p>
+
+<p class="reading">
+Here the ensemble is a deliberate step backwards on paper. The single tuned LSTM
+scored 0.6903, and fusing it with the autoencoder gave 0.7341; the ensemble gives
+0.6583 and fuses to 0.7234. Roughly one hundredth of PR-AUC was traded for a detector
+whose behaviour does not depend on a seed drawn once. The single model's 0.6903 is a
+sample from a distribution with a 0.029 standard deviation; the ensemble's 0.6583 is
+what the system delivers every time it is rebuilt. On a system meant to run
+unattended, the second number is the one that can be promised.
+</p>
+</section>
+
+<!-- ===================== FUSION ===================== -->
+<section class="cs" id="fusion">
+<h2>Fusion</h2>
+
+<p>
+Two detectors that fail on different things are worth combining — but their scores are
+not comparable. Both are reconstruction errors, computed on different quantities,
+living at different magnitudes: the autoencoder's validation errors have a median of
+0.000297, the LSTM's 0.000106. Averaging them raw lets the larger scale decide every
+alarm.
+</p>
+
+<p>
+The fix is to stop comparing the two scores to each other and compare each to a fixed
+reference of its own. Each detector's raw error is converted into its rank within a
+frozen reference vector — that detector's own validation errors — and the two ranks,
+now both in [0, 1] and both meaning "how unusual relative to a known distribution",
+are averaged.
+</p>
+
+<details class="codebox"><summary>Show code — ranking against a frozen reference</summary><pre><code class="python">def _rang(self, valeurs, reference_triee):
+    """Rank within the pre-sorted reference: fraction of reference <= value.
+    A rank is NEVER recomputed on the current batch — that would be transductive."""
+    return np.searchsorted(reference_triee, valeurs, side="right") / len(reference_triee)
+
+r_ae   = self._rang(err_ae,   self.ref_ae)     # reference: 4,219 validation points
+r_lstm = self._rang(err_lstm, self.ref_lstm)   # reference: 4,006 validation sequences
+score_fusion = (r_ae + r_lstm) / 2</code></pre></details>
+
+<p class="note">
+This is where the streaming constraint from the first section becomes a line of code.
+The natural way to rank is <code>rankdata</code> over the batch — but in production the
+batch is one point, and its rank among itself is always 1.0, so every measurement would
+be an alarm. Ranking against a frozen reference produces a score meaning the same thing
+whether it is computed on four thousand points or on one.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_fusion_methodes.png" alt="Five fusion methods compared by PR-AUC on the common support" loading="lazy" />
+  <figcaption>Five ways of combining the two detectors, on the same 4,006 points</figcaption>
+</figure>
+
+<table class="minitable">
+<thead><tr><th>Method</th><th>PR-AUC</th><th>Gain</th><th>Overfitting risk</th></tr></thead>
+<tbody>
+<tr><td>Weighted average (w = 0.45 chosen on val)</td><td>0.7244</td><td>+0.0009</td><td>Low but real</td></tr>
+<tr><td><strong>Rank average</strong></td><td><strong>0.7234</strong></td><td>—</td><td>None</td></tr>
+<tr><td>Z-score average</td><td>0.7140</td><td>−0.0094</td><td>None</td></tr>
+<tr><td>Rank maximum</td><td>0.6618</td><td>−0.0617</td><td>None</td></tr>
+<tr><td>Stacking (honest cross-validation)</td><td>0.5233</td><td>−0.2002</td><td>High</td></tr>
+</tbody>
+</table>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_fusion_scatter.png" alt="Fusion methods plotted as performance against overfitting risk" loading="lazy" />
+  <figcaption>Performance against overfitting risk — the axis that decided the choice</figcaption>
+</figure>
+
+<p class="reading">
+The weighted average wins by 0.0009, and buys that with a weight fitted on the same
+validation set used to report the number. Plain rank averaging was kept: a
+nine-ten-thousandths gain does not justify a parameter chosen on the evaluation data.
+The stacking result is the instructive one — a meta-model, evaluated with honest
+cross-validation, scores 0.5233, far below both of its inputs. With 176 anomalies to
+learn from, the meta-model overfits comprehensively. Evaluated dishonestly it would
+have topped this table, which is precisely why the second axis of this figure exists.
+</p>
+
+<p>
+On the common support of 4,006 points, the retained fusion reaches
+<strong>0.7234</strong> against 0.6903 for the best single detector: +0.0331, earned
+from the two models disagreeing usefully rather than from either being better.
+</p>
+</section>
+
+<!-- ===================== THRESHOLD ===================== -->
+<section class="cs" id="threshold">
+<h2>Decision threshold</h2>
+
+<p>
+A fused score is a ranking. Turning it into an alarm requires a cut, and that cut
+encodes an economic judgement the model cannot make for itself.
+</p>
+
+<p>
+On a PV plant the two errors are asymmetric. A false positive sends a technician to
+check a healthy string; a false negative leaves a fault running for weeks. The
+threshold is therefore selected by maximising F2 on validation — the F-measure
+weighting recall twice as heavily as precision — rather than F1, which treats the two
+as equals.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_seuil_fusion_final.png" alt="F2 score and operating points as a function of the fusion threshold" loading="lazy" />
+  <figcaption>F2 against threshold, with the selected operating point and the alternatives</figcaption>
+</figure>
+
+<table class="minitable">
+<thead><tr><th>Criterion</th><th>Threshold</th><th>Precision</th><th>Recall</th><th>Missed</th></tr></thead>
+<tbody>
+<tr><td><strong>F2 maximum</strong></td><td><strong>0.9460</strong></td><td>0.731</td><td>0.727</td><td>48 / 176</td></tr>
+<tr><td>Recall ≥ 0.80</td><td>0.8107</td><td>0.283</td><td>0.801</td><td>35 / 176</td></tr>
+<tr><td>Recall ≥ 0.85</td><td>0.4572</td><td>0.072</td><td>0.852</td><td>26 / 176</td></tr>
+<tr><td>Recall ≥ 0.90</td><td>0.2648</td><td>0.049</td><td>0.903</td><td>17 / 176</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+The operating-point table is more informative than the chosen threshold. Pushing
+recall from 0.727 to 0.801 costs precision 0.731 → 0.283: two thirds of alarms become
+false. Pushing to 0.85 collapses precision to 0.072, barely above the 0.044 base rate —
+at that point the detector is flagging almost everything. Recall does not degrade
+gracefully here, it hits a wall. That is a property of the system, not a tuning
+decision, and it is the honest answer to "why not just set the threshold lower".
+</p>
+</section>
+
+<!-- ===================== PACKAGING ===================== -->
+<section class="cs" id="packaging">
+<h2>Packaging the system</h2>
+
+<p>
+The deployed system is ten networks, two scalers, two reference vectors and one
+threshold — about 2.8 MB in total, versioned in the repository so that a clone can
+reproduce every result without retraining anything.
+</p>
+
+<table class="srctable">
+<thead><tr><th>Artefact</th><th>Contents</th></tr></thead>
+<tbody>
+<tr><td><code>ae/ae_0..4.keras</code></td><td>Five dense autoencoders, code dimension 4</td></tr>
+<tr><td><code>lstm/lstm_0..4.keras</code></td><td>Five LSTM autoencoders — 6 steps, 64 units, code 16</td></tr>
+<tr><td><code>scaler_ae.pkl</code>, <code>scaler_lstm.pkl</code></td><td>Fitted on healthy training rows only</td></tr>
+<tr><td><code>ref_score_ae.npy</code>, <code>ref_score_lstm.npy</code></td><td>4,219 and 4,006 frozen validation errors — the rank references</td></tr>
+<tr><td><code>config.json</code></td><td>Features, hyperparameters, and the 0.9460 threshold</td></tr>
+</tbody>
+</table>
+
+<p class="note">
+These artefacts are only meaningful together. Retraining the networks changes the error
+scale, which invalidates the references, which invalidates the threshold. The notebook
+makes that dependency explicit: the retraining switch is off by default, and the
+section that would trigger it states in its own comment that references and threshold
+must be recomputed immediately afterwards — which the following section then does.
+</p>
+
+<p>
+A single class, <code>DetecteurPV</code>, loads those artefacts and exposes one method.
+It is defined once in the notebook and copied verbatim into <code>src/detecteur.py</code>
+for deployment, with the notebook remaining the source of truth. The next section
+verifies that the copy behaves identically.
+</p>
+</section>
+
+<!-- ===================== VALIDATION ===================== -->
+<section class="cs" id="validation">
+<h2>Final validation</h2>
+
+<p>
+This section exists because a saved model is not the same object as the model that
+produced the numbers above. Everything is reloaded from disk and re-verified before the
+test partition is opened.
+</p>
+
+<h3>The saved networks reproduce the reported scores</h3>
+<p>
+The five reloaded autoencoders, scored on the 4,219 validation points, reproduce the
+section 9 scores with a maximum deviation of <strong>0.00e+00</strong>. The five LSTMs
+do the same on 4,006 sequences. Not "close" — bit-identical.
+</p>
+
+<h3>Why the rank references had to be recomputed</h3>
+<p>
+The repository also contains two frozen score vectors from an earlier version of the
+project, which retrained its ensembles on every run. They are kept deliberately, as
+evidence for a point that is otherwise abstract: a rank reference belongs to the
+networks that produced it.
+</p>
+
+<table class="minitable">
+<thead><tr><th>Detector</th><th>Median, old reference</th><th>Median, deployed</th><th>Rank a median deployed point receives</th></tr></thead>
+<tbody>
+<tr><td>Dense AE</td><td>0.000595</td><td>0.000297</td><td>0.243 instead of 0.500</td></tr>
+<tr><td>LSTM</td><td>0.000089</td><td>0.000106</td><td>0.577 instead of 0.500</td></tr>
+</tbody>
+</table>
+
+<p class="reading">
+A perfectly median point from the deployed autoencoder — true rank 0.500 — would be
+scored 0.243 against the old reference, an error of 0.257 on a scale whose alarm
+threshold is 0.946. Reusing a reference across a retraining would not produce a
+slightly wrong score; it would produce a systematically deflated one, and the system
+would go quiet. The notebook asserts at run time that the two references are still
+distinct, so the demonstration cannot silently rot into a comparison of a thing with
+itself.
+</p>
+
+<h3>Two independent paths, one score</h3>
+<p>
+The score is computed twice by code written independently — once from the models used
+throughout the notebook, once from the artefacts reloaded from disk. Maximum
+point-by-point deviation: <strong>0.00e+00</strong> across 4,006 points, with identical
+PR-AUC to six decimals. Instantiating the deployable class and feeding it the same data
+gives the same answer again, including through the streaming path with its six-point
+sliding window. One rank convention, one score, one threshold, three implementations.
+</p>
+
+<p>
+Validation performance of the final system at the 0.9460 threshold: 128 true positives,
+48 false negatives, 47 false positives; 4 of 4 episodes detected, median delay 0 steps.
+</p>
+
+<p class="note">
+A guard cell runs immediately before the test is opened, verifying that no test metric
+has been computed anywhere earlier in the notebook. The test scores exist as arrays from
+section 10 onwards — they were never confronted with their labels. The cell also reports
+what the test contains: 3 episodes, all of type 3.1, a type absent from every
+development partition.
+</p>
+</section>
+
+<!-- ===================== TEST ===================== -->
+<section class="cs" id="test">
+<h2>The test partition</h2>
+
+<p>
+Opened once, with the threshold already fixed, after feature ablation, hyperparameter
+search, ensemble sizing, fusion selection and threshold calibration had all been settled
+on validation.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/fig_eval_finale_B.png" alt="Six-panel final evaluation on the test partition: PR curve, score timeline, detected episodes, confusion matrix" loading="lazy" />
+  <figcaption>Final evaluation dashboard on the held-out test partition</figcaption>
+</figure>
+
+<table class="minitable">
+<thead><tr><th>Metric</th><th>Validation</th><th>Test</th></tr></thead>
+<tbody>
+<tr><td>Points scored</td><td>4,006</td><td>2,813</td></tr>
+<tr><td>Anomaly base rate</td><td>4.4%</td><td>2.6%</td></tr>
+<tr><td>PR-AUC</td><td>0.7234 (×16.5)</td><td><strong>0.7765 (×29.9)</strong></td></tr>
+<tr><td>ROC-AUC</td><td>—</td><td>0.9964</td></tr>
+<tr><td>Precision</td><td>0.731</td><td>0.703</td></tr>
+<tr><td>Recall</td><td>0.727</td><td>0.973</td></tr>
+<tr><td>F2</td><td>0.728</td><td>0.903</td></tr>
+<tr><td>Episodes detected</td><td>4 / 4</td><td>3 / 3</td></tr>
+<tr><td>Median detection delay</td><td>0 steps</td><td>0 steps</td></tr>
+</tbody>
+</table>
+
+<p>
+At the 0.9460 threshold the test confusion matrix reads 71 true positives, 2 false
+negatives, 30 false positives, 2,710 true negatives. All three episodes were caught on
+their first scored point.
+</p>
+
+<p class="reading">
+The test recall (0.973) is far above the validation recall (0.727), which is not the
+usual direction and must not be read as the model improving. The two partitions contain
+different faults: test carries type 3.1 exclusively, validation carries 3.2 and 4.0. The
+system happens to be better at the family that landed in the test window — and, since
+3.1 appears nowhere in development, this is genuinely out-of-family generalisation
+rather than tuning paying off. With three episodes, the honest statement is that the
+point-level metrics are informative and the 3/3 episode score is a small sample.
+</p>
+</section>
+
+<!-- ===================== STREAMING ===================== -->
+<section class="cs" id="streaming">
+<h2>Running system</h2>
+
+<p>
+A detector that only exists inside a notebook has not been shown to work on a stream.
+The second half of the project ports the model into a pipeline that scores measurements
+one at a time, on infrastructure starting from a single command.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/architecture.png" alt="Pipeline architecture: replayer to Kafka to scoring consumer, then TimescaleDB and Grafana" loading="lazy" />
+  <figcaption>Replayer → Kafka → scoring consumer → TimescaleDB → Grafana</figcaption>
+</figure>
+
+<ol class="pipeline">
+  <li><strong>Replayer</strong> — publishes the test partition to a Kafka topic, one measurement per second, standing in for the plant.</li>
+  <li><strong>Consumer</strong> — maintains a six-point sliding window, scores it through the ten networks, writes to TimescaleDB and publishes threshold crossings to an <code>alarms</code> topic.</li>
+  <li><strong>TimescaleDB</strong> — hypertables for measurements and alarms, with a unique index on time so that replaying the demo updates rows instead of duplicating them.</li>
+  <li><strong>Grafana</strong> — eight panels provisioned from versioned JSON, so a clean volume comes up already configured.</li>
+</ol>
+
+<h3>The window buffer</h3>
+<p>
+Kafka delivers points; the LSTM needs six contiguous ones. The consumer keeps a sliding
+buffer that clears itself whenever the gap between two arrivals exceeds seven minutes —
+the same night rule as in the notebook, now enforced on a live stream rather than on a
+dataframe.
+</p>
+
+<p class="reading">
+Of the 2,975 replayed points, 2,813 receive a score. The other 162 are the five first
+points of each daylight segment, which have no complete window behind them. They are
+still written to the database with a null score rather than dropped: the sensor did
+record them, and a gap in a Grafana series should mean a gap in the data, not a gap in
+the model's coverage. That distinction is invisible in a notebook and immediately
+visible on a dashboard.
+</p>
+
+<figure class="shot shot--wide">
+  <img src="images/grafana.png" alt="Grafana dashboard showing the fused anomaly score against the decision threshold and production with anomalies overlaid" loading="lazy" />
+  <figcaption>The provisioned dashboard: fused score against threshold, production with detections overlaid</figcaption>
+</figure>
+
+<p>
+Throughput is the honest weak point: scoring one measurement takes about 0.9 s, because
+the ten networks are queried one after another. That is 300× faster than the five-minute
+measurement cadence, so it is comfortable for one plant and would not survive scoring
+many from a single process.
+</p>
+</section>
+
+<!-- ===================== LIMITS ===================== -->
+<section class="cs" id="limits">
+<h2 class="limits-head">Limits</h2>
+
+<div class="limits">
+<ul>
+  <li><strong>One plant, one dataset.</strong> Everything here comes from a single installation in La Réunion. The pipeline transfers; the threshold does not, and would have to be re-derived from a healthy period on any new site.</li>
+  <li><strong>Three test episodes.</strong> 3/3 detected is a good result on a small sample. The point-level metrics rest on 2,813 measurements and are far more informative than the episode count.</li>
+  <li><strong>ROC-AUC is flattering.</strong> 0.9964 looks conclusive and largely reflects the 2.6% positive rate. PR-AUC at 0.7765 — a lift of ×29.9 over the base rate — is the figure to compare against.</li>
+  <li><strong>Recall hits a wall.</strong> The operating-point table shows precision collapsing from 0.731 to 0.283 for seven points of extra recall. Some faults are simply not separable in this feature space, and no threshold fixes that.</li>
+  <li><strong>Labels are used — just not for training.</strong> The models never see a fault, but the labels select the threshold and produce every number reported here. A site with no labelled history at all would need a different way to set the cut.</li>
+  <li><strong>Throughput.</strong> 0.9 s per point, ten networks queried serially. Fine for one plant, unsuitable for a fleet.</li>
+  <li><strong>Frozen references age.</strong> The rank references are a snapshot of a healthy period. Panel ageing shifts the healthy baseline over years, which would slowly deflate every score.</li>
+</ul>
+</div>
+
+<h3>Next steps</h3>
+<ul>
+  <li>Batch the ten networks into a single vectorised call and drop per-point latency by an order of magnitude.</li>
+  <li>Monitor drift on the reference distributions, and define a re-calibration procedure recomputing references and threshold together.</li>
+  <li>Attribute each alarm to a feature — which of the six sensors drove the reconstruction error — so an alert says where to look, not only when.</li>
+  <li>Validate on a second plant, which is the only real test of whether the approach generalises.</li>
+</ul>
+</section>
+
+</div><!-- /.case -->
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/pfa-photovoltaique" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="https://zenodo.org/records/7358042" target="_blank" rel="noopener">Dataset (Zenodo)</a>
+      <a class="btn" href="../../index.html#work">All projects</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap"><p>Malak Mounji — ENSA Agadir, Morocco</p></div>
+</footer>
+
+</body>
+</html>
