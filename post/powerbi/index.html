@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Carrefour Sales Analysis · Case study · Malak Mounji</title>
+<meta name="description" content="Case study: an end-to-end business intelligence workflow on about 286,000 retail order lines: Python ETL, layered data preparation, star schema modelling, DAX measures and eight Power BI dashboard views." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../styles.css" />
+<link rel="stylesheet" href="case.css" />
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <a class="wordmark" href="../../index.html">Malak&nbsp;Mounji</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="../../index.html#work">All work</a>
+      <a href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener">Source</a>
+      <a class="nav-cv" href="../../malak.pdf">CV (PDF)</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero case-hero">
+  <div class="wrap">
+    <p class="eyebrow">Case study · Pair project with Rawane Cerbouche · 2025</p>
+    <h1>Carrefour Sales Analysis</h1>
+    <p class="standfirst">
+      An end-to-end business intelligence workflow on about 286,000 retail order
+      lines, built as a layered pipeline rather than a single report file.
+    </p>
+    <p class="lede">
+      This page documents the full chain: what the raw export looked like, which
+      inconsistencies had to be resolved before any measure could be trusted, why
+      the model was structured as a star schema, and what the eight dashboard views
+      are each for.
+    </p>
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener">View source</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap case">
+
+<nav class="toc" aria-label="On this page">
+  <p class="toc-head">On this page</p>
+  <ol>
+    <li><a href="#objective">Objective</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#etl">ETL</a></li>
+    <li><a href="#layers">Data layers</a></li>
+    <li><a href="#model">Star schema</a></li>
+    <li><a href="#dax">DAX measures</a></li>
+    <li><a href="#dashboards">Dashboards</a></li>
+    <li><a href="#outcome">Outcome</a></li>
+  </ol>
+</nav>
+
+<!-- ===================== OBJECTIVE ===================== -->
+<section class="cs" id="objective">
+<h2>Objective</h2>
+
+<p>
+The dataset is a retail transaction export of about 286,000 order lines across 19 columns,
+covering order lines, product categories, payment methods, customer demographics,
+cities, discounts, and cancellation reasons.
+</p>
+
+<p>
+A spreadsheet of that size answers single questions well and comparative questions
+badly. Asking which categories carry the highest cancellation rate, or whether
+discounting actually moves revenue, means rebuilding the same pivot tables every
+time. The purpose of the project was to replace that with a model where those
+questions are already expressed as measures.
+</p>
+
+<h3>Questions the dashboard is built to answer</h3>
+<ul>
+  <li>How much revenue is validated, and how much is lost to cancellations?</li>
+  <li>What is the effect of discounting on revenue, by category and over time?</li>
+  <li>Which categories, cities and payment methods perform best?</li>
+  <li>How do sales move month over month and year over year?</li>
+  <li>Which customer segments (by gender, age band, basket size) drive volume?</li>
+</ul>
+</section>
+
+<!-- ===================== PIPELINE ===================== -->
+<section class="cs" id="pipeline">
+<h2>Pipeline</h2>
+
+<p>
+The project is deliberately split into stages rather than done inside Power BI
+alone. Cleaning happens in Python, where it is versioned and repeatable; modelling
+and measures happen in Power BI, where they belong.
+</p>
+
+<ol class="pipeline">
+  <li><strong>Raw layer</strong>: the untouched source export, kept as the reference point.</li>
+  <li><strong>Python ETL</strong>: a single script producing a clean, analysis-ready CSV.</li>
+  <li><strong>Processed layer</strong>: the cleaned dataset, with stable types and column set.</li>
+  <li><strong>Star schema</strong>: one fact table and seven dimensions built in the Power BI model.</li>
+  <li><strong>DAX measures</strong>: KPIs and time intelligence defined on top of the model.</li>
+  <li><strong>Reporting layer</strong>: eight interactive dashboard views.</li>
+</ol>
+
+<p class="note">
+Keeping cleaning outside the report matters: a transformation written in Power
+Query lives inside a binary file, while a Python script can be read, reviewed and
+re-run on a new export. Anyone can regenerate the processed dataset from the raw
+one with a single command.
+</p>
+</section>
+
+<!-- ===================== ETL ===================== -->
+<section class="cs" id="etl">
+<h2>ETL and data preparation</h2>
+
+<p>
+The ETL script (<code>ETL/etl.py</code>) takes the raw export and produces the
+processed dataset. Each transformation exists because of a specific defect in the
+source file.
+</p>
+
+<h3>Encoding</h3>
+<p>
+Retail exports arrive in whatever encoding the exporting system used. The reader
+attempts UTF-8, UTF-8 with BOM, CP1252 and Latin-1 in turn, and falls back to
+replacement characters rather than failing outright, so a single unusual byte in
+a city name cannot stop the pipeline.
+</p>
+
+<div class="codebox-static">
+<pre><code class="python">def read_csv_smart(path: Path) -> pd.DataFrame:
+    for enc in ("utf-8", "utf-8-sig", "cp1252", "latin1"):
+        try:
+            return pd.read_csv(path, encoding=enc)
+        except UnicodeDecodeError:
+            continue
+    return pd.read_csv(path, encoding="cp1252", encoding_errors="replace")</code></pre>
+</div>
+
+<h3>Text normalisation</h3>
+<p>
+Trailing whitespace in a text column creates duplicate members in a dimension.
+In the refund reason column, <code>"bad reviews"</code> and <code>"bad reviews "</code>
+would become two rows in every visual. Text columns are stripped, and the literal
+strings <code>"nan"</code>, <code>"none"</code> and <code>"null"</code>, which arrive
+as text rather than as missing values, are converted to true nulls.
+</p>
+
+<h3>Dates, months and years</h3>
+<p>
+The <code>month</code> column arrives in inconsistent forms across exports. The
+script parses it, and if fewer than 60% of values parse successfully, it discards
+the column and derives the month from <code>order_date</code> instead. The year is
+derived the same way when absent. A date dimension is only as good as the key it
+joins on.
+</p>
+
+<h3>Discount reconciliation</h3>
+<p>
+The script checks that <code>discount_amount</code> agrees with
+<code>value × Discount_Percent / 100</code> on every row, replaces the stored amount
+where the two diverge beyond a tolerance, and prints how many rows it corrected.
+On the current export the count is zero: the source file is consistent.
+</p>
+
+<p>
+The first version of this step was wrong. It multiplied every discount by 100,
+and that error reached the dashboard. See the known issues below.
+</p>
+
+<div class="codebox-static">
+<pre><code class="python">expected = df["value"] * df["Discount_Percent"] / 100.0
+mismatch = (df["discount_amount"] - expected).abs() &gt; 0.01
+print(f"discount_amount: {mismatch.sum()} rows corrected")
+df.loc[mismatch, "discount_amount"] = expected[mismatch]</code></pre>
+</div>
+
+<h3>Types and contract</h3>
+<p>
+Identifiers and counts are cast to nullable integers, monetary fields to floats,
+and the output is restricted to a fixed list of 18 columns. If any expected column
+is missing, the script raises rather than writing a partial file, so a malformed
+export fails loudly at the ETL stage instead of silently at the reporting stage.
+</p>
+</section>
+
+<!-- ===================== LAYERS ===================== -->
+<section class="cs" id="layers">
+<h2>Data layers</h2>
+
+<p>
+The project has no enterprise warehouse behind it, but it follows the same
+separation of concerns, which is what makes the pipeline auditable.
+</p>
+
+<table class="srctable">
+<thead><tr><th>Layer</th><th>Contents</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td><strong>Raw</strong></td><td>Original export, about 286,000 rows × 19 columns (a 10,000-row extract is in the repository)</td><td>Never modified</td></tr>
+<tr><td><strong>Processed</strong></td><td>Cleaned dataset, same rows × 18 columns</td><td>Regenerated by script only</td></tr>
+<tr><td><strong>Reporting</strong></td><td>Power BI model, measures and views</td><td>Reads processed only</td></tr>
+</tbody>
+</table>
+
+<p class="note">
+One column is dropped between layers (a redundant selling-price field), and no
+rows are lost: the row count is identical before and after, which is the first
+thing to check when a cleaning script silently filters data.
+</p>
+</section>
+
+<!-- ===================== MODEL ===================== -->
+<section class="cs" id="model">
+<h2>Star schema</h2>
+
+<p>
+The cleaned table is a flat file. Loading it directly into Power BI works, but
+every filter then scans the full width of the table and every relationship has to
+be inferred. Restructuring it as a star schema separates what is measured from
+what it is measured by.
+</p>
+
+<h3>Fact table</h3>
+<p>
+<code>Fact_Sales</code>: one row per order line, carrying the numeric quantities:
+value, quantity ordered, price, discount amount and percent.
+</p>
+
+<h3>Dimensions</h3>
+<ul class="dims">
+  <li><code>Dim_Date</code>: calendar for time intelligence</li>
+  <li><code>Dim_Produit</code>: product and category</li>
+  <li><code>Dim_Client</code>: gender, age band</li>
+  <li><code>Dim_Geography</code>: city</li>
+  <li><code>Dim_Payment</code>: payment method</li>
+  <li><code>Dim_Status</code>: order status</li>
+  <li><code>Dim_Refund</code>: cancellation and refund reason</li>
+</ul>
+
+<figure class="shot shot--wide">
+  <img src="etoile.png" alt="Star schema: Fact_Sales at the centre, seven dimension tables around it" loading="lazy" />
+  <figcaption>Model view: one fact table, seven dimensions</figcaption>
+</figure>
+
+<h3>What the structure buys</h3>
+<ul>
+  <li><strong>Simpler DAX.</strong> Time intelligence functions expect a dedicated date table; without <code>Dim_Date</code>, year-to-date and prior-year measures have to be written by hand.</li>
+  <li><strong>Unambiguous relationships.</strong> Each filter path from a dimension to the fact table is single and directional.</li>
+  <li><strong>Readable model.</strong> A reader opening the file sees the business structure, not a 19-column rectangle.</li>
+</ul>
+</section>
+
+<!-- ===================== DAX ===================== -->
+<section class="cs" id="dax">
+<h2>DAX measures</h2>
+
+<p>
+Measures are where business questions become reusable definitions. Writing
+"revenue" once, correctly, means every visual that uses it agrees.
+</p>
+
+<h3>Base measures</h3>
+
+<div class="codebox-static">
+<pre><code class="dax">CA                   = SUM(fact_sales[value])
+Panier_Moyen         = DIVIDE([CA], [Nb_Commandes], 0)
+Total_Discount       = SUM(fact_sales[discount_amount])
+Taux_discount_Global = DIVIDE([Total_Discount], [CA] + [Total_Discount], 0)</code></pre>
+</div>
+
+<h3>Validated versus cancelled revenue</h3>
+<p>
+Total revenue on its own is misleading when a share of orders is later cancelled.
+Splitting the measure keeps the two visible side by side, and makes the
+cancellation rate a first-class indicator rather than something inferred.
+</p>
+<ul class="dims">
+  <li><code>CA_Validé</code>: revenue on validated orders</li>
+  <li><code>CA_Annulé</code>: revenue lost to cancellations</li>
+  <li><code>Taux_Annulation %</code>: cancellation rate</li>
+  <li><code>Taux_Discount_Global</code>: overall discount rate</li>
+</ul>
+
+<h3>Time intelligence</h3>
+<p>
+Built on <code>Dim_Date</code>, these give the dashboard its comparative
+dimension: a figure means little without the equivalent period beside it.
+</p>
+<ul class="dims">
+  <li><code>CA_MoM_Prev</code>: previous month revenue</li>
+  <li><code>CA_PY</code>: same period, previous year</li>
+  <li><code>CA_YTD</code>: year to date</li>
+  <li><code>Croissance_CA_YoY %</code>: year-over-year growth</li>
+</ul>
+
+<div class="codebox-static">
+<pre><code class="dax">CA_YTD              = TOTALYTD([CA], 'Dim_Date'[Date])
+CA_PY               = CALCULATE([CA], SAMEPERIODLASTYEAR('Dim_Date'[Date]))
+Croissance_CA_YoY % = DIVIDE([CA] - [CA_PY], [CA_PY], 0)</code></pre>
+</div>
+
+<h3>Behavioural measures</h3>
+<ul class="dims">
+  <li><code>Articles_par_Panier</code>: items per basket</li>
+  <li><code>Taux_Discount_Moyen</code>: average discount rate</li>
+</ul>
+</section>
+
+<!-- ===================== DASHBOARDS ===================== -->
+<section class="cs" id="dashboards">
+<h2>Dashboard views</h2>
+
+<p>
+Eight views, each answering one family of questions, so that no page becomes a
+single crowded canvas.
+</p>
+
+<ul class="dims">
+  <li><strong>Sales overview:</strong> headline KPIs, revenue by category, discount exposure.</li>
+  <li><strong>Transaction details:</strong> line-level drill-through on order, customer and category.</li>
+  <li><strong>Discounts and promotions:</strong> discount rate by category and payment method over time.</li>
+  <li><strong>Cancellations and refunds:</strong> cancellation volume, dominant reasons and lost revenue.</li>
+  <li><strong>Payment analysis:</strong> payment methods by order volume, value and cancellation rate.</li>
+  <li><strong>Geography:</strong> commercial performance by city.</li>
+  <li><strong>Customer insights:</strong> segmentation by gender and age band.</li>
+  <li><strong>Time trends:</strong> monthly evolution, year to date and growth against the prior year.</li>
+</ul>
+
+<p>
+Only the cancellations view is shown here. The seven others display discount
+figures affected by the ETL error described in the known issues below, so their
+screenshots were taken down rather than published with wrong numbers.
+</p>
+
+<figure class="shot shot--wide"><img src="cencellation.png" alt="Cancellations and refunds view" loading="lazy" /><figcaption>Cancellations and refunds</figcaption></figure>
+
+<h3>Known issues</h3>
+<div class="limits">
+<ul>
+  <li><strong>Discounts multiplied by 100.</strong> The first version of the ETL multiplied every discount amount by 100. Every discount measure in the published report is wrong: total discount reads 2.01 bn against 95.7 M of validated sales, and the global discount rate reads 0.89 where the source data gives about 0.08. Sales, quantities, orders and cancellations are not affected. The script is fixed in the repository and now logs how many rows it corrects.</li>
+  <li><strong>Validated sales on cancelled lines.</strong> In the transaction details view, some lines with status <code>canceled</code> still show a value under <em>Total Sales (Valid)</em>. The status filter in that measure needs to be checked.</li>
+  <li><strong>Two definitions of validated sales.</strong> <code>CA_Validé</code> counts complete and received orders, <code>Total Sales (Valid)</code> also counts paid ones, so the report shows 95.47 M and 95.72 M for the same idea. One measure should be kept.</li>
+  <li><strong>Year-over-year growth.</strong> In the time trends view, a growth that should read zero is displayed as 2.45E-16, a floating-point residue that the measure should round.</li>
+</ul>
+<p class="limits-note">The report was not rebuilt after these fixes because I no longer have access to Power BI.</p>
+</div>
+</section>
+
+<!-- ===================== OUTCOME ===================== -->
+<section class="cs" id="outcome">
+<h2>Outcome</h2>
+
+<p>
+The deliverable is a Power BI report plus the pipeline that feeds it: raw data,
+ETL script, processed dataset and model. Pointing the script at a new export
+regenerates the processed dataset; the report then reloads it.
+</p>
+
+<p>Two parts of the work were the ones that mattered:</p>
+
+<ul>
+  <li><strong>Checking the arithmetic after publishing.</strong> Recomputing the global discount rate by hand against the source file is what exposed the ETL error. A figure of 0.89 should have been questioned before the report was shared.</li>
+  <li><strong>Separating cleaning from reporting.</strong> Putting the transformations in a versioned script rather than in Power Query is what makes the result reproducible by someone else.</li>
+</ul>
+
+<h3>Limitations</h3>
+<div class="limits">
+<ul>
+  <li><strong>Single static export.</strong> The pipeline runs on one file; there is no scheduled refresh or incremental load.</li>
+  <li><strong>Limited data quality report.</strong> The script logs the discount corrections but not null counts or the effect of each other cleaning step.</li>
+  <li><strong>Dimensions built in-model.</strong> The star schema is constructed inside the Power BI file rather than materialised as separate tables, so it is not reusable outside this report.</li>
+</ul>
+</div>
+
+<h3>Next steps</h3>
+<ul>
+  <li>Emit a data quality summary from the ETL: rows affected per correction, null counts per column.</li>
+  <li>Materialise the dimensions as CSVs or database tables, so the model is portable.</li>
+  <li>Add row-level security if the report were shared across regional teams.</li>
+</ul>
+</section>
+
+</div><!-- /.case -->
+
+<section class="section alt">
+  <div class="wrap">
+    <div class="proj-links">
+      <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/Carrefour-Sales-Analysis-Power-BI-Project" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="https://drive.google.com/file/d/1X8w2iwG33Yd4KUv2MXWcPAy2ngNGf-DJ/view" target="_blank" rel="noopener">Raw dataset</a>
+      <a class="btn" href="../../index.html#work">All projects</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap"><p>Malak Mounji · ENSA Agadir, Morocco</p></div>
+</footer>
+
+</body>
+</html>
