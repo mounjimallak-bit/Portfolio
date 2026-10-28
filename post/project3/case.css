@@ -1,0 +1,377 @@
+/* ================================================================
+   Case study pages — extends ../../styles.css
+   Long-form reading: one column, quiet figures, code folded away.
+   ================================================================ */
+
+/* The container itself is the column. Nothing inside can be wider than
+   its parent, so text, figures, tables and code align by construction
+   rather than by a max-width repeated on every element. */
+.case{
+  width: min(100%, 760px);
+  margin-inline: auto;
+  padding-bottom: var(--gap);
+}
+
+.case-hero .wrap{ width: min(100%, 760px); }
+
+.case-hero{ padding-bottom: clamp(2rem, 5vw, 3.5rem); }
+
+.case-hero .standfirst{
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  line-height: 1.45;
+  margin: 0 0 1.4rem;
+}
+
+.case-hero .lede{ margin: 0 0 1.8rem; }
+
+/* ---- section rhythm ---- */
+.cs{
+  padding: clamp(2.2rem, 5vw, 3.4rem) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.cs > h2{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -.015em;
+  margin: 0 0 1.4rem;
+}
+
+.cs h3{
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.12rem;
+  margin: 2.4rem 0 .7rem;
+}
+
+.cs h4{
+  font-size: .78rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 1.6rem 0 .5rem;
+}
+
+
+
+.cs li{ margin-bottom: .4rem; }
+
+.cs .note{
+  border-left: 2px solid var(--rule);
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+  font-size: .95rem;
+}
+
+/* reading of a figure — sits under the chart it explains */
+.reading{
+  border-left: 2px solid var(--signal);
+  padding-left: 1.1rem;
+  font-size: .97rem;
+}
+
+/* ---- numbered pipeline ---- */
+.pipeline{ padding-left: 1.3rem; }
+.pipeline li{ margin-bottom: .7rem; }
+.pipeline li::marker{ font-family: var(--mono); color: var(--ink-soft); }
+
+/* ---- tables ---- */
+.srctable,
+.minitable{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .87rem;
+  margin: 1rem 0 1.6rem;
+}
+
+.minitable{ font-size: .8rem; }
+
+.srctable th,
+.srctable td,
+.minitable th,
+.minitable td{
+  text-align: left;
+  padding: .5rem .7rem .5rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.srctable thead th,
+.minitable thead th{
+  font-size: .72rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom-color: var(--ink);
+}
+
+.minitable td:nth-child(n+3){ font-family: var(--mono); text-align: right; }
+
+/* ---- screenshots ---- */
+.shot{ margin: 1.4rem 0 2rem; }
+
+/* Never upscale: a 336px screenshot blown up to 1080px is just blurry.
+   Images render at natural size, capped by the column. */
+.shot img{
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  background: #fff;
+}
+
+/* wide screenshots and strips: full column width is the point */
+
+
+/* two narrow portrait screenshots read as a pair, not a queue */
+.shot-pair{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin: 1.4rem 0 2rem;
+}
+.shot-pair .shot{ margin: 0; }
+.shot-pair img{ width: 100%; }
+
+/* same indicator, two years: side by side or the comparison is lost */
+.shot-duo{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin: 1.4rem 0 2rem;
+}
+.shot-duo .shot{ margin: 0; }
+.shot-duo img{ width: 100%; }
+
+.shot figcaption{
+  margin-top: .55rem;
+  font-size: .8rem;
+  color: var(--ink-soft);
+}
+
+/* ---- folded code ---- */
+.codebox{
+  border: 1px solid var(--rule);
+  margin: 1rem 0 1.8rem;
+  background: var(--paper-alt);
+}
+
+.codebox summary{
+  cursor: pointer;
+  padding: .55rem .9rem;
+  font-family: var(--mono);
+  font-size: .78rem;
+  letter-spacing: .04em;
+  color: var(--ink-soft);
+  list-style: none;
+}
+
+.codebox summary::before{ content: "▸ "; }
+.codebox[open] summary::before{ content: "▾ "; }
+.codebox summary::-webkit-details-marker{ display: none; }
+.codebox[open] summary{ border-bottom: 1px solid var(--rule); }
+
+.codebox pre{
+  margin: 0;
+  padding: .9rem;
+  overflow-x: auto;
+  background: #fff;
+}
+
+.codebox code{
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 1.6;
+  background: none;
+  padding: 0;
+  white-space: pre;
+}
+
+/* ---- limitations: the section that must not be skimmed ---- */
+.limits-head{ margin-top: 2.6rem !important; }
+
+.limits{
+  border: 1px solid var(--anomaly);
+  border-left-width: 3px;
+  padding: 1.2rem 1.4rem .4rem;
+  margin-bottom: 1.5rem;
+}
+
+.limits p,
+.limits ul{ max-width: none; }
+
+.limits-note{
+  font-size: .92rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* ---- two-column comparison ---- */
+.twocol{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.2rem, 3vw, 2.4rem);
+  align-items: start;
+  margin: 1.2rem 0 1.6rem;
+}
+
+.twocol .minitable,
+.twocol .codebox{ max-width: none; }
+
+.twocol h4{ margin-top: 0; }
+
+/* ---- assistant question types ---- */
+.qa{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.4rem;
+  margin: 1.2rem 0 1.6rem;
+}
+
+.qa > div{ border-top: 1px solid var(--rule); padding-top: .8rem; }
+.qa h4{ margin-top: 0; }
+.qa p{ font-size: .9rem; margin: 0 0 .5rem; }
+
+.qa .q{
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink);
+  font-size: .97rem;
+}
+
+@media (max-width: 780px){
+  .twocol{ grid-template-columns: 1fr; }
+}
+
+@media print{
+  .codebox{ display: none; }
+  .shot img{ max-height: 9cm; object-fit: contain; }
+}
+
+/* ---- gallery: nine projection charts read as a set, not a queue ---- */
+.shot-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem .9rem;
+  margin: 1.4rem 0 2rem;
+}
+
+.shot-grid .shot{ margin: 0; }
+
+.shot-grid .shot img{
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  padding: .4rem;
+}
+
+.shot-grid figcaption{ font-size: .74rem; }
+
+@media (max-width: 900px){
+  .shot-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px){
+  .shot-grid{ grid-template-columns: 1fr; }
+}
+
+/* safety net: never let a figure exceed its column, even unstyled-adjacent */
+.cs img{ max-width: 100%; height: auto; }
+
+@media (max-width: 560px){
+  .shot-pair,
+  .shot-duo{ grid-template-columns: 1fr; }
+}
+
+/* ---- table of contents ----
+   Sits in the left margin on wide screens, so it costs no reading width.
+   Collapses to a compact block above the text when the margin disappears. */
+.toc{
+  font-size: .82rem;
+  border-top: 1px solid var(--ink);
+  padding-top: .8rem;
+  margin: 0 0 2.5rem;
+}
+
+.toc-head{
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 .7rem;
+}
+
+.toc ol{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: toc;
+}
+
+.toc li{
+  counter-increment: toc;
+  margin: 0;
+  padding: .22rem 0;
+}
+
+.toc li::before{
+  content: counter(toc, decimal-leading-zero);
+  font-family: var(--mono);
+  font-size: .7rem;
+  color: var(--ink-soft);
+  margin-right: .6rem;
+}
+
+.toc a{
+  text-decoration: none;
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+}
+
+.toc a:hover{ border-bottom-color: var(--signal); color: var(--signal); }
+
+/* wide screens: park it in the margin and let it follow the scroll */
+@media (min-width: 1180px){
+  .toc{
+    position: fixed;
+    top: 7.5rem;
+    left: calc(50% - 380px - 210px);
+    width: 180px;
+    margin: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+@media print{ .toc{ display: none; } }
+
+/* code shown unfolded when it is the evidence for a claim */
+.codebox-static{
+  border: 1px solid var(--rule);
+  background: #fff;
+  margin: 1rem 0 1.4rem;
+}
+.codebox-static pre{ margin: 0; padding: .9rem; overflow-x: auto; }
+.codebox-static code{
+  font-family: var(--mono);
+  font-size: .8rem;
+  line-height: 1.6;
+  background: none;
+  padding: 0;
+  white-space: pre;
+}
+
+/* compact definition lists used for measure and dimension names */
+.dims{ list-style: none; padding: 0; }
+.dims li{
+  padding: .3rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: .93rem;
+}
+
+/* wide screenshots fill the column; the column is already the reading width */
+.shot--wide img{ width: 100%; }
