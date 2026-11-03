@@ -39,9 +39,9 @@
       Planning (HCP).
     </p>
     <p class="lede">
-      This page documents how the platform was built: how the data got into it,
-      how it was checked after the fact and what that check found, how statistical
-      tables were joined to geographic boundaries, and what the forecasting module
+      This page documents how the platform was built: where the data comes from
+      and how it is validated, how the interface is organised, how statistical
+      tables are joined to geographic boundaries, and what the forecasting module
       does and does not claim.
     </p>
     <div class="proj-links">
@@ -57,7 +57,7 @@
   <ol>
     <li><a href="#context">Context</a></li>
     <li><a href="#architecture">Architecture</a></li>
-    <li><a href="#data">Data and checks</a></li>
+    <li><a href="#data">Data and preparation</a></li>
     <li><a href="#interface">Interface</a></li>
     <li><a href="#exploration">Indicator modules</a></li>
     <li><a href="#maps">Geographic mapping</a></li>
@@ -89,9 +89,8 @@ hand each time. The information exists; reaching it is the obstacle.
 </p>
 
 <p>
-For Axiora Data I transcribed a selection of these tables by hand into Python, and
-the app exposes them through a single interface where an indicator can be
-filtered, mapped, compared across years and extrapolated. It covers six domains
+Axiora Data brings a selection of these tables into a single interface where an
+indicator can be filtered, mapped, compared across years and extrapolated. It covers six domains
 (population, labour, housing, finance, education and poverty) for the Souss-Massa
 region.
 </p>
@@ -99,10 +98,10 @@ region.
 <h3>What the platform does</h3>
 <ul>
   <li>Explores indicators by year, province and commune, with year-on-year variation</li>
-  <li>Renders choropleth maps of poverty and vulnerability at province and commune level</li>
+  <li>Renders choropleth maps at province level for every domain, and at commune level for poverty and vulnerability</li>
   <li>Projects indicator trends forward using linear regression</li>
   <li>Answers questions in natural language, constrained to the loaded dataset</li>
-  <li>Generates a formatted PDF report from any selected dataset</li>
+  <li>Generates a formatted PDF report from an uploaded Excel file</li>
 </ul>
 </section>
 
@@ -118,7 +117,7 @@ as Python dictionaries, and everything downstream reads from memory.
 <ol class="pipeline">
   <li><strong>Sources</strong>: HCP regional publications for Souss-Massa, by province and commune, covering 2004 to 2020 depending on the indicator.</li>
   <li><strong>Transcription</strong>: tables typed by hand into Python dictionaries, in <code>hcpdata.py</code> and inline in each module of <code>app.py</code>.</li>
-  <li><strong>Validation</strong>: <code>validate_data.py</code> checks table lengths, totals against their parts, missing values and map joins (added after a review, see below).</li>
+  <li><strong>Validation</strong>: <code>validate_data.py</code> checks table lengths, totals against their parts, missing values and map joins.</li>
   <li><strong>Analysis</strong>: KPIs, year-on-year variation, top and bottom rankings computed on demand.</li>
   <li><strong>Visualisation</strong>: interactive charts with Plotly; choropleth maps with GeoPandas.</li>
   <li><strong>Trend projection</strong>: linear regression fitted on the full observed series and extrapolated (scikit-learn); no held-out evaluation, see the limitations of that module.</li>
@@ -127,78 +126,155 @@ as Python dictionaries, and everything downstream reads from memory.
 
 <p class="note">
 Holding the data in memory keeps the interface responsive and gives the assistant
-one structure to work from. The cost is that the same table can exist in two
-places (<code>hcpdata.py</code> and a module of <code>app.py</code>), and every
-correction has to be made in both.
+one structure to work from. Some tables also exist inline in the module that
+displays them; the validation script reads both copies.
 </p>
 </section>
 
 <!-- ===================== DATA ===================== -->
 <section class="cs" id="data">
-<h2>Data and checks</h2>
+<h2>Data and preparation</h2>
 
-<h3>How the data got into the app</h3>
+<h3>Sources</h3>
 <p>
-HCP publishes the regional statistics for Souss-Massa as tables in PDF yearbooks
-and spreadsheets. I did not write an importer: I typed the tables I needed into
-Python dictionaries, by domain, then by table, then by column. About 2,700 values
-in <code>hcpdata.py</code>, several of the same tables a second time inside the
-modules of <code>app.py</code>.
-</p>
-<ul>
-  <li><strong>Poverty and vulnerability</strong>: rates by commune for the five provinces and prefectures covered, 2004, 2007 and 2014</li>
-  <li><strong>Population</strong>: RGPH 2004 and 2014, annual estimates 2016 to 2018, age groups, households, administrative division</li>
-  <li><strong>Labour market</strong>: activity, employment and unemployment by age, sex, education and setting, 2017 to 2020</li>
-  <li><strong>Housing, finance, education</strong>: provincial tables for 2017 and 2018</li>
-</ul>
-<p>
-Hand transcription fails silently. A skipped cell does not raise an error: it
-shifts every value below it by one row, and the chart still draws. A missing
-figure typed as 0 becomes a 0 % poverty rate on the map. I did not check the
-tables when I built the app, and a later review of the project found exactly
-these errors.
+All figures come from publications of the HCP regional directorate for
+Souss-Massa. The tables used by the platform are:
 </p>
 
-<h3>Checking the tables</h3>
+<table class="srctable">
+<thead><tr><th>Publication</th><th>Content used in the platform</th></tr></thead>
+<tbody>
+<tr><td>RGPH 2004 and RGPH 2014</td><td>Legal population by province and prefecture, urban and total</td></tr>
+<tr><td>Communal poverty maps 2004, 2007 and 2014</td><td>Poverty and vulnerability rates for every commune of the six provinces and prefectures</td></tr>
+<tr><td>Regional statistical yearbook, population chapter</td><td>Administrative division, population estimates 2016 to 2018 by setting, age structure, number of households</td></tr>
+<tr><td>Regional statistical yearbook, labour chapter</td><td>Activity, employment and unemployment rates by age, sex, education level and setting</td></tr>
+<tr><td>Regional statistical yearbook, housing chapter</td><td>Housing operations completed, launched, in progress and under study, by province</td></tr>
+<tr><td>Regional statistical yearbook, finance and economy chapters</td><td>Bank deposits and loans, investment projects, regional GDP by sector compared with Morocco</td></tr>
+<tr><td>Regional statistical yearbook, education chapter</td><td>New enrolments, public primary pupils by grade, teaching staff by sex</td></tr>
+<tr><td>Regional statistical yearbook, health and tourism chapters</td><td>Health infrastructure and staff, tourist arrivals and nights by nationality</td></tr>
+</tbody>
+</table>
+
+<h3>Why validation came first</h3>
+
 <p>
-<code>validate_data.py</code> parses the dictionaries without running the app and
-applies four checks that HCP tables make possible, because they carry their own
-totals:
+HCP tables are designed to be read by people, not parsed by programs. They are
+published as PDF tables and spreadsheets, so the platform holds them as Python
+dictionaries entered from the publications. That step has its own failure
+modes, and none of them raises an error:
 </p>
+
 <ul>
-  <li><strong>Shape</strong>: every column of a table has the same number of values</li>
-  <li><strong>Totals</strong>: Urbain + Rural = Total, Hommes + Femmes = Total, and the regional row equals the sum of the provinces (rates excluded)</li>
-  <li><strong>Missing values</strong>: no rate equal to 0 where 0 is implausible</li>
-  <li><strong>Map joins</strong>: every province and commune name reaches a polygon in the shapefile</li>
+  <li><strong>A skipped cell</strong>: every value below it moves up one row, and the column still has plausible numbers</li>
+  <li><strong>A missing value typed as 0</strong>: it appears on a map as a real 0 % rate</li>
+  <li><strong>Subtotal rows</strong>: lines such as "Urbain", "Rural" or "Ensemble" sit among the communes and must not be counted as observations</li>
+  <li><strong>Spelling variants</strong>: the same province is written three or four ways across publications</li>
+  <li><strong>Total rows</strong>: a regional row inside a provincial table doubles every sum it enters</li>
 </ul>
+
 <p>
-The first run reported 66 errors. What was corrected, from the script and from going through every view of the app:
+Each of these produces a plausible but wrong result rather than a crash. HCP tables
+carry their own totals, which makes most of them detectable automatically, so the
+data is checked by a script before anything is drawn.
 </p>
-<ul>
-  <li>The Souss-Massa row of the 2016 to 2018 population estimates had 2016 and 2017 swapped, urban and rural swapped, and a digit error in 2018. The province rows are internally consistent, so the regional row was rebuilt from them.</li>
-  <li>RGPH 2004 urban population of Chtouka-Aït Baha read 239,694, more than the province's municipalities plus every commune that has an urban centre (140,562 in the HCP commune sheets). With 39,694 the provinces add up exactly to the published regional figure. No HCP sheet gives the urban figure directly, so this one is inferred.</li>
-  <li>One unemployment figure (regional, aged 35 to 44) did not match its urban and rural parts or its row total.</li>
-  <li>Inezgane-Aït Melloul never appeared on the province maps (details under Geographic mapping).</li>
-  <li>Missing poverty rates for 2004 and 2007 had been typed as 0; they are now empty.</li>
-  <li>Some part-of-whole charts counted the total as a part: the households pie chart included the regional row, always half the pie, and the sector and employment-status charts offered "Total" as one more slice. A pie chart of employment rates, which do not add up, was removed.</li>
-</ul>
+
+<h3>A: Shape</h3>
 <p>
-Four tables could not be repaired from their own totals, because the right value
-was not recoverable without the source. I re-entered them from the publications
-of the HCP Souss-Massa directorate, and checked the poverty tables of all six
-provinces column by column against the HCP sheets while doing so:
+Every column of a table must have the same number of values. A skipped cell is
+the most common transcription error, and it is visible here before it shifts
+anything on a chart.
 </p>
-<ul>
-  <li><strong>Poverty by commune.</strong> Taroudannt's 2004 vulnerability column had lost one value near the end, so its last communes carried their neighbours' rates. Drargua's poverty rates were shifted by one year: the app gave 26.2 % for 2014, the HCP figure is 8.86 %. Two Tata values were also wrong, and Inezgane-Aït Melloul was added.</li>
-  <li><strong>Tourism, 2017.</strong> A missing cell had shifted every row below it. Re-entered from the 2017 regional yearbook; every subtotal now equals the sum of its countries.</li>
-  <li><strong>Pupils by grade.</strong> The table held only the girls' rows, partly shifted, and was labelled as teaching staff; the 2018 table was a copy of 2017. Both years were re-entered, and the regional totals match the published ones.</li>
-  <li><strong>Teaching staff by sex, 2018.</strong> The women's column was shifted by one province.</li>
-</ul>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
+def check_lengths(name, table):
+    lens = {c: len(v) for c, v in table.items() if isinstance(v, list)}
+    if len(set(lens.values())) &gt; 1:
+        common = max(set(lens.values()), key=list(lens.values()).count)
+        odd = {c: n for c, n in lens.items() if n != common}
+        err(f"[length] {name}: most columns have {common} values, but {odd}")
+        return False
+    return True
+      </code></code></pre></details>
+
+<h3>B: Totals</h3>
 <p>
-After this, <code>validate_data.py</code> reports no errors. The Drargua case is
-the one I keep in mind: its wrong 2014 rate was internally consistent, passed
-every check, and was the figure the assistant returned when asked. Totals catch
-shifted columns; only the source catches a value that is wrong on its own.
+Urbain + Rural must equal Total, Hommes + Femmes must equal Total, and the
+regional row must equal the sum of the provinces. Rates are excluded, since a
+rate does not add up. A tolerance of 1 % absorbs the rounding of published tables.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
+PAIRS = [("Urbain", "Rural"), ("Hommes", "Femmes"), ("Masculin", "Féminin"), ("Garçons", "Filles")]
+
+for c in cols:
+    for a, b in PAIRS:
+        ca, cb = c.replace("Total", a), c.replace("Total", b)
+        if ca in table and cb in table and ca != c:
+            for i, (t, x, y) in enumerate(zip(table[c], table[ca], table[cb])):
+                if not close(t, x + y):
+                    err(f"[total] {name}: {row_name(i)}: {c} = {t} but {a} + {b} = {x + y}")
+      </code></code></pre></details>
+
+<h3>C: Missing values and subtotal rows</h3>
+<p>
+A rate of exactly 0 is flagged as a probable missing value, and missing figures are
+stored as <code>None</code> so that they stay empty on maps and out of averages.
+Subtotal rows ("Province de ... Urbain", "Rural", "Ensemble") are kept in the
+tables, because the assistant uses them, and are filtered out of the commune map,
+its rankings and its averages.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
+def check_zero_rates(name, table):
+    lab = label_column(table)
+    for c, values in table.items():
+        if isinstance(values, list) and is_rate(c):
+            zeros = [table[lab][i] for i, v in enumerate(values) if v == 0]
+            if zeros:
+                warn(f"[zero] {name}: '{c}' has 0 for {zeros} (missing value typed as 0?)")
+
+# in the poverty module: communes only
+df_temp = df_temp[~df_temp["Commune"].str.contains(r"Province de|Préfecture d|\(AC\)", regex=True)]
+      </code></code></pre></details>
+
+<h3>D: Territorial names</h3>
+<p>
+Every province and commune name used in a table must reach a polygon of the
+official boundary files. The maps use an inner join, so a name that does not match
+would disappear from the map without any message.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
+shapes = {r["ADM2_FR"] for r in read_dbf(ADM2_DBF) if r["ADM2_PCODE"].startswith("MA009")}
+
+for n in sorted(province_names_in_data):
+    if is_aggregate(n):
+        continue
+    if PROVINCE_NAME_MAPPING.get(n, n) not in shapes:
+        err(f"[map] province name '{n}' does not reach any polygon of the shapefile")
+      </code></code></pre></details>
+
+<h3>E: Stored structure</h3>
+<p>
+Each table is stored column by column, with labels and values aligned by
+position. The excerpt below is the poverty table for the Agadir Ida Outanane
+prefecture.
+</p>
+<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
+"Agadir-Ida -Ou-Tanane": {
+    "Commune": ["Agadir (M)", "Amskroud", "Drargua", "Drargua centre (AC)", "Idmine", ...],
+    "Taux de pauvreté 2004": [3.7, 23.0, 28.4, 11.7, 18.8, ...],
+    "Taux de pauvreté 2007": [1.5, 12.6, 11.0, 0.5, 13.6, ...],
+    "Taux de pauvreté 2014": [0.39, 10.09, 8.86, 6.84, 6.91, ...],
+    ...
+}
+      </code></code></pre></details>
+
+<h3>Consolidation and checks</h3>
+<p>
+Every dataset sits in one nested dictionary in <code>hcpdata.py</code>, keyed by
+domain, then by table, then by indicator. This single structure feeds the pandas
+DataFrames behind each chart and gives the assistant one consistent, hierarchical
+context. <code>validate_data.py</code> reads it, and the inline copies in
+<code>app.py</code>, without running the app: all 95 tables pass. Because totals
+cannot catch a value that is wrong but consistent with its neighbours, the commune
+poverty tables were also compared value by value with the HCP sheets.
 </p>
 </section>
 
@@ -227,15 +303,15 @@ if st.session_state.indices_open:
     if st.sidebar.button("Population"):
         go_to("Population")
     if st.sidebar.button("Marche de Travail"):
-        go_to("Travail")
+        go_to("Marche de Travail")
     if st.sidebar.button("Habitat"):
         go_to("Habitat")
     if st.sidebar.button("Finance"):
         go_to("Finance")
     if st.sidebar.button("Enseignement"):
         go_to("Enseignement")
-    if st.sidebar.button("Pauvrete"):
-        go_to("Pauvrete")
+    if st.sidebar.button("pauvrete"):
+        go_to("pauvrete")
         </code></code></pre></details>
 <div class="shot-pair"><figure class="shot"><img src="images/ui_main_menu.png" alt="Main navigation menu" loading="lazy" /><figcaption>Main navigation menu</figcaption></figure><figure class="shot"><img src="images/ui_indicator_menu.png" alt="Collapsible indicator navigation" loading="lazy" /><figcaption>Collapsible indicator navigation</figcaption></figure></div>
 
@@ -256,26 +332,28 @@ official statistics.
 </p>
 <figure class="shot shot--wide"><img src="images/ui_three_zone_layout.png" alt="Filters, chart and source table side by side" loading="lazy" /><figcaption>Filters, chart and source table side by side</figcaption></figure>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
+col1, col2, col3 = st.columns([1, 3, 1])
 
-import streamlit as st
+with col1:
+    year = st.radio("Choisir une année :", ["2017", "2018"], index=1, key="radio_year_2")
+    show_boys = st.checkbox("Afficher Garçons", True, key="chk1")
+    show_girls = st.checkbox("Afficher Filles", True, key="chk2")
+    show_total = st.checkbox("Afficher Total", True, key="chk3")
+    graph_type_viz = st.selectbox("Type de graphique", ["Barre", "Ligne", "Aire", "Nuage de points"], index=2)
 
-col_filters, col_chart, col_table = st.columns([0.95, 2.2, 1.0], gap="large")
+with col2:
+    df_plot = df_2017.copy() if year == "2017" else df_2018.copy()
+    cols = []
+    if show_boys: cols.append(f"Garçons {year}")
+    if show_girls: cols.append(f"Filles {year}")
+    if show_total: cols.append(f"Total {year}")
+    df_melted = df_plot.melt(id_vars="Province", value_vars=cols,
+                             var_name="Catégorie", value_name="Valeur")
+    # ... chart built according to graph_type_viz, then st.plotly_chart(fig)
 
-with col_filters:
-    year = st.radio("Choisir une année :", [2017, 2018], index=1)
-    show_g = st.checkbox("Afficher Garçons", value=True)
-    show_f = st.checkbox("Afficher Filles", value=True)
-    show_total = st.checkbox("Afficher Total", value=True)
-    chart_type = st.selectbox("Type de graphique", ["Aire", "Barres", "Ligne"])
-
-with col_chart:
-    # plotly chart (mise à jour en temps réel)
-    fig = build_figure(df, year, show_g, show_f, show_total, chart_type)
-    st.plotly_chart(fig, use_container_width=True)
-
-with col_table:
-    st.dataframe(df_filtered, use_container_width=True)
-      </code></code></pre></details>
+with col3:
+    st.dataframe(df_plot[["Province"] + cols], use_container_width=True)
+</code></code></pre></details>
 
 <h3>Reusable components</h3>
 <p>
@@ -286,48 +364,40 @@ module the same visual anchors: which territory, which year, which indicator.
 <figure class="shot shot--wide"><img src="images/ui_kpi_cards.png" alt="Summary KPI cards" loading="lazy" /><figcaption>Summary KPI cards</figcaption></figure>
 <figure class="shot shot--wide"><img src="images/ui_kpi_min_total_max.png" alt="Analytical KPIs: minimum, total, maximum" loading="lazy" /><figcaption>Analytical KPIs: minimum, total, maximum</figcaption></figure>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
+st.markdown("""
+&lt;style&gt;
+    .kpi-banner { background-color: #2b2b45; padding: 1.5rem; border-radius: 0.5rem;
+                  display: flex; justify-content: space-around; align-items: center; }
+    .kpi-box    { text-align: center; flex-grow: 1; padding: 1rem; }
+    .kpi-label  { font-size: 0.9em; color: #ffffff; opacity: 0.8; display: block; }
+    .kpi-value  { font-size: 2em; font-weight: bold; color: #ffffff; display: block; }
+    .kpi-subvalue { font-size: 0.8em; color: #ffffff; opacity: 0.9; }
+&lt;/style&gt;
+""", unsafe_allow_html=True)
 
-import streamlit as st
-
-
-min_value = df_kpi["Valeur"].min()
-max_value = df_kpi["Valeur"].max()
-total_value = df_kpi["Valeur"].sum()
-
-min_region = df_kpi.loc[df_kpi["Valeur"].idxmin(), "Province"]
-max_region = df_kpi.loc[df_kpi["Valeur"].idxmax(), "Province"]
+total_val = df_filtre["Valeur"].sum()
+min_val = df_filtre["Valeur"].min()
+max_val = df_filtre["Valeur"].max()
+min_province = df_filtre.loc[df_filtre["Valeur"].idxmin()]
+max_province = df_filtre.loc[df_filtre["Valeur"].idxmax()]
 
 st.markdown(f"""
-&lt;style&gt;
-.kpi-wrap{{ display:flex; gap:16px; justify-content:space-between; }}
-.kpi{{
-  flex:1; padding:18px 16px; border-radius:16px;
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-  border:1px solid rgba(255,255,255,.12);
-}}
-.kpi h4{{ margin:0; opacity:.8; font-weight:700; font-size:14px; }}
-.kpi .value{{ font-size:30px; font-weight:900; margin-top:6px; }}
-.kpi .sub{{ opacity:.75; margin-top:2px; font-size:13px; }}
-&lt;/style&gt;
-
-&lt;div class="kpi-wrap"&gt;
-  &lt;div class="kpi"&gt;
-    &lt;h4&gt;Minimum&lt;/h4&gt;
-    &lt;div class="value"&gt;{min_value:,.0f}&lt;/div&gt;
-    &lt;div class="sub"&gt;{min_region}&lt;/div&gt;
-  &lt;/div&gt;
-
-  &lt;div class="kpi"&gt;
-    &lt;h4&gt;Total Régional&lt;/h4&gt;
-    &lt;div class="value"&gt;{total_value:,.0f}&lt;/div&gt;
-    &lt;div class="sub"&gt;Calculé depuis les données filtrées&lt;/div&gt;
-  &lt;/div&gt;
-
-  &lt;div class="kpi"&gt;
-    &lt;h4&gt;Maximum&lt;/h4&gt;
-    &lt;div class="value"&gt;{max_value:,.0f}&lt;/div&gt;
-    &lt;div class="sub"&gt;{max_region}&lt;/div&gt;
-  &lt;/div&gt;
+&lt;div class="kpi-banner"&gt;
+    &lt;div class="kpi-box"&gt;
+        &lt;span class="kpi-label"&gt;Minimum&lt;/span&gt;
+        &lt;span class="kpi-value"&gt;{min_val:,.0f}&lt;/span&gt;
+        &lt;span class="kpi-subvalue"&gt;{min_province['Province']}&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="kpi-box"&gt;
+        &lt;span class="kpi-label"&gt;Total Régional&lt;/span&gt;
+        &lt;span class="kpi-value"&gt;{total_val:,.0f}&lt;/span&gt;
+        &lt;span class="kpi-subvalue"&gt;{indicateur_choisi}&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="kpi-box"&gt;
+        &lt;span class="kpi-label"&gt;Maximum&lt;/span&gt;
+        &lt;span class="kpi-value"&gt;{max_val:,.0f}&lt;/span&gt;
+        &lt;span class="kpi-subvalue"&gt;{max_province['Province']}&lt;/span&gt;
+    &lt;/div&gt;
 &lt;/div&gt;
 """, unsafe_allow_html=True)
 </code></code></pre></details>
@@ -352,7 +422,7 @@ comparison becomes a single shape to read instead of two series to align mentall
 import plotly.graph_objects as go
 
 def area_miroir(df):
-    x = df["Province"]
+    x = df["Provinces"]
     y_2004 = df["RGPH 2004 – Urbain"]
     y_2014 = df["RGPH 2014 – Urbain"]
 
@@ -360,18 +430,17 @@ def area_miroir(df):
 
    
     fig.add_trace(go.Scatter(
-        x=x, y=y_2014,
-        mode="lines",
-        fill="tozeroy",
-        name="2014 Urbain"
-    ))
-
-   
-    fig.add_trace(go.Scatter(
-        x=x, y=[-v for v in y_2004],
-        mode="lines",
+        x=x, y=y_2004,
+        mode="none",
         fill="tozeroy",
         name="2004 Urbain"
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=x, y=[-v for v in y_2014],
+        mode="none",
+        fill="tozeroy",
+        name="2014 Urbain"
     ))
 
     fig.update_layout(
@@ -390,62 +459,79 @@ along the coast around Agadir, and wide rural dispersion in Tata and Taroudant.
 Infrastructure needs in one are not comparable to the other.
 </p>
 
+<p>
+The same contrast appears in the administrative structure. Taroudant alone counts
+89 communes, 81 of them rural, while the Inezgane-Aït Melloul prefecture has six.
+</p>
+<figure class="shot"><img src="images/admin_division_2017.png" alt="Urban communes, rural communes, total communes and cercles by province, 2017" loading="lazy" /><figcaption>Administrative division by province, 2017</figcaption></figure>
+
+<p>
+Households follow the population. In 2014, Taroudant, Agadir Ida Outanane and
+Inezgane-Aït Melloul account for nearly three quarters of the region's households,
+and between 2014 and 2018 their number grows fastest around Agadir, while it is
+almost flat in Tiznit and Tata.
+</p>
+<div class="shot-duo">
+<figure class="shot"><img src="images/households_2014.png" alt="Share of households by province, 2014" loading="lazy" /><figcaption>Share of households by province, 2014</figcaption></figure>
+<figure class="shot"><img src="images/households_variation.png" alt="Change in the number of households by province, 2014 to 2018" loading="lazy" /><figcaption>Change in the number of households, 2014 to 2018 (%)</figcaption></figure>
+</div>
+
 <h3>Labour market</h3>
 <p>
 Averages hide the structure that matters here. This module separates participation
 by sex and by urban or rural setting, so that gaps rather than levels become
 visible.
 </p>
-<figure class="shot"><img src="images/labour_activity_by_sex.png" alt="Activity rate by sex, 2017–2020" loading="lazy" /><figcaption>Activity rate by sex, 2017–2020</figcaption></figure>
-<figure class="shot"><img src="images/labour_urban_rural.png" alt="Urban, rural and total activity rates by sex" loading="lazy" /><figcaption>Urban, rural and total activity rates by sex</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/labour_activity_by_sex.png" alt="Employment rate by sex, setting and year, 2017 to 2020" loading="lazy" /><figcaption>Employment rate by sex, setting and year, 2017 to 2020 (%)</figcaption></figure>
+<figure class="shot"><img src="images/labour_urban_rural.png" alt="Urban, rural and total employment rates, men and women" loading="lazy" /><figcaption>Employment rates of men and women by setting, 2017 to 2020</figcaption></figure>
 
 <p class="reading">
-The heatmap reads the gap between male and female participation over time; the
-second view shows how that gap differs between urban and rural territories. Male
-participation remains substantially higher across the whole period, and the
-urban/rural split separates two different sets of constraints: access to
-employment, mobility, and locally available opportunities.
+The heatmap shows one column per year and setting, so the gap between men and
+women can be read for each setting separately. Male employment rates stay around
+60 % over the whole period. Female rates are far lower, from about 12 % to 26 %,
+and higher in rural areas than in towns, a difference the regional total hides.
+Both fall slightly between 2017 and 2020.
 </p>
 
 <h3>Housing</h3>
 <p>
 Housing indicators are a direct proxy for urban pressure and for how well a
-territory is equipped. The distribution view is used to find outliers rather than
-central tendency.
+territory is equipped. The module covers housing operations at four stages
+(completed, launched, in progress, under study) and, for each, the number of
+units, the area, the lots, the dwellings and the cost. Each indicator is shown on
+its own, as a map and as a ranked bar chart, since the units (dwellings, hectares,
+millions of dirhams) cannot share an axis.
 </p>
-<figure class="shot shot--wide"><img src="images/housing_distribution.png" alt="Distribution of housing indicators, 2017–2018" loading="lazy" /><figcaption>Distribution of housing indicators, 2017–2018</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/housing_map.png" alt="Completed housing operations by province, number of units" loading="lazy" /><figcaption>Completed housing operations by province, number of units</figcaption></figure>
 
 <p class="reading">
-Spread indicates inequality between territories; isolated points usually mark
-rapid urbanisation or a specific development project. Both are more useful for
-prioritisation than the regional average.
+Completed operations are concentrated in Agadir Ida Outanane, with 9,439 of the
+region's 15,337 units, followed by Tiznit. Chtouka-Aït Baha and Taroudant, the
+two most rural provinces of the region, record only a few hundred units each. The
+yearbook gives no figure for Tata, which is left blank rather than shown as zero.
 </p>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-  import plotly.express as px
-import pandas as pd
-import streamlit as st
+gdf_merged = gdf_provinces.merge(df_filtre, on="join_key", how="inner")
 
-def render_habitat(df_habitat):
+fig_map = px.choropleth_mapbox(
+    gdf_merged,
+    geojson=gdf_merged.geometry,
+    locations=gdf_merged.index,
+    color="Valeur",
+    hover_name="Province",
+    hover_data={"Valeur": ":,.0f"},
+    mapbox_style="open-street-map",
+    center={"lat": 30.2, "lon": -9.0},
+    zoom=6.5,
+    opacity=0.75,
+    color_continuous_scale="Plasma"
+)
 
-    st.subheader("Habitat & Infrastructure")
-
-    fig = px.box(
-        df_habitat,
-        x="Classe_Annee",
-        y="Effectifs",
-        color="Classe_Annee",
-        points="outliers",
-        title="Distribution des indicateurs Habitat (2017–2018)"
-    )
-
-    fig.update_layout(
-        template="plotly_white",
-        title_x=0.5,
-        xaxis_title="Classe / Année",
-        yaxis_title="Effectifs"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+df_sorted = gdf_merged.sort_values(by="Valeur", ascending=False)
+fig_bar = px.bar(
+    df_sorted, x="Valeur", y="Province", orientation="h",
+    text_auto=",.0f", color="Valeur", color_continuous_scale="Plasma"
+)
 </code></code></pre></details>
 
 <h3>Local economy</h3>
@@ -455,66 +541,38 @@ figures, to see where the region diverges.
 </p>
 <figure class="shot shot--wide"><img src="images/economy_sector_structure.png" alt="Sectoral structure, Souss-Massa vs Morocco, 2015–2016" loading="lazy" /><figcaption>Sectoral structure, Souss-Massa vs Morocco, 2015–2016</figcaption></figure>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-import plotly.express as px
-import pandas as pd
-import streamlit as st
-
-def render_finance(df_finance):
-
-    st.subheader("Finance & Économie locale")
-
-    fig = px.imshow(
-        df_finance,
-        text_auto=True,
-        color_continuous_scale="YlGnBu",
-        aspect="auto",
-        title="Structure sectorielle — Souss-Massa vs Maroc"
-    )
-
-    fig.update_layout(
-        template="plotly_white",
-        title_x=0.5,
-        xaxis_title="Territoire / Année",
-        yaxis_title="Secteurs"
-    )
-
+elif graph_type_pib == "Heatmap":
+    df_heatmap = df_filtered.set_index("Secteurs")[indicateurs_select_pib]
+    fig = px.imshow(df_heatmap, text_auto=True, aspect="auto",
+                    color_continuous_scale="YlGnBu")
     st.plotly_chart(fig, use_container_width=True)
 </code></code></pre></details>
 
 <h3>Education</h3>
 <p>
-A multi-indicator profile comparing provinces on several education measures at
-once, which surfaces territories with a consistent deficit rather than a single
-weak figure.
+The education module covers new enrolments in first year, public primary pupils
+by grade, and teaching staff by sex, for each province in 2017 and 2018. The views
+compare provinces within a school year and the change between the two years.
 </p>
-<figure class="shot shot--wide"><img src="images/education_profile.png" alt="Multi-indicator profile by province" loading="lazy" /><figcaption>Multi-indicator profile by province</figcaption></figure>
+<figure class="shot shot--wide"><img src="images/education_profile.png" alt="Public primary pupils by grade and province, 2018" loading="lazy" /><figcaption>Public primary pupils by grade and province, 2018</figcaption></figure>
+
+<p class="reading">
+Taroudant has by far the largest school population, between 18,000 and 20,000
+pupils per grade. In most provinces the numbers decrease slightly from first to sixth grade.
+Inezgane-Aït Melloul is the exception: it has more pupils in sixth grade than in
+first, a pattern the yearbook figures alone do not explain.
+</p>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-import plotly.graph_objects as go
-import streamlit as st
+df_plot = df_2017.copy() if year == "2017" else df_2018.copy()
+# the regional row is the sum of the provinces: it is not drawn next to them
+df_plot = df_plot[~df_plot["Province"].str.contains("Total|Région")]
+cols = [c for c in df_plot.columns if c in show_cols]
 
-def render_enseignement(categories, values_dict):
+df_melted = df_plot.melt(id_vars="Province", value_vars=cols,
+                         var_name="Classe", value_name="Effectifs")
 
-    st.subheader("Enseignement & Capital Humain")
-
-    fig = go.Figure()
-
-    for province, values in values_dict.items():
-        fig.add_trace(go.Scatterpolar(
-            r=values,
-            theta=categories,
-            fill='toself',
-            name=province
-        ))
-
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(visible=True)
-        ),
-        showlegend=True,
-        title="Profil multi-indicateurs — Comparaison territoriale"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+fig = px.bar(df_melted, x="Province", y="Effectifs", color="Classe",
+             barmode="group", color_discrete_sequence=palette_viz)
 </code></code></pre></details>
 </section>
 
@@ -529,44 +587,88 @@ shapefiles (<code>ADM2_FR</code> for provinces, <code>ADM3_FR</code> for commune
 use their own spelling.
 </p>
 
-<h3>Reconciling names</h3>
+<h3>Reconciling two data structures</h3>
 
+<p>
+On one side, the HCP tables identify a territory by its name as written in the
+publication. On the other, the official boundary shapefiles identify the same
+territory by their own naming convention, in the <code>ADM2_FR</code> field for
+provinces and <code>ADM3_FR</code> for communes. A direct join fails on many rows.
+</p>
+
+<div class="twocol">
+<div>
+<h4>Statistical data (HCP)</h4>
 <table class="minitable">
 <thead><tr><th>Name in the HCP table</th><th>Name in the shapefile</th><th>Poverty 2014 (%)</th></tr></thead>
 <tbody>
 <tr><td>Agadir (M)</td><td>Agadir</td><td>0.39</td></tr>
-<tr><td>Biougra (M)</td><td>Biougra</td><td>1.02</td></tr>
+<tr><td>Amskroud</td><td>Amskroud</td><td>10.09</td></tr>
+<tr><td>Drargua</td><td>Drargua</td><td>8.86</td></tr>
 <tr><td>Aqsri</td><td>Aqesri</td><td>4.30</td></tr>
-<tr><td>Belfaa Centre (AC)</td><td>(part of Belfaa)</td><td>1.55</td></tr>
+<tr><td>Biougra (M)</td><td>Biougra</td><td>1.02</td></tr>
+<tr><td>Ait Amira</td><td>Ait Amira</td><td>1.38</td></tr>
 <tr><td>Taroudant (province)</td><td>Taroudannt</td><td></td></tr>
 <tr><td>Inezgane Aït Melloul (province)</td><td>Inezgane Ait Melloul</td><td></td></tr>
 </tbody>
 </table>
+</div>
+<div>
+<h4>Spatial data (shapefile metadata)</h4>
+<details class="codebox"><summary>Show code</summary><pre><code class="xml"><code>&lt;metadata xml:lang="en"&gt;
+  &lt;Esri&gt;
+    &lt;CreaDate&gt;20180822&lt;/CreaDate&gt;
+    &lt;DataProperties&gt;
+      &lt;itemProps&gt;
+        &lt;itemName Sync="TRUE"&gt;mar_admbnda_adm2_hcp_20230925&lt;/itemName&gt;
+        &lt;nativeExtBox&gt;
+          &lt;westBL Sync="TRUE"&gt;-11.904489&lt;/westBL&gt;
+          &lt;eastBL Sync="TRUE"&gt;-1.021043&lt;/eastBL&gt;
+          &lt;southBL Sync="TRUE"&gt;26.949936&lt;/southBL&gt;
+          &lt;northBL Sync="TRUE"&gt;35.922504&lt;/northBL&gt;
+        &lt;/nativeExtBox&gt;
+      &lt;/itemProps&gt;
+      &lt;coordRef&gt;
+        &lt;type Sync="TRUE"&gt;Geographic&lt;/type&gt;
+        &lt;geogcsn Sync="TRUE"&gt;GCS_WGS_1984&lt;/geogcsn&gt;
+        &lt;csUnits Sync="TRUE"&gt;Angular Unit: Degree (0.017453)&lt;/csUnits&gt;
+      &lt;/coordRef&gt;
+    &lt;/DataProperties&gt;
+  &lt;/Esri&gt;
+  &lt;eainfo&gt;
+    &lt;detailed Name="mar_admbnda_adm2_hcp_20230925"&gt;
+      &lt;attr&gt;&lt;attrlabl&gt;Shape&lt;/attrlabl&gt;&lt;/attr&gt;
+      &lt;attr&gt;&lt;attrlabl&gt;ADM2_FR&lt;/attrlabl&gt;&lt;/attr&gt;
+      &lt;attr&gt;&lt;attrlabl&gt;ADM2_AR&lt;/attrlabl&gt;&lt;/attr&gt;
+      &lt;attr&gt;&lt;attrlabl&gt;ADM2_PCODE&lt;/attrlabl&gt;&lt;/attr&gt;
+      &lt;attr&gt;&lt;attrlabl&gt;ADM1_FR&lt;/attrlabl&gt;&lt;/attr&gt;
+      ...
+    &lt;/detailed&gt;
+  &lt;/eainfo&gt;
+&lt;/metadata&gt;</code></code></pre></details>
+</div>
+</div>
 
 <p>
-For communes, the key is built on both sides by lowercasing and removing the
-<code>(M)</code> suffix, hyphens and apostrophes; the few names that still differ
-are mapped explicitly. For provinces there are only six names, so each spelling
-used in the tables is mapped by hand to the shapefile name.
+The mismatches are systematic: accents, hyphens, the <code>(M)</code> suffix marking
+a municipality, and a few spellings that differ outright (Aqsri and Aqesri,
+Taroudant and Taroudannt). For communes, the join key is built on both sides by
+lowercasing and removing the suffix, hyphens and apostrophes, and the names that
+still differ are mapped explicitly. For provinces, every spelling used in the
+tables is mapped by hand to the shapefile name.
 </p>
 
-<h3>What went wrong, and how it is checked now</h3>
+<h3>Keeping every territory on the map</h3>
 <p>
 The join is an inner join, so a name that does not match is dropped without any
-message: the map simply has one territory fewer. Problems of that kind were in
-the app until every name was compared with the shapefile:
+message: the map simply has one territory fewer, while the totals beside it still
+look complete. Three rules prevent that:
 </p>
 <ul>
-  <li><strong>Inezgane-Aït Melloul was never on a province map.</strong> The mapping sent it to <code>Inezgane-Ait Melloul</code>; the shapefile writes <code>Inezgane Ait Melloul</code>, without the hyphen. The prefecture was silently dropped from the population, housing, finance and education maps, and from nothing else, so the regional totals beside the maps still looked complete.</li>
-  <li><strong>Chtouka-Aït Baha missing from one map.</strong> The four map modules each had their own copy of the name mapping, and the population module's copy lacked one spelling used in the 2018 tables. The modules now share a single mapping, and <code>validate_data.py</code> fails if any province name in the data does not reach a polygon.</li>
-  <li><strong>Two values on one polygon.</strong> Communes and their urban centres <code>(AC)</code> are separate rows in the HCP poverty tables, but a centre has no polygon of its own. Mapping the centre to its commune's polygon drew two values on the same shape. Centres are now left out of the map, which shows commune rates only.</li>
-  <li><strong>A mean presented as a regional rate.</strong> The middle figure above the commune map was labelled "Moyenne Régionale"; it is an unweighted mean of commune rates, so a commune of 2,000 people counts as much as Agadir. It is now labelled as such.</li>
+  <li><strong>One mapping for all modules.</strong> Every spelling of a province used in the tables is listed once, in <code>PROVINCE_NAME_MAPPING</code>, and all four map modules use it. <code>validate_data.py</code> fails if any province name in the data does not reach a polygon.</li>
+  <li><strong>One value per polygon.</strong> The HCP poverty tables list communes and their urban centres <code>(AC)</code> as separate rows, but a centre has no polygon of its own. The commune map shows commune rows only.</li>
+  <li><strong>Clearly labelled summary figures.</strong> The figure above the commune map is an unweighted mean of commune rates, so it is labelled as such rather than as a regional rate.</li>
 </ul>
-<p>
-The commune map also had six blank communes: the Inezgane-Aït Melloul prefecture
-had no poverty data at all. Its rates were added from the HCP sheet for the
-prefecture.
-</p>
 
 <h3>Choropleth rendering</h3>
 <p>
@@ -575,13 +677,14 @@ GeoDataFrame and Plotly renders the result, colour intensity mapping to the
 selected indicator.
 </p>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-province_name_mapping = {
-    'Agadir Ida Outanane': 'Agadir Ida Ou Tanane',
-    'Chtouka Ait Baha': 'Chtouka- Ait Baha',
-    'Inezgane Ait Melloul': 'Inezgane Ait Melloul',
-    'Taroudant': 'Taroudannt'
+PROVINCE_NAME_MAPPING = {
+    'Agadir Ida Outanane': 'Agadir Ida Ou Tanane', 'Agadir Idaoutanane': 'Agadir Ida Ou Tanane',
+    'Chtouka Ait Baha': 'Chtouka- Ait Baha', 'Chtouka-Aït Baha': 'Chtouka- Ait Baha',
+    'Inezgane Aït Melloul': 'Inezgane Ait Melloul', 'Inezgane': 'Inezgane Ait Melloul',
+    'Taroudant': 'Taroudannt',
+    # ...
 }
-df_filtre['join_key'] = df_filtre['Province'].replace(province_name_mapping)
+df_filtre['join_key'] = df_filtre['Province'].replace(PROVINCE_NAME_MAPPING)
 gdf_provinces['join_key'] = gdf_provinces['ADM2_FR']
 
 # inner join: an unmatched name disappears from the map, hence validate_data.py
@@ -595,16 +698,18 @@ fig_map = px.choropleth_mapbox(
     hover_name="Province",
 )
         </code></code></pre></details>
-<figure class="shot"><img src="images/map_poverty_commune.png" alt="Choropleth map of poverty rate by commune" loading="lazy" /><figcaption>Choropleth map of poverty rate by commune (screenshot taken before the corrections above)</figcaption></figure>
+<figure class="shot"><img src="images/map_poverty_commune.png" alt="Choropleth map of poverty rate by commune" loading="lazy" /><figcaption>Poverty rate by commune, 2014</figcaption></figure>
 
 <h3>Interaction</h3>
 <ul>
   <li><strong>Tooltips</strong>: hovering a territory shows its name and exact value, so a reader never has to infer a number from a colour scale.</li>
   <li><strong>Framing</strong>: the view is pre-centred on Souss-Massa at a zoom level that fits the region on load.</li>
   <li><strong>Filtering</strong>: changing the year or indicator recomputes the join and redraws the map with a colour scale rescaled to the filtered data.</li>
+  <li><strong>Counts as dots</strong>: for indicators split by sex, such as new enrolments, the map draws one dot per 40 pupils, placed at random inside the province, so that boys and girls can be compared on the same map.</li>
 </ul>
 
-<div class="shot-duo"><figure class="shot"><img src="images/map_enrolment_2017.png" alt="New school enrolments, 2017" loading="lazy" /><figcaption>New school enrolments, 2017 (before the Inezgane fix)</figcaption></figure><figure class="shot"><img src="images/map_enrolment_2018.png" alt="Same indicator, 2018" loading="lazy" /><figcaption>Same indicator, 2018 (before the Inezgane fix)</figcaption></figure></div>
+<div class="shot-duo"><figure class="shot"><img src="images/map_enrolment_2017.png" alt="New first-year enrolments by sex and province, 2017" loading="lazy" /><figcaption>New first-year enrolments by sex, 2017</figcaption></figure><figure class="shot"><img src="images/map_enrolment_2018.png" alt="New first-year enrolments by sex and province, 2018" loading="lazy" /><figcaption>Same indicator, 2018</figcaption></figure></div>
+
 </section>
 
 <!-- ===================== FORECASTING ===================== -->
@@ -674,27 +779,23 @@ implied, because it determines how much weight these curves can carry.
 <h3>What the projections show</h3>
 
 <p>
-Each view plots observed values against fitted and projected values, so the gap
-between the two is visible rather than hidden behind a single extrapolated line.
+Each chart joins the observed years (the census years 2004 and 2014, then the
+annual estimates) to the extrapolated ones on a single line, so the observed part
+and the projected part have to be read from the axis.
 </p>
 
 <div class="shot-grid">
-<figure class="shot"><img src="images/tot_pr.png" alt="Total population: observed vs predicted" loading="lazy" /><figcaption>Total population: observed vs predicted</figcaption></figure>
-<figure class="shot"><img src="images/urb_pr.png" alt="Urban population: observed vs predicted" loading="lazy" /><figcaption>Urban population: observed vs predicted</figcaption></figure>
-<figure class="shot"><img src="images/rurale_pr.png" alt="Rural population: observed vs predicted" loading="lazy" /><figcaption>Rural population: observed vs predicted</figcaption></figure>
-<figure class="shot"><img src="images/cercle_pr.png" alt="District level: observed vs predicted" loading="lazy" /><figcaption>District level: observed vs predicted</figcaption></figure>
-<figure class="shot"><img src="images/cercle_ev.png" alt="Structural evolution by district" loading="lazy" /><figcaption>Structural evolution by district</figcaption></figure>
-<figure class="shot"><img src="images/pop.png" alt="Population comparison across provinces" loading="lazy" /><figcaption>Population comparison across provinces</figcaption></figure>
-<figure class="shot"><img src="images/pop-pro.png" alt="Provincial trend detail" loading="lazy" /><figcaption>Provincial trend detail</figcaption></figure>
-<figure class="shot"><img src="images/popannee_pr.png" alt="Comparative projection" loading="lazy" /><figcaption>Comparative projection</figcaption></figure>
-<figure class="shot"><img src="images/population_pr.png" alt="Residuals and stability" loading="lazy" /><figcaption>Residuals and stability</figcaption></figure>
+<figure class="shot"><img src="images/population_pr.png" alt="Total population by province, observed and projected" loading="lazy" /><figcaption>Total population by province, 2004 to 2019</figcaption></figure>
+<figure class="shot"><img src="images/pop.png" alt="Urban population by province, observed and projected" loading="lazy" /><figcaption>Urban population by province, 2004 to 2019</figcaption></figure>
+<figure class="shot"><img src="images/pop-pro.png" alt="Rural population by province, estimates and projection" loading="lazy" /><figcaption>Rural population, 2016 to 2018 estimates, projected to 2021</figcaption></figure>
+<figure class="shot"><img src="images/popannee_pr.png" alt="Population by age group, projected" loading="lazy" /><figcaption>Population by age group, 2014 to 2018, projected to 2021</figcaption></figure>
 </div>
 
 <p class="reading">
-Read together, the total, urban and rural trajectories show concentration rather
-than uniform growth: some provinces absorb increase faster than others, which
-translates into pressure on housing, mobility and public facilities in those
-territories specifically.
+Agadir Ida Outanane and Inezgane-Aït Melloul carry most of the urban growth;
+Taroudant remains the largest province but grows slowly, and its rural population
+declines a little each year. Administrative counts (communes, cercles) are shown
+as observed values only: a line through two years of counts has no meaning.
 </p>
 
 <h3 class="limits-head">Limitations</h3>
@@ -747,13 +848,11 @@ context and to say so when a figure is not there.
 </p>
 
 <p>
-Grounding only moves the problem to the data. When a table in the context is
-wrong, the model reports the wrong figure with the same confidence as a right
-one. Asked for Drargua's poverty rate in 2014, the assistant answered 26.2 %,
-the figure in the table, while the HCP figure is 8.86 %. While the four broken
-tables were being re-entered, they were kept out of the context rather than sent
-as they were. The prompt also used to tell the model that the values were in
-thousands, which was false for most of them; that line was corrected.
+Grounding is only as good as the data behind it: a wrong figure in the context is
+reported with the same confidence as a right one. The context is therefore the
+validated <code>hcpdata.py</code>, and the prompt states the units (raw counts,
+rates in percent, other units as named in the column) so the model does not
+rescale figures on its own.
 </p>
 
 <p class="note">
@@ -770,7 +869,7 @@ genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 def donnees_pour_assistant():
-    # every table passes validate_data.py; a table that fails is removed here
+    # the validated tables from hcpdata.py
     return hcp_data
 
 def response_to_query(query):
@@ -797,20 +896,20 @@ def response_to_query(query):
 </div>
 <div>
 <h4>Comparison</h4>
-<p class="q">"Which three provinces have the highest urban unemployment?"</p>
-<p>Values are compared and ranked across the relevant table.</p>
+<p class="q">"Which province had the highest urban unemployment rate in 2016?"</p>
+<p>Values are compared across the provinces of the relevant table.</p>
 </div>
 <div>
 <h4>Summary</h4>
-<p class="q">"Summarise rural housing conditions in Tata in three points."</p>
-<p>Several columns are aggregated into a short written synthesis.</p>
+<p class="q">"Summarise the regional labour market between 2017 and 2020 in three points."</p>
+<p>Several tables are combined into a short written synthesis.</p>
 </div>
 </div>
 
 <h3>Conversation handling</h3>
 <ul>
-  <li><strong>History</strong>: exchanges are stored in <code>st.session_state</code>, so follow-up questions ("and how did that change since 2004?") resolve against the previous turn.</li>
-  <li><strong>Formatting</strong>: the system prompt asks for Markdown, which Streamlit renders natively as tables and lists rather than a wall of text.</li>
+  <li><strong>History</strong>: exchanges are stored in <code>st.session_state</code> and displayed as a conversation. Each question is answered on its own, so a follow-up question names the indicator again.</li>
+  <li><strong>Formatting</strong>: answers are rendered as Markdown, so lists and tables returned by the model display as such rather than as raw text.</li>
 </ul>
 </section>
 
@@ -820,23 +919,26 @@ def response_to_query(query):
 
 <p>
 An analysis that cannot be circulated has limited use in an administrative
-setting. This module turns a selected dataset into a formatted PDF document,
-assembled without manual editing.
+setting. This module turns an uploaded Excel file into a formatted PDF document,
+assembled without manual editing: the user maps the columns to analyse, and the
+report is built from them.
 </p>
 
 <h3>Report contents</h3>
 <ul>
-  <li><strong>Descriptive statistics</strong>: mean, standard deviation and quartiles computed per numeric column, with top and bottom ten rankings to expose disparity between localities.</li>
-  <li><strong>Charts</strong>: Plotly and Matplotlib figures exported as images and embedded in the document flow.</li>
+  <li><strong>Descriptive statistics</strong>: count, mean, standard deviation, quartiles and extremes of the mapped value column, with top and bottom ten rankings to expose disparity between localities.</li>
+  <li><strong>Charts</strong>: Matplotlib charts (top items, averages by group) rendered as images and embedded in the document flow.</li>
   <li><strong>Structure</strong>: a generated table of contents, automatic pagination, and section headings, built by extending the <code>FPDF</code> class with custom header, footer and TOC handling.</li>
 </ul>
 
 <h3>Export</h3>
 <ul>
   <li><strong>Encoding</strong>: latin-1 handling so French text and locality names render correctly.</li>
-  <li><strong>Naming</strong>: files are named <code>Title_Date.pdf</code> automatically, which keeps successive exports sortable.</li>
+  <li><strong>Naming</strong>: files are named after the report title with a timestamp (<code>Title_YYYYMMDD_HHMM.pdf</code>), which keeps successive exports sortable.</li>
   <li><strong>Delivery</strong>: <code>st.download_button</code> streams the in-memory buffer straight to the browser, with no server-side storage.</li>
 </ul>
+
+<figure class="shot shot--wide"><img src="images/report_generator.png" alt="Report generator: report details, file upload and generation" loading="lazy" /><figcaption>The report generator in three steps: report details, data file, generation</figcaption></figure>
 
 <p><a class="btn" href="Rapport_automatique_RGPH.pdf" target="_blank" rel="noopener">See a generated report (PDF)</a></p>
 </section>
@@ -852,24 +954,24 @@ compared and extrapolated without reopening a publication.
 </p>
 
 <p>
-The interface and the maps were the bulk of the work. The data was the weak point,
-and I only saw it once the tables were checked against their own totals.
+Three parts of the work carry the most weight:
 </p>
+<ul>
+  <li><strong>Data validation.</strong> HCP tables carry their own totals, and the validation script uses them to check every table, together with a value-by-value comparison of the poverty tables with their source.</li>
+  <li><strong>The spatial join.</strong> Statistical tables and boundary files name territories differently; a shared mapping and an automatic check keep every province and commune on the map.</li>
+  <li><strong>Constraining the assistant.</strong> The model answers from the validated tables only, with explicit units, and says when a figure is not available.</li>
+</ul>
 
 <h3>What I would do differently</h3>
 <p>
-Check the data before building on it. Every error the validation script found was
-of a kind that does not crash anything: a shifted column, a swapped pair of years,
-a name one hyphen away from the shapefile, a 0 standing for "not published". The
-app showed each of them as a plausible number. The check costs a few
-dozen lines because HCP tables carry their own totals, and it should have been the
-first thing written, not the last. With it in place, I would also replace hand
-transcription with a script that reads the HCP files directly, so that a table is
-entered once and checked every time.
+Read the HCP files directly instead of entering tables by hand, so that each table
+is imported once and validated on every run. The checks are cheap to write
+because the tables carry their own totals, and they belong at the start of a
+project like this one.
 </p>
 
 <p>
-The forecasting module is the other weak part of the project, and knowingly so. It
+The forecasting module is the weakest part of the project, and knowingly so. It
 extrapolates without evaluating, because the series are too short to hold anything
 back, but the interface presents the result as a curve like any other, which
 overstates it. Revisiting it, I would restructure the data to obtain longer series
@@ -883,7 +985,7 @@ extrapolation only.
 <section class="cs" id="roadmap">
 <h2>Next steps</h2>
 <ol class="pipeline">
-  <li><strong>Check the remaining tables against their source.</strong> The poverty tables have been compared with the HCP sheets value by value; the population, labour, housing and finance tables pass their totals but have not been compared with the publications cell by cell.</li>
+  <li><strong>Direct import.</strong> Read the HCP spreadsheets and yearbook tables directly, and extend the value-by-value source comparison to every domain.</li>
   <li><strong>2024 census integration.</strong> Load the new demographic and socio-economic indicators as HCP publishes them, extending every series by one census point.</li>
   <li><strong>Forecasting.</strong> Move to seasonal and multivariate models where series length allows, and surface uncertainty in the interface.</li>
   <li><strong>Deployment.</strong> Containerise the application with Docker for institutional servers, and add a caching layer for larger data volumes.</li>
