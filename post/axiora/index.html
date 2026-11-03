@@ -39,10 +39,10 @@
       Planning (HCP).
     </p>
     <p class="lede">
-      This page documents how the platform was built: what the raw data looked
-      like, why it had to be cleaned before anything else, how statistical tables
-      were joined to geographic boundaries, and what the forecasting module does
-      and does not claim.
+      This page documents how the platform was built: how the data got into it,
+      how it was checked after the fact and what that check found, how statistical
+      tables were joined to geographic boundaries, and what the forecasting module
+      does and does not claim.
     </p>
     <div class="proj-links">
       <a class="btn btn-solid" href="https://axiora-data.streamlit.app/" target="_blank" rel="noopener">Open the live app</a>
@@ -57,7 +57,7 @@
   <ol>
     <li><a href="#context">Context</a></li>
     <li><a href="#architecture">Architecture</a></li>
-    <li><a href="#data">Data and preparation</a></li>
+    <li><a href="#data">Data and checks</a></li>
     <li><a href="#interface">Interface</a></li>
     <li><a href="#exploration">Indicator modules</a></li>
     <li><a href="#maps">Geographic mapping</a></li>
@@ -89,10 +89,11 @@ hand each time. The information exists; reaching it is the obstacle.
 </p>
 
 <p>
-Axiora Data loads those files once, harmonises them, and exposes them through a
-single interface where an indicator can be filtered, mapped, compared across
-years and extrapolated. It covers six domains (population, labour, housing,
-finance, education and poverty) for the Souss-Massa region.
+For Axiora Data I transcribed a selection of these tables by hand into Python, and
+the app exposes them through a single interface where an indicator can be
+filtered, mapped, compared across years and extrapolated. It covers six domains
+(population, labour, housing, finance, education and poverty) for the Souss-Massa
+region.
 </p>
 
 <h3>What the platform does</h3>
@@ -110,14 +111,14 @@ finance, education and poverty) for the Souss-Massa region.
 <h2>Architecture</h2>
 
 <p>
-The application is a single Streamlit process. Data preparation happens once, at
-import time, and everything downstream reads from memory.
+The application is a single Streamlit process. The data lives in the source code
+as Python dictionaries, and everything downstream reads from memory.
 </p>
 
 <ol class="pipeline">
-  <li><strong>Sources</strong>: fifteen HCP spreadsheets covering six domains, organised by province and commune, spanning 2004 to 2024.</li>
-  <li><strong>Preparation</strong>: cleaning, type conversion, missing-value handling and label normalisation with pandas and NumPy.</li>
-  <li><strong>Consolidation</strong>: all cleaned datasets merged into one Python dictionary (<code>hcpdata.py</code>).</li>
+  <li><strong>Sources</strong>: HCP regional publications for Souss-Massa, by province and commune, covering 2004 to 2020 depending on the indicator.</li>
+  <li><strong>Transcription</strong>: tables typed by hand into Python dictionaries, in <code>hcpdata.py</code> and inline in each module of <code>app.py</code>.</li>
+  <li><strong>Validation</strong>: <code>validate_data.py</code> checks table lengths, totals against their parts, missing values and map joins (added after a review, see below).</li>
   <li><strong>Analysis</strong>: KPIs, year-on-year variation, top and bottom rankings computed on demand.</li>
   <li><strong>Visualisation</strong>: interactive charts with Plotly; choropleth maps with GeoPandas.</li>
   <li><strong>Trend projection</strong>: linear regression fitted on the full observed series and extrapolated (scikit-learn); no held-out evaluation, see the limitations of that module.</li>
@@ -125,158 +126,79 @@ import time, and everything downstream reads from memory.
 </ol>
 
 <p class="note">
-Holding the cleaned data in a single in-memory dictionary rather than reading
-files on each interaction keeps the interface responsive, and gives the
-assistant one consistent structure to work from.
+Holding the data in memory keeps the interface responsive and gives the assistant
+one structure to work from. The cost is that the same table can exist in two
+places (<code>hcpdata.py</code> and a module of <code>app.py</code>), and every
+correction has to be made in both.
 </p>
 </section>
 
 <!-- ===================== DATA ===================== -->
 <section class="cs" id="data">
-<h2>Data and preparation</h2>
+<h2>Data and checks</h2>
 
-<h3>Sources</h3>
+<h3>How the data got into the app</h3>
 <p>
-All data comes from HCP publications. The main files are:
+HCP publishes the regional statistics for Souss-Massa as tables in PDF yearbooks
+and spreadsheets. I did not write an importer: I typed the tables I needed into
+Python dictionaries, by domain, then by table, then by column. About 2,700 values
+in <code>hcpdata.py</code>, several of the same tables a second time inside the
+modules of <code>app.py</code>.
 </p>
-
-<table class="srctable">
-<thead><tr><th>File</th><th>Content</th></tr></thead>
-<tbody>
-<tr><td><code>RGPH2014.xlsx</code></td><td>Census structure by territory: administrative codes, total population, urban/rural split, age bands, households</td></tr>
-<tr><td><code>RGPH2024: indicators.xlsx</code></td><td>Updated demographic and socio-economic indicators by region and province</td></tr>
-<tr><td><code>chtouka pauvr.xlsx</code></td><td>Poverty rate, intensity and vulnerability by territory</td></tr>
-<tr><td><code>Poverty mapping 2004–2014.xlsx</code></td><td>Multidimensional poverty indicators over time, by region</td></tr>
-<tr><td><code>CPI base 100 2017.xlsx</code></td><td>Monthly and annual consumer price index series (2017–2024)</td></tr>
-<tr><td><code>Activity, employment 2016.xlsx</code></td><td>Activity, employment and unemployment rates by territory</td></tr>
-<tr><td><code>Labour 2017–2020.xlsx</code></td><td>Labour market indicators over time</td></tr>
-<tr><td><code>population17 / pop2018</code></td><td>Population counts and age structure</td></tr>
-<tr><td><code>Habitat17 / habitat</code></td><td>Housing characteristics</td></tr>
-<tr><td><code>finance17 / finance18</code></td><td>Budgetary and financial indicators</td></tr>
-<tr><td><code>enseignementprimaire17 / enseig18</code></td><td>School enrolment and schooling rates</td></tr>
-<tr><td><code>sante17 / sante18</code></td><td>Health infrastructure</td></tr>
-<tr><td><code>M.E17 / M.E18</code></td><td>Energy and mining sector indicators</td></tr>
-<tr><td><code>tourisme17.xlsx</code></td><td>Arrivals, overnight stays, hotel capacity</td></tr>
-</tbody>
-</table>
-
-<h3>Why cleaning came first</h3>
-
-<p>
-HCP spreadsheets are designed to be read by people, not parsed by programs. Five
-recurring problems made them unusable as-is:
-</p>
-
 <ul>
-  <li><strong>Thousands separated by spaces</strong>: <code>421 844</code> is a string, not a number</li>
-  <li><strong>Percentages carrying their symbol</strong>: <code>49,8%</code> needs extraction before conversion</li>
-  <li><strong>Comma decimal separator</strong> (French convention): silently breaks <code>float()</code></li>
-  <li><strong>Partially empty hierarchical rows</strong>: subtotal lines such as "Rural" or "Centre" that are not observations</li>
-  <li><strong>Column names varying between exports</strong>: the same field spelled differently across files</li>
+  <li><strong>Poverty and vulnerability</strong>: rates by commune for the five provinces and prefectures covered, 2004, 2007 and 2014</li>
+  <li><strong>Population</strong>: RGPH 2004 and 2014, annual estimates 2016 to 2018, age groups, households, administrative division</li>
+  <li><strong>Labour market</strong>: activity, employment and unemployment by age, sex, education and setting, 2017 to 2020</li>
+  <li><strong>Housing, finance, education</strong>: provincial tables for 2017 and 2018</li>
 </ul>
-
 <p>
-Left unhandled, each of these produces a plausible but wrong result rather than an
-error: a column read as text sorts alphabetically, a subtotal row counted as an
-observation inflates every average. Cleaning is what makes the rest of the
-platform trustworthy.
+Hand transcription fails silently. A skipped cell does not raise an error: it
+shifts every value below it by one row, and the chart still draws. A missing
+figure typed as 0 becomes a 0 % poverty rate on the map. I did not check the
+tables when I built the app, and a later review of the project found exactly
+these errors.
 </p>
 
-<h3>A: Column name normalisation</h3>
+<h3>Checking the tables</h3>
 <p>
-Stripping whitespace, collapsing repeated spaces and removing invisible characters,
-so that joins and transformations match on stable keys.
+<code>validate_data.py</code> parses the dictionaries without running the app and
+applies four checks that HCP tables make possible, because they carry their own
+totals:
 </p>
-<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-import re
-
-def normalize_colname(c: str) -> str:
-    c = str(c).strip()
-    c = re.sub(r"\s+", " ", c)                
-    c = c.replace("\u202f", " ").replace("\xa0", " ")  
-    return c
-
-df.columns = [normalize_colname(c) for c in df.columns]
-      </code></code></pre></details>
-
-<h3>B: Numeric conversion</h3>
+<ul>
+  <li><strong>Shape</strong>: every column of a table has the same number of values</li>
+  <li><strong>Totals</strong>: Urbain + Rural = Total, Hommes + Femmes = Total, and the regional row equals the sum of the provinces (rates excluded)</li>
+  <li><strong>Missing values</strong>: no rate equal to 0 where 0 is implausible</li>
+  <li><strong>Map joins</strong>: every province and commune name reaches a polygon in the shapefile</li>
+</ul>
 <p>
-Turning display strings such as <code>33 610 084</code> or <code>49,8%</code> into
-integers and floats, with a conversion that fails safely rather than silently.
+The first run reported 66 errors. What was corrected, from the script and from going through every view of the app:
 </p>
-<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-import re
-import pandas as pd
-import numpy as np
-
-def to_number(x):
-    if pd.isna(x):
-        return np.nan
-    s = str(x)
-    s = s.replace(" ", "").replace("\u202f", "").replace("\xa0", "")  
-    s = s.replace("%", "")                                            
-    s = s.replace(",", ".")                                            
-    s = re.sub(r"[^0-9\.\-]", "", s)                                
-    return pd.to_numeric(s, errors="coerce")
-      </code></code></pre></details>
-
-<h3>C: Missing values and hierarchical rows</h3>
+<ul>
+  <li>The Souss-Massa row of the 2016 to 2018 population estimates had 2016 and 2017 swapped, urban and rural swapped, and a digit error in 2018. The province rows are internally consistent, so the regional row was rebuilt from them.</li>
+  <li>RGPH 2004 urban population of Chtouka-Aït Baha read 239,694, more than the province's municipalities plus every commune that has an urban centre (140,562 in the HCP commune sheets). With 39,694 the provinces add up exactly to the published regional figure. No HCP sheet gives the urban figure directly, so this one is inferred.</li>
+  <li>One unemployment figure (regional, aged 35 to 44) did not match its urban and rural parts or its row total.</li>
+  <li>Inezgane-Aït Melloul never appeared on the province maps (details under Geographic mapping).</li>
+  <li>Missing poverty rates for 2004 and 2007 had been typed as 0; they are now empty.</li>
+  <li>Some part-of-whole charts counted the total as a part: the households pie chart included the regional row, always half the pie, and the sector and employment-status charts offered "Total" as one more slice. A pie chart of employment rates, which do not add up, was removed.</li>
+</ul>
 <p>
-Identifying rows that carry no observation (aggregation levels left partially
-empty by the export), so they do not distort statistics or maps.
+Four tables could not be repaired from their own totals, because the right value
+was not recoverable without the source. I re-entered them from the publications
+of the HCP Souss-Massa directorate, and checked the poverty tables of all six
+provinces column by column against the HCP sheets while doing so:
 </p>
-<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-
-numeric_cols = [c for c in df.columns if c not in ["CONC", "Localités"]]
-
-mask_all_nan = df[numeric_cols].isna().all(axis=1)
-df_clean = df.loc[~mask_all_nan].copy()
-
-
-df_clean["Localités"] = df_clean["Localités"].ffill()
-      </code></code></pre></details>
-
-<h3>D: Territorial key standardisation</h3>
+<ul>
+  <li><strong>Poverty by commune.</strong> Taroudannt's 2004 vulnerability column had lost one value near the end, so its last communes carried their neighbours' rates. Drargua's poverty rates were shifted by one year: the app gave 26.2 % for 2014, the HCP figure is 8.86 %. Two Tata values were also wrong, and Inezgane-Aït Melloul was added.</li>
+  <li><strong>Tourism, 2017.</strong> A missing cell had shifted every row below it. Re-entered from the 2017 regional yearbook; every subtotal now equals the sum of its countries.</li>
+  <li><strong>Pupils by grade.</strong> The table held only the girls' rows, partly shifted, and was labelled as teaching staff; the 2018 table was a copy of 2017. Both years were re-entered, and the regional totals match the published ones.</li>
+  <li><strong>Teaching staff by sex, 2018.</strong> The women's column was shifted by one province.</li>
+</ul>
 <p>
-Normalising the join key so census data and poverty data can be merged on an exact
-match.
-</p>
-<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-def normalize_code(x):
-    s = "".join(ch for ch in str(x) if ch.isdigit())
-    return s if s else None
-
-rgph["CONC"]  = rgph["CONC"].apply(normalize_code)
-pauvr["CONC"] = pauvr["CONC"].apply(normalize_code)
-
-df_merged = rgph.merge(pauvr, on="CONC", how="left")
-      </code></code></pre></details>
-
-<h3>E: Cleaned output</h3>
-<details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-
-data_clean_preview = {
-  "Province": "Agadir-Ida -Ou-Tanane",
-  "Commune_head": [
-    "Agadir (M)",
-    "Amskroud",
-    "Drargua",
-    "Drargua centre (AC)",
-    "Idmine"
-  ],
-  "Taux_pauvrete_2004_head": [3.7, 23.0, 0, 0, 18.8],
-  "Taux_pauvrete_2007_head": [1.5, 12.6, 18.86, 0.5, 13.6],
-  "Taux_pauvrete_2014_head": [0.39, 10.09, 26.2, 6.84, 6.91]
-}
-      </code></code></pre></details>
-
-<h3>Consolidation</h3>
-<p>
-After cleaning, the platform no longer depends on scattered files. Every dataset is
-consolidated into one nested Python dictionary in <code>hcpdata.py</code>, keyed by
-domain, then by province, then by indicator. This single structure feeds the
-pandas DataFrames behind each chart and supplies the assistant with one
-consistent, hierarchical context.
+After this, <code>validate_data.py</code> reports no errors. The Drargua case is
+the one I keep in mind: its wrong 2014 rate was internally consistent, passed
+every check, and was the figure the assistant returned when asked. Totals catch
+shifted columns; only the source catches a value that is wrong on its own.
 </p>
 </section>
 
@@ -601,89 +523,49 @@ def render_enseignement(categories, values_dict):
 <h2>Geographic mapping</h2>
 
 <p>
-Mapping is the most direct way to locate territorial disparity, but it required the
-most work. The difficulty is not drawing the map; it is joining two datasets that
-were never designed to be joined.
+The maps join two datasets that were never designed to be joined: the HCP tables
+name a territory as the publication writes it, and the official boundary
+shapefiles (<code>ADM2_FR</code> for provinces, <code>ADM3_FR</code> for communes)
+use their own spelling.
 </p>
 
-<h3>Reconciling two data structures</h3>
+<h3>Reconciling names</h3>
 
-<p>
-On one side, HCP statistical tables identify a territory by its name as written in
-the spreadsheet. On the other, the official boundary shapefiles identify the same
-territory by their own naming convention. A direct join fails on most rows.
-</p>
-
-<div class="twocol">
-<div>
-<h4>Statistical data (HCP)</h4>
 <table class="minitable">
-<thead><tr><th>Commune</th><th>Setting</th><th>Population</th><th>Poverty %</th></tr></thead>
+<thead><tr><th>Name in the HCP table</th><th>Name in the shapefile</th><th>Poverty 2014 (%)</th></tr></thead>
 <tbody>
-<tr><td>Agadir (M)</td><td>Urban</td><td>421 844</td><td>0.39</td></tr>
-<tr><td>Amskroud</td><td>Rural</td><td>10 020</td><td>10.09</td></tr>
-<tr><td>Drargua</td><td>Rural</td><td>70 793</td><td>6.84</td></tr>
-<tr><td>Tiqqi</td><td>Rural</td><td>8 773</td><td>18.50</td></tr>
-<tr><td>Biougra (M)</td><td>Urban</td><td>37 933</td><td>6.50</td></tr>
-<tr><td>Ait Amira</td><td>Rural</td><td>76 646</td><td>8.20</td></tr>
+<tr><td>Agadir (M)</td><td>Agadir</td><td>0.39</td></tr>
+<tr><td>Biougra (M)</td><td>Biougra</td><td>1.02</td></tr>
+<tr><td>Aqsri</td><td>Aqesri</td><td>4.30</td></tr>
+<tr><td>Belfaa Centre (AC)</td><td>(part of Belfaa)</td><td>1.55</td></tr>
+<tr><td>Taroudant (province)</td><td>Taroudannt</td><td></td></tr>
+<tr><td>Inezgane Aït Melloul (province)</td><td>Inezgane Ait Melloul</td><td></td></tr>
 </tbody>
 </table>
-</div>
-<div>
-<h4>Spatial data (shapefile metadata)</h4>
-<details class="codebox"><summary>Show code</summary><pre><code class="xml"><code>&lt;metadata <span class="attr">xml:lang</span>=<span class="val">"en"</span>&gt;
-  <span class="comment">&lt;!-- Architecture de projection spatiale --&gt;</span>
-  &lt;Esri&gt;
-    &lt;CreaDate&gt;<span class="val">20230925</span>&lt;/CreaDate&gt;
-    &lt;DataProperties&gt;
-      &lt;itemProps&gt;
-        &lt;itemName <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">mar_admbnda_adm2_hcp</span>&lt;/itemName&gt;
-        &lt;nativeExtBox&gt;
-          &lt;westBL&gt;<span class="val">-17.104231</span>&lt;/westBL&gt;
-          &lt;eastBL&gt;<span class="val">-1.031999</span>&lt;/eastBL&gt;
-          &lt;southBL&gt;<span class="val">20.771534</span>&lt;/southBL&gt;
-          &lt;northBL&gt;<span class="val">35.926510</span>&lt;/northBL&gt;
-        &lt;/nativeExtBox&gt;
-      &lt;/itemProps&gt;
-      &lt;coordRef&gt;
-        &lt;type <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">Geographic</span>&lt;/type&gt;
-        &lt;geogcsn <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">GCS_WGS_1984</span>&lt;/geogcsn&gt;
-        &lt;csUnits <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">Angular Unit: Degree (0.017453)</span>&lt;/csUnits&gt;
-      &lt;/coordRef&gt;
-    &lt;/DataProperties&gt;
-  &lt;/Esri&gt;
-
-  <span class="comment">&lt;!-- Définition des entités (Polygones) --&gt;</span>
-  &lt;eainfo&gt;
-    &lt;detailed <span class="attr">Name</span>=<span class="val">"mar_admbnda_adm2"</span>&gt;
-      &lt;attr&gt;
-        &lt;attrlabl <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">Shape</span>&lt;/attrlabl&gt;
-        &lt;attrdef <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">Feature geometry.</span>&lt;/attrdef&gt;
-        &lt;attrtype <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">Geometry</span>&lt;/attrtype&gt;
-      &lt;/attr&gt;
-      &lt;attr&gt;
-        &lt;attrlabl <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">ADM2_FR</span>&lt;/attrlabl&gt;
-        &lt;attrdef&gt;<span class="val">Province or Prefecture name (French)</span>&lt;/attrdef&gt;
-        &lt;attrtype <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">String</span>&lt;/attrtype&gt;
-        &lt;attwidth <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">50</span>&lt;/attwidth&gt;
-      &lt;/attr&gt;
-      &lt;attr&gt;
-        &lt;attrlabl <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">ADM2_PCODE</span>&lt;/attrlabl&gt;
-        &lt;attrdef&gt;<span class="val">Unique administrative code</span>&lt;/attrdef&gt;
-        &lt;attrtype <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">String</span>&lt;/attrtype&gt;
-        &lt;attwidth <span class="attr">Sync</span>=<span class="val">"TRUE"</span>&gt;<span class="val">50</span>&lt;/attwidth&gt;
-      &lt;/attr&gt;
-    &lt;/detailed&gt;
-  &lt;/eainfo&gt;
-&lt;/metadata&gt;</code></code></pre></details>
-</div>
-</div>
 
 <p>
-The mismatches are systematic: accents, hyphens, the <code>(M)</code> suffix marking
-a municipality, and inconsistent spacing. The join key is normalised on both sides
-by stripping diacritics, separators and suffixes, and the province names that still
-differ are mapped explicitly, as in the code below.
+For communes, the key is built on both sides by lowercasing and removing the
+<code>(M)</code> suffix, hyphens and apostrophes; the few names that still differ
+are mapped explicitly. For provinces there are only six names, so each spelling
+used in the tables is mapped by hand to the shapefile name.
+</p>
+
+<h3>What went wrong, and how it is checked now</h3>
+<p>
+The join is an inner join, so a name that does not match is dropped without any
+message: the map simply has one territory fewer. Problems of that kind were in
+the app until every name was compared with the shapefile:
+</p>
+<ul>
+  <li><strong>Inezgane-Aït Melloul was never on a province map.</strong> The mapping sent it to <code>Inezgane-Ait Melloul</code>; the shapefile writes <code>Inezgane Ait Melloul</code>, without the hyphen. The prefecture was silently dropped from the population, housing, finance and education maps, and from nothing else, so the regional totals beside the maps still looked complete.</li>
+  <li><strong>Chtouka-Aït Baha missing from one map.</strong> The four map modules each had their own copy of the name mapping, and the population module's copy lacked one spelling used in the 2018 tables. The modules now share a single mapping, and <code>validate_data.py</code> fails if any province name in the data does not reach a polygon.</li>
+  <li><strong>Two values on one polygon.</strong> Communes and their urban centres <code>(AC)</code> are separate rows in the HCP poverty tables, but a centre has no polygon of its own. Mapping the centre to its commune's polygon drew two values on the same shape. Centres are now left out of the map, which shows commune rates only.</li>
+  <li><strong>A mean presented as a regional rate.</strong> The middle figure above the commune map was labelled "Moyenne Régionale"; it is an unweighted mean of commune rates, so a commune of 2,000 people counts as much as Agadir. It is now labelled as such.</li>
+</ul>
+<p>
+The commune map also had six blank communes: the Inezgane-Aït Melloul prefecture
+had no poverty data at all. Its rates were added from the HCP sheet for the
+prefecture.
 </p>
 
 <h3>Choropleth rendering</h3>
@@ -693,54 +575,36 @@ GeoDataFrame and Plotly renders the result, colour intensity mapping to the
 selected indicator.
 </p>
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-import streamlit as st
-import pandas as pd
-import geopandas as gpd
-import plotly.express as px
+province_name_mapping = {
+    'Agadir Ida Outanane': 'Agadir Ida Ou Tanane',
+    'Chtouka Ait Baha': 'Chtouka- Ait Baha',
+    'Inezgane Ait Melloul': 'Inezgane Ait Melloul',
+    'Taroudant': 'Taroudannt'
+}
+df_filtre['join_key'] = df_filtre['Province'].replace(province_name_mapping)
+gdf_provinces['join_key'] = gdf_provinces['ADM2_FR']
 
-@st.cache_data
-def load_shapefile(path):
-    return gpd.read_file(path)
+# inner join: an unmatched name disappears from the map, hence validate_data.py
+gdf_merged = gdf_provinces.merge(df_filtre, on='join_key', how='inner')
 
-def render_choropleth(df_indic):
-    gdf_provinces = load_shapefile("mar_admbnda_adm2_hcp_20230925.shp")
-
-    # Mapping et nettoyage pour la jointure spatiale
-    province_mapping = {
-        'Agadir Ida Outanane': 'Agadir Ida Ou Tanane',
-        'Chtouka Ait Baha': 'Chtouka- Ait Baha',
-        'Inezgane Ait Melloul': 'Inezgane-Ait Melloul',
-        'Taroudant': 'Taroudannt'
-    }
-    
-    df_indic = df_indic.copy()
-    df_indic["join_key"] = df_indic["Province"].replace(province_mapping)
-    gdf_provinces["join_key"] = gdf_provinces["ADM2_FR"]
-
-    # La Jointure : Fusion stats + géométrie
-    gdf_merged = gdf_provinces.merge(df_indic, on="join_key", how="inner")
-
-    # Rendu Plotly Mapbox
-    fig_map = px.choropleth_mapbox(
-        gdf_merged,
-        geojson=gdf_merged.geometry,
-        locations=gdf_merged.index,
-        color="Valeur",
-        mapbox_style="open-street-map",
-        color_continuous_scale="Blues"
-    )
-    return fig_map
+fig_map = px.choropleth_mapbox(
+    gdf_merged,
+    geojson=gdf_merged.geometry,
+    locations=gdf_merged.index,
+    color="Valeur",
+    hover_name="Province",
+)
         </code></code></pre></details>
-<figure class="shot"><img src="images/map_poverty_commune.png" alt="Choropleth map of poverty rate by commune" loading="lazy" /><figcaption>Choropleth map of poverty rate by commune</figcaption></figure>
+<figure class="shot"><img src="images/map_poverty_commune.png" alt="Choropleth map of poverty rate by commune" loading="lazy" /><figcaption>Choropleth map of poverty rate by commune (screenshot taken before the corrections above)</figcaption></figure>
 
 <h3>Interaction</h3>
 <ul>
   <li><strong>Tooltips</strong>: hovering a territory shows its name and exact value, so a reader never has to infer a number from a colour scale.</li>
-  <li><strong>Framing</strong>: the view is pre-centred on Souss-Massa (lat 30.2, lon −9.0) at a zoom level that fits the region on load.</li>
-  <li><strong>Filtering</strong>: year, indicator and granularity (province or commune) are driven by <code>st.session_state</code>; each change recomputes the join and redraws the map with a colour scale rescaled to the filtered data.</li>
+  <li><strong>Framing</strong>: the view is pre-centred on Souss-Massa at a zoom level that fits the region on load.</li>
+  <li><strong>Filtering</strong>: changing the year or indicator recomputes the join and redraws the map with a colour scale rescaled to the filtered data.</li>
 </ul>
 
-<div class="shot-duo"><figure class="shot"><img src="images/map_enrolment_2017.png" alt="New school enrolments, 2017" loading="lazy" /><figcaption>New school enrolments, 2017</figcaption></figure><figure class="shot"><img src="images/map_enrolment_2018.png" alt="Same indicator, 2018" loading="lazy" /><figcaption>Same indicator, 2018</figcaption></figure></div>
+<div class="shot-duo"><figure class="shot"><img src="images/map_enrolment_2017.png" alt="New school enrolments, 2017" loading="lazy" /><figcaption>New school enrolments, 2017 (before the Inezgane fix)</figcaption></figure><figure class="shot"><img src="images/map_enrolment_2018.png" alt="Same indicator, 2018" loading="lazy" /><figcaption>Same indicator, 2018 (before the Inezgane fix)</figcaption></figure></div>
 </section>
 
 <!-- ===================== FORECASTING ===================== -->
@@ -857,8 +721,7 @@ the basis for a planning decision.
 
 <h3>Possible extensions</h3>
 <ul>
-  <li><strong>A real evaluation.</strong> On the monthly CPI series, which has enough points, hold out a chronological test portion and report mean absolute error: the missing piece today.</li>
-  <li><strong>Seasonal models.</strong> If HCP publishes at monthly frequency, a model handling seasonality (such as Prophet) would apply to the CPI series, which already has monthly granularity.</li>
+  <li><strong>A real evaluation.</strong> Holding out the last points and reporting the error needs longer series than any the app holds today; it is the missing piece, and depends on adding data first.</li>
   <li><strong>Multivariate models.</strong> Composite indicators such as poverty depend on several measured quantities; a gradient-boosted model over multiple features would fit that structure better than a univariate line.</li>
   <li><strong>Exogenous variables.</strong> Adding geospatial or external data (climate, public investment programmes) as features, provided enough observations exist to justify the added parameters.</li>
 </ul>
@@ -878,10 +741,19 @@ a module restricted to the loaded dataset.
 <h3>How it is constrained</h3>
 
 <p>
-Every request sends the cleaned indicator dictionary from <code>hcpdata.py</code>
-to the model as context, together with a system prompt instructing it to answer
-only from that context. The model is therefore working from the same numbers the
-charts use, in the same structure.
+Every request sends the indicator dictionary from <code>hcpdata.py</code> to the
+model as context, together with a prompt instructing it to answer only from that
+context and to say so when a figure is not there.
+</p>
+
+<p>
+Grounding only moves the problem to the data. When a table in the context is
+wrong, the model reports the wrong figure with the same confidence as a right
+one. Asked for Drargua's poverty rate in 2014, the assistant answered 26.2 %,
+the figure in the table, while the HCP figure is 8.86 %. While the four broken
+tables were being re-entered, they were kept out of the context rather than sent
+as they were. The prompt also used to tell the model that the values were in
+thousands, which was false for most of them; that line was corrected.
 </p>
 
 <p class="note">
@@ -894,33 +766,25 @@ displays alongside every chart for exactly this reason.
 </p>
 
 <details class="codebox"><summary>Show code</summary><pre><code class="python"><code>
-import streamlit as st
-import google.generativeai as genai
-from hcpdata import hcp_data
-
-# 1. Initialisation sécurisée de l'API Gemini
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
-def ask_axiora_assistant(user_prompt):
-   
-    system_instruction = f"""
-    Tu es l'assistant expert en Data Analytics de la plateforme AXIORA.
-    Ton rôle est d'aider les décideurs publics de la région Souss-Massa.
-    
-    RÈGLE ABSOLUE : Tu ne dois répondre QU'EN TE BASANT sur le dictionnaire 
-    de données JSON suivant issu du Haut-Commissariat au Plan :
-    {hcp_data}
-    
-    Si une question sort de ce contexte socio-économique, refuse poliment d'y répondre.
-    Réponds toujours en Markdown avec des structures claires (tableaux, listes).
+def donnees_pour_assistant():
+    # every table passes validate_data.py; a table that fails is removed here
+    return hcp_data
+
+def response_to_query(query):
+    data_json = json.dumps(donnees_pour_assistant(), indent=2, ensure_ascii=False)
+    prompt = f"""
+        Tu es un assistant expert en données statistiques du HCP.
+        Si la question porte sur des données chiffrées, réponds UNIQUEMENT à partir
+        des données suivantes. [...] Si la donnée demandée n'y figure pas, dis-le
+        au lieu de l'estimer.
+        Données HCP :
+        {data_json}
+        [...]
     """
-    
-    
-    full_prompt = f"{system_instruction}\n\nQuestion de l'utilisateur : {user_prompt}"
-    response = model.generate_content(full_prompt)
-    
-    return response.text
+    return model.generate_content(prompt).text
         </code></code></pre></details>
 
 <h3>Question types</h3>
@@ -982,25 +846,30 @@ assembled without manual editing.
 <h2>Outcome</h2>
 
 <p>
-The platform is deployed and publicly accessible. It consolidates fifteen HCP
-spreadsheets across six domains into a single interface where an indicator can be
-filtered, mapped, compared and extrapolated without reopening a source file.
+The platform is deployed and publicly accessible. It brings HCP tables for six
+domains into a single interface where an indicator can be filtered, mapped,
+compared and extrapolated without reopening a publication.
 </p>
 
 <p>
-Three parts of the work were the most technically demanding, and are the ones I
-would defend:
+The interface and the maps were the bulk of the work. The data was the weak point,
+and I only saw it once the tables were checked against their own totals.
 </p>
-
-<ul>
-  <li><strong>The cleaning pipeline.</strong> The failure modes of these spreadsheets are silent rather than loud: a column read as text still sorts, a subtotal row still averages. Handling them explicitly is what makes every downstream figure reliable.</li>
-  <li><strong>The spatial join.</strong> Reconciling statistical tables with boundary geometry required normalising territorial keys on both sides; without it, the maps would simply have been missing rows.</li>
-  <li><strong>Constraining the assistant.</strong> Injecting the cleaned dictionary as context, rather than letting a general model answer from its own knowledge, is what keeps the answers tied to the published data.</li>
-</ul>
 
 <h3>What I would do differently</h3>
 <p>
-The forecasting module is the weakest part of the project, and knowingly so. It
+Check the data before building on it. Every error the validation script found was
+of a kind that does not crash anything: a shifted column, a swapped pair of years,
+a name one hyphen away from the shapefile, a 0 standing for "not published". The
+app showed each of them as a plausible number. The check costs a few
+dozen lines because HCP tables carry their own totals, and it should have been the
+first thing written, not the last. With it in place, I would also replace hand
+transcription with a script that reads the HCP files directly, so that a table is
+entered once and checked every time.
+</p>
+
+<p>
+The forecasting module is the other weak part of the project, and knowingly so. It
 extrapolates without evaluating, because the series are too short to hold anything
 back, but the interface presents the result as a curve like any other, which
 overstates it. Revisiting it, I would restructure the data to obtain longer series
@@ -1014,6 +883,7 @@ extrapolation only.
 <section class="cs" id="roadmap">
 <h2>Next steps</h2>
 <ol class="pipeline">
+  <li><strong>Check the remaining tables against their source.</strong> The poverty tables have been compared with the HCP sheets value by value; the population, labour, housing and finance tables pass their totals but have not been compared with the publications cell by cell.</li>
   <li><strong>2024 census integration.</strong> Load the new demographic and socio-economic indicators as HCP publishes them, extending every series by one census point.</li>
   <li><strong>Forecasting.</strong> Move to seasonal and multivariate models where series length allows, and surface uncertainty in the interface.</li>
   <li><strong>Deployment.</strong> Containerise the application with Docker for institutional servers, and add a caching layer for larger data volumes.</li>
