@@ -37,7 +37,7 @@
 
 <section class="hero case-hero">
   <div class="wrap">
-    <p class="eyebrow">Case study · Personal project, extending HCP internship work · 2025</p>
+    <p class="eyebrow">Case study · Project extending a remote internship at the HCP regional directorate for Souss-Massa · 2025</p>
     <h1>Axiora Data</h1>
     <p class="standfirst">
       A validated dataset and a commune-level analysis of poverty and population in the Souss-Massa
@@ -94,15 +94,26 @@
   <p>
     <strong>Descriptive statistics.</strong> Distributions are summarised by the median, the 25th and 75th percentiles,
     and the interquartile range <code>IQR = Q3 - Q1</code>. Each commune counts once, regardless of its population.
-    Population weights are not used because the commune population series needed to compute them is not part of
-    the dataset.
+    Population weights are not used because commune-level population series compatible with the poverty observations were
+    not available in the assembled dataset.
   </p>
   <p>
-    <strong>Inference.</strong> Three tests are reported. (i) A two-sided exact sign test of the hypothesis that a
+    <strong>Inference.</strong> Two hypothesis tests and one confidence interval are reported. (i) A two-sided exact sign test of the hypothesis that a
     commune is equally likely to decline or increase, applied to the signs of <code>d<sub>i</sub></code>. (ii) A
     two-sided Wilcoxon signed-rank test on the paired values <code>(x<sub>i</sub>, z<sub>i</sub>)</code>, which does not
     assume normality of the differences. (iii) A 95% confidence interval for the median change, obtained by the
     percentile bootstrap with 10,000 resamples of the 179 communes and a fixed random seed (42).
+  </p>
+  <p>
+    <strong>Justification of the inference.</strong> The 179 communes are the complete set of observations in the
+    sample, so the descriptive statistics fully describe them. The tests are used to assess whether the direction of
+    change is consistent across communes, not to generalise to a larger population. The sign and Wilcoxon tests assume
+    independent observations. Neighbouring communes are unlikely to be independent, because poverty is spatially
+    clustered, so the reported p-values probably overstate the precision of the evidence. The bootstrap resamples
+    communes independently for the same reason: the interval ignores spatial dependence and is likely too narrow. The
+    percentile method is preferred because it does not rely on a parametric form for the sampling distribution of the
+    median. It is nonetheless conditional on the resampling scheme: communes are treated as independent draws, so the
+    interval does not correct for spatial dependence.
   </p>
   <p>
     <strong>Validation.</strong> Before analysis, every table passes an automated check of column lengths, totals
@@ -131,14 +142,26 @@
   </p>
   <p>
     The spread between communes also narrowed. The interquartile range was 14.3 points in 2004 (17.2% to 31.5%) and
-    9.7 points in 2014 (5.8% to 15.5%). The gap between the lowest and highest communes was therefore smaller in 2014.
+    9.7 points in 2014 (5.8% to 15.5%). The interquartile range therefore narrowed, so the middle half of the communes became more similar. This describes the spread of the central 50% only; it does not describe the range between the lowest and highest communes.
   </p>
+
+  <figure class="shot shot--wide">
+    <img src="images/pauvrete_boxplot.png" alt="Boxplots of commune poverty rates in 2004, 2007 and 2014" loading="lazy" />
+    <figcaption>Distribution of commune poverty rates, 2004, 2007 and 2014 (179 communes with complete data). Boxes show the interquartile range; the line is the median.</figcaption>
+  </figure>
+
+  <figure class="shot shot--wide">
+    <img src="images/pauvrete_carte_changements.png" alt="Map of the change in commune poverty rate between 2004 and 2014, by commune" loading="lazy" />
+    <figcaption>Change in commune poverty rate, 2014 minus 2004, in percentage points. Blue indicates a decline, red an increase. The map draws one polygon per commune (175 polygons). Four urban centre units (AC) of Drargua, Aourir, Temsia and Massa share their polygon with the commune of the same name in the HCP boundary file; the map shows the commune value for these polygons. The four AC values are included in all statistics (179 observations in total) but are not drawn separately. Sources: HCP poverty sheets; HCP administrative boundaries.</figcaption>
+  </figure>
 
   <h3>Change by commune and statistical tests</h3>
   <p>
     171 of the 179 communes (95.5%) recorded a lower rate in 2014 than in 2004. The remaining eight recorded an
     increase, with a largest increase of 4.2 points. The largest decline was 40.4 points. The median change is
-    −12.5 points, with a 95% bootstrap confidence interval of −14.2 to −11.2 points.
+    −12.5 points, with a 95% bootstrap confidence interval of −14.2 to −11.2 points. This is a different statistic
+    from the difference between the two medians (23.0% − 10.2% = 12.8 points): the median of commune-level changes
+    depends on how each commune moves, not only on where the central commune sits.
   </p>
   <table class="results-table">
     <thead>
@@ -150,30 +173,46 @@
     </tbody>
   </table>
   <p class="note">
-    The p-values indicate that the decline is not an artefact of a few large changes: the sign test depends only on the
-    direction of change, and the Wilcoxon test depends on its ranks. Neither test says anything about the size of
+    The sign test depends only on the direction of change and makes no symmetry assumption. The Wilcoxon test depends on
+    the ranks of the changes, and is read as a test of the median only if the changes are symmetric around it. The
+    changes are mildly skewed (skewness −0.4). This does not establish symmetry, so the Wilcoxon result should be read
+    alongside the sign test. No change
+    is exactly zero, so no observation is dropped. The test was computed with SciPy 1.18.1 (two-sided, scipy.stats.wilcoxon).
+    With 179 observations the p-value uses the normal approximation with a variance adjusted for ties, and without continuity
+    correction; tied absolute changes receive average ranks. The statistic W is the smaller of the sums of positive and
+    negative ranks (124). Neither test says anything about the size of
     the effect, which is given by the median change and its interval.
   </p>
+
+  <figure class="shot shot--wide">
+    <img src="images/pauvrete_slope_territoires.png" alt="Slope chart of median commune poverty rate by territory, 2004 to 2014" loading="lazy" />
+    <figcaption>Median commune poverty rate by territory, 2004 and 2014. Tata is highlighted.</figcaption>
+  </figure>
 
   <h3>Change by territory</h3>
   <table class="results-table">
     <thead>
-      <tr><th>Territory</th><th>Communes in sample</th><th class="num">Median 2004</th><th class="num">Median 2014</th><th>Communes with a decline</th></tr>
+      <tr><th>Territory</th><th>Communes in sample</th><th class="num">Median 2004</th><th class="num">Median 2014</th><th class="num">Median of commune changes</th><th>Communes with a decline</th></tr>
     </thead>
     <tbody>
-      <tr><td>Agadir Ida Outanane</td><td class="num">15</td><td class="num">21.4%</td><td class="num">6.8%</td><td>15 of 15</td></tr>
-      <tr><td>Inezgane-Aït Melloul</td><td class="num">7</td><td class="num">13.8%</td><td class="num">4.3%</td><td>7 of 7</td></tr>
-      <tr><td>Chtouka-Aït Baha</td><td class="num">23</td><td class="num">17.3%</td><td class="num">7.2%</td><td>20 of 23</td></tr>
-      <tr><td>Taroudant</td><td class="num">89</td><td class="num">28.1%</td><td class="num">11.7%</td><td>87 of 89</td></tr>
-      <tr><td>Tiznit</td><td class="num">25</td><td class="num">20.7%</td><td class="num">7.5%</td><td>25 of 25</td></tr>
-      <tr><td>Tata</td><td class="num">20</td><td class="num">21.2%</td><td class="num">16.6%</td><td>17 of 20</td></tr>
+      <tr><td>Agadir Ida Outanane</td><td class="num">15</td><td class="num">21.4%</td><td class="num">6.8%</td><td class="num">−11.7 points</td><td>15 of 15</td></tr>
+      <tr><td>Inezgane-Aït Melloul</td><td class="num">7</td><td class="num">13.8%</td><td class="num">4.3%</td><td class="num">−7.5 points</td><td>7 of 7</td></tr>
+      <tr><td>Chtouka-Aït Baha</td><td class="num">23</td><td class="num">17.3%</td><td class="num">7.2%</td><td class="num">−12.5 points</td><td>20 of 23</td></tr>
+      <tr><td>Taroudant</td><td class="num">89</td><td class="num">28.1%</td><td class="num">11.7%</td><td class="num">−14.4 points</td><td>87 of 89</td></tr>
+      <tr><td>Tiznit</td><td class="num">25</td><td class="num">20.7%</td><td class="num">7.5%</td><td class="num">−11.5 points</td><td>25 of 25</td></tr>
+      <tr><td>Tata</td><td class="num">20</td><td class="num">21.2%</td><td class="num">16.6%</td><td class="num">−5.0 points</td><td>17 of 20</td></tr>
     </tbody>
   </table>
   <p>
-    Tata shows the smallest decline. Its median fell from 21.2% to 16.6%, the smallest fall of any territory, and its
-    2014 median is the highest of the six. Taroudant has the highest 2004 median, at 28.1%, and fell to 11.7% by
+    Tata shows the smallest decline on both measures. Its median rate fell from 21.2% to 16.6%, and the median of its
+    commune-level changes is −5.0 points, the smallest of the six territories. Its 2014 median is also the highest of the
+    six. Inezgane-Aït Melloul has the second smallest median change (−7.5 points) and the lowest 2014 median. Taroudant has the highest 2004 median, at 28.1%, and fell to 11.7% by
     2014. Inezgane-Aït Melloul and Agadir Ida Outanane have the lowest 2014 medians.
   </p>
+  <figure class="shot shot--wide">
+    <img src="images/pauvrete_boxplot_territoires.png" alt="Boxplots of commune-level change in poverty rate by territory" loading="lazy" />
+    <figcaption>Distribution of commune-level changes (2014 minus 2004, in points) by territory. The line inside each box is the median; the dashed line marks no change. Two territories can share a median and differ in dispersion, which is why the distributions are shown.</figcaption>
+  </figure>
 </section>
 
 <section id="discussion">
@@ -189,8 +228,51 @@
     Two features of the analysis limit how far the results can be generalised. First, the statistics are unweighted,
     so a small commune and a large commune count equally; a population-weighted measure could give a different
     picture. Second, the sample excludes three urban centre units for which no rate is published in two of the three
-    years. The three years are also the only years for which the poverty sheets were available in the dataset.
+    years.
   </p>
+</section>
+
+
+
+<section id="validation">
+  <h2>Data and validation</h2>
+  <p>
+    The 93 tables are stored as aligned columns and pass an automated check before they are used. The check verifies
+    that columns have equal length, that urban plus rural equals total and men plus women equals total, that the
+    regional row equals the sum of the provinces within 1%, that a rate of exactly zero is not treated as a missing
+    value, and that every territory name matches a polygon of the official HCP boundary files. On the current dataset,
+    the check reports no errors and no warnings. It also identified a misaligned row in a 2017 housing table, which
+    was corrected against the yearbook.
+  </p>
+</section>
+
+<section id="contributions">
+  <h2>Scope of the work</h2>
+  <p>
+    This project extends work carried out during a remote internship at the HCP regional directorate for Souss-Massa in
+    2025. The parts below indicate what the project comprises.
+  </p>
+  <ul>
+    <li><strong>Data harmonisation.</strong> Transcription of 93 HCP tables into a structured, column-aligned dataset.</li>
+    <li><strong>Data quality assessment.</strong> The automated validation script and the investigation of discrepancies against the source publications, including the correction of a misaligned row in a 2017 housing table.</li>
+    <li><strong>Statistical analysis.</strong> Distributional description, paired non-parametric tests, and the bootstrap interval for the change in the median commune poverty rate.</li>
+    <li><strong>Analytical application.</strong> An interactive application for exploring the indicators, with maps, trend lines and a report generator.</li>
+  </ul>
+</section>
+
+<section id="references">
+  <h2>Sources</h2>
+  <table class="results-table">
+    <thead><tr><th>Dataset</th><th>Source</th><th>Years</th></tr></thead>
+    <tbody>
+      <tr><td>Poverty and vulnerability rates by commune</td><td>HCP communal poverty evolution sheets (<em>Evolution des indicateurs de pauvreté</em>), Souss-Massa</td><td>2004, 2007, 2014</td></tr>
+      <tr><td>Population by territory</td><td>HCP, General Population and Housing Census (RGPH), legal population</td><td>2004, 2014</td></tr>
+      <tr><td>Regional indicators (population, labour, housing, finance, education)</td><td>HCP, <em>Annuaire statistique régional</em>, Souss-Massa</td><td>2017, 2018</td></tr>
+      <tr><td>Labour indicators by age, sex and setting</td><td>HCP, Enquête nationale sur l'emploi (ENE), regional results</td><td>2017 to 2020</td></tr>
+      <tr><td>Administrative boundaries (provinces, prefectures, communes)</td><td>HCP, administrative boundary files for Morocco (ADM2, ADM3)</td><td>2023 edition</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Publication titles are given as they appear in the project documentation. Each source is listed with its years; the repository records the page or table used for each transcribed series.</p>
 </section>
 
 <section id="population">
@@ -217,23 +299,11 @@
   </figure>
 </section>
 
-<section id="validation">
-  <h2>Data and validation</h2>
-  <p>
-    The 93 tables are stored as aligned columns and pass an automated check before they are used. The check verifies
-    that columns have equal length, that urban plus rural equals total and men plus women equals total, that the
-    regional row equals the sum of the provinces within 1%, that a rate of exactly zero is not treated as a missing
-    value, and that every territory name matches a polygon of the official HCP boundary files. On the current dataset,
-    the check reports no errors and no warnings. It also identified a misaligned row in a 2017 housing table, which
-    was corrected against the yearbook.
-  </p>
-</section>
-
 <section id="limitations">
   <h2>Limitations</h2>
   <ul>
     <li><strong>Chtouka-Aït Baha, urban population in 2004.</strong> The HCP sheets do not give this figure. The value 39,694 is an inference, chosen so that the province figures sum to the published regional total. It affects the 2004 urban share of the region.</li>
-    <li><strong>Unweighted statistics.</strong> Each commune counts once. A population-weighted analysis would require commune population series that are not part of the dataset.</li>
+    <li><strong>Unweighted statistics.</strong> Each commune counts once. A population-weighted analysis would require commune-level population series compatible with the poverty observations, which were not available in the assembled dataset.</li>
     <li><strong>Labour tables for 2017 to 2020.</strong> These come from the regional results of the ENE survey and were not checked cell by cell against a single published table. They are not used for any result on this page. Most other numeric tables were cross-checked value by value against their source.</li>
     <li><strong>Projections.</strong> The application also extrapolates trends with linear regression. These extrapolations have no held-out evaluation and are not used here.</li>
     <li><strong>Scope.</strong> The analysis covers Souss-Massa only and is descriptive. Vulnerability rates are in the dataset but are not analysed here.</li>
@@ -243,7 +313,9 @@
 <section id="stack">
   <h2>Stack and access</h2>
   <p>
-    Python, pandas, NumPy, Plotly, GeoPandas, Streamlit. The live application and the source code, including the
+    Data analysis: Python, pandas, NumPy, SciPy. Visualisation and mapping: Plotly, Matplotlib, GeoPandas. Application:
+    Streamlit. Reporting and assistant: fpdf, Google Gemini API. Modelling: scikit-learn (linear regression for trend lines).
+    The live application and the source code, including the
     tables and the validation script, are public.
   </p>
   <p>
