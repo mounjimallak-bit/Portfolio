@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Axiora Data · Case study · Malak Mounji</title>
-<meta name="description" content="Axiora Data: a validated dataset of 93 HCP tables for the Souss-Massa region, and a commune-level analysis of poverty change between 2004 and 2014." />
+<meta name="description" content="Axiora Data: a quality-checked dataset of 93 HCP tables for the Souss-Massa region, and a commune-level analysis of poverty change between 2004 and 2014." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -40,7 +40,7 @@
     <p class="eyebrow">Case study · Project extending a remote internship at the HCP regional directorate for Souss-Massa · 2025</p>
     <h1>Axiora Data</h1>
     <p class="standfirst">
-      A validated dataset and a commune-level analysis of poverty and population in the Souss-Massa
+      A quality-checked dataset and a commune-level analysis of poverty and population in the Souss-Massa
       region of Morocco, built from 93 tables published by the High Commission for Planning (HCP).
     </p>
     <div class="case-actions">
@@ -56,7 +56,7 @@
   <h2>Summary</h2>
   <p>
     Official statistics for the six territories of Souss-Massa are published as PDF tables that are hard to
-    compare across years and places. This project transcribed 93 of these tables, checked them automatically, and
+    compare across years and places. This project transcribed 93 of these tables, checked them for internal consistency, and
     used them to answer descriptive questions about population, housing, finance and poverty. The main analysis
     concerns the change in commune poverty rates between 2004 and 2014.
   </p>
@@ -105,15 +105,7 @@
     percentile bootstrap with 10,000 resamples of the 179 communes and a fixed random seed (42).
   </p>
   <p>
-    <strong>Justification of the inference.</strong> The 179 communes are the complete set of observations in the
-    sample, so the descriptive statistics fully describe them. The tests are used to assess whether the direction of
-    change is consistent across communes, not to generalise to a larger population. The sign and Wilcoxon tests assume
-    independent observations. Neighbouring communes are unlikely to be independent, because poverty is spatially
-    clustered, so the reported p-values probably overstate the precision of the evidence. The bootstrap resamples
-    communes independently for the same reason: the interval ignores spatial dependence and is likely too narrow. The
-    percentile method is preferred because it does not rely on a parametric form for the sampling distribution of the
-    median. It is nonetheless conditional on the resampling scheme: communes are treated as independent draws, so the
-    interval does not correct for spatial dependence.
+    <strong>Justification of the inference.</strong> The 179 communes constitute the complete set of communes with comparable observations in the assembled dataset. The descriptive statistics therefore describe this observed set directly. The inferential procedures are used as model-based assessments of the consistency of the observed changes, under a hypothetical framework in which commune-level changes are treated as independent observations. They are not interpreted as uncertainty arising from sampling a subset of communes from the region. Neighbouring communes are unlikely to be independent, because poverty is spatially clustered, so the p-values probably overstate the precision of the evidence. The percentile bootstrap resamples communes independently for the same reason: its interval ignores spatial dependence and is likely too narrow. The percentile method is preferred because it does not rely on a parametric form for the sampling distribution of the median.
   </p>
   <p>
     <strong>Validation.</strong> Before analysis, every table passes an automated check of column lengths, totals
@@ -126,8 +118,9 @@
 
   <h3>Distribution across the region</h3>
   <table class="results-table">
+    <caption>Distribution of commune poverty rates, 2004, 2007 and 2014</caption>
     <thead>
-      <tr><th>Year</th><th>Communes</th><th class="num">25th percentile</th><th class="num">Median</th><th class="num">75th percentile</th><th class="num">Mean</th></tr>
+      <tr><th scope="col">Year</th><th scope="col">Communes</th><th scope="col" class="num">25th percentile</th><th scope="col" class="num">Median</th><th scope="col" class="num">75th percentile</th><th scope="col" class="num">Mean</th></tr>
     </thead>
     <tbody>
       <tr><td>2004</td><td class="num">179</td><td class="num">17.2%</td><td class="num">23.0%</td><td class="num">31.5%</td><td class="num">24.1%</td></tr>
@@ -164,8 +157,9 @@
     depends on how each commune moves, not only on where the central commune sits.
   </p>
   <table class="results-table">
+    <caption>Results of the paired tests, 2004 to 2014</caption>
     <thead>
-      <tr><th>Test</th><th>Statistic</th><th>Two-sided p-value</th></tr>
+      <tr><th scope="col">Test</th><th scope="col">Statistic</th><th scope="col">Two-sided p-value</th></tr>
     </thead>
     <tbody>
       <tr><td>Exact sign test, 171 declines out of 179</td><td class="num">171 / 179</td><td class="num">6.1 × 10<sup>−41</sup></td></tr>
@@ -184,15 +178,12 @@
     the effect, which is given by the median change and its interval.
   </p>
 
-  <figure class="shot shot--wide">
-    <img src="images/pauvrete_slope_territoires.png" alt="Slope chart of median commune poverty rate by territory, 2004 to 2014" loading="lazy" />
-    <figcaption>Median commune poverty rate by territory, 2004 and 2014. Tata is highlighted.</figcaption>
-  </figure>
 
   <h3>Change by territory</h3>
   <table class="results-table">
+    <caption>Median poverty rate and median commune-level change by territory</caption>
     <thead>
-      <tr><th>Territory</th><th>Communes in sample</th><th class="num">Median 2004</th><th class="num">Median 2014</th><th class="num">Median of commune changes</th><th>Communes with a decline</th></tr>
+      <tr><th scope="col">Territory</th><th scope="col">Communes in sample</th><th scope="col" class="num">Median 2004</th><th scope="col" class="num">Median 2014</th><th scope="col" class="num">Median of commune changes</th><th scope="col">Communes with a decline</th></tr>
     </thead>
     <tbody>
       <tr><td>Agadir Ida Outanane</td><td class="num">15</td><td class="num">21.4%</td><td class="num">6.8%</td><td class="num">−11.7 points</td><td>15 of 15</td></tr>
@@ -217,12 +208,14 @@
 
 <section id="discussion">
   <h2>Discussion</h2>
+
   <p>
-    The results show a large and widespread decline in commune poverty rates between 2004 and 2014, with most of the
-    decline concentrated before 2007. They also show that the decline was uneven: Tata, in particular, retained
-    higher rates than the other territories in 2014. The data show where the declines occurred and how large they
-    were; they do not show why. Explaining the differences would require data on local investment, employment and
-    infrastructure, which are outside the dataset.
+    The results show that poverty declined in 171 of the 179 observed communes between 2004 and 2014, but the magnitude of
+    the decline varied substantially across territories. Most of the regional decline occurred before 2007. Tata
+    experienced the smallest median commune-level reduction and retained the highest median poverty rate in 2014. These
+    findings describe where poverty declined and by how much, but do not establish the causes of these territorial
+    differences. Explaining them would require additional information on local investment, employment and
+    infrastructure, which falls outside the scope of this dataset.
   </p>
   <p>
     Two features of the analysis limit how far the results can be generalised. First, the statistics are unweighted,
@@ -237,33 +230,41 @@
 <section id="validation">
   <h2>Data and validation</h2>
   <p>
-    The 93 tables are stored as aligned columns and pass an automated check before they are used. The check verifies
-    that columns have equal length, that urban plus rural equals total and men plus women equals total, that the
-    regional row equals the sum of the provinces within 1%, that a rate of exactly zero is not treated as a missing
-    value, and that every territory name matches a polygon of the official HCP boundary files. On the current dataset,
-    the check reports no errors and no warnings. It also identified a misaligned row in a 2017 housing table, which
-    was corrected against the yearbook.
+    The 93 tables are stored as aligned columns and pass an automated check before they are used. The check verifies that
+    columns have equal length, that urban plus rural equals total and men plus women equals total, that the regional row
+    equals the sum of the provinces (within the larger of one unit or 1% of the compared values), that the copies of each
+    table in the data module and in the application agree, and that every province and commune name used in a map reaches a
+    polygon of the official HCP boundary files. Exact zeros in rate columns are reported as warnings for review rather than
+    treated as missing values.
+  </p>
+  <p>
+    On the current dataset the check reports no errors and no warnings. It also identified a misaligned row in a 2017
+    housing table, which was corrected against the yearbook. These checks test internal consistency. They do not verify
+    every transcribed value against its publication, and the 2017 to 2020 labour tables were not checked cell by cell.
   </p>
 </section>
 
 <section id="contributions">
-  <h2>Scope of the work</h2>
+  <h2>Scope and personal contribution</h2>
   <p>
-    This project extends work carried out during a remote internship at the HCP regional directorate for Souss-Massa in
-    2025. The parts below indicate what the project comprises.
+    Axiora Data builds on work initiated during a remote internship at the HCP regional directorate for Souss-Massa in
+    2025. I subsequently extended the project into a broader analytical platform and developed the commune-level poverty
+    analysis presented in this case study.
   </p>
+  <p>My contributions cover four areas:</p>
   <ul>
-    <li><strong>Data harmonisation.</strong> Transcription of 93 HCP tables into a structured, column-aligned dataset.</li>
-    <li><strong>Data quality assessment.</strong> The automated validation script and the investigation of discrepancies against the source publications, including the correction of a misaligned row in a 2017 housing table.</li>
-    <li><strong>Statistical analysis.</strong> Distributional description, paired non-parametric tests, and the bootstrap interval for the change in the median commune poverty rate.</li>
-    <li><strong>Analytical application.</strong> An interactive application for exploring the indicators, with maps, trend lines and a report generator.</li>
+    <li><strong>Data harmonisation:</strong> transcription of 93 HCP statistical tables into a structured, column-aligned dataset.</li>
+    <li><strong>Data quality assessment:</strong> development of automated validation checks and investigation of discrepancies against the source publications.</li>
+    <li><strong>Statistical analysis:</strong> distributional analysis of commune-level poverty changes between 2004 and 2014, including non-parametric tests and bootstrap estimation.</li>
+    <li><strong>Application development:</strong> implementation of an interactive platform for exploring socio-economic indicators, visualising territorial patterns and generating reports.</li>
   </ul>
 </section>
 
 <section id="references">
   <h2>Sources</h2>
   <table class="results-table">
-    <thead><tr><th>Dataset</th><th>Source</th><th>Years</th></tr></thead>
+    <caption>Sources used in the analysis</caption>
+    <thead><tr><th scope="col">Dataset</th><th scope="col">Source</th><th scope="col">Years</th></tr></thead>
     <tbody>
       <tr><td>Poverty and vulnerability rates by commune</td><td>HCP communal poverty evolution sheets (<em>Evolution des indicateurs de pauvreté</em>), Souss-Massa</td><td>2004, 2007, 2014</td></tr>
       <tr><td>Population by territory</td><td>HCP, General Population and Housing Census (RGPH), legal population</td><td>2004, 2014</td></tr>
@@ -272,31 +273,23 @@
       <tr><td>Administrative boundaries (provinces, prefectures, communes)</td><td>HCP, administrative boundary files for Morocco (ADM2, ADM3)</td><td>2023 edition</td></tr>
     </tbody>
   </table>
-  <p class="note">Publication titles are given as they appear in the project documentation. Each source is listed with its years; the repository records the page or table used for each transcribed series.</p>
+  <p class="note">Publication titles are given as they appear in the project documentation.</p>
 </section>
 
 <section id="population">
   <h2>Population and sectors</h2>
   <p>
+    These indicators place the poverty analysis in its regional context.
+  </p>
+  <p>
     Population grew by 15.2% between the RGPH 2004 and RGPH 2014 censuses, from 2,324,142 to 2,676,847. Growth was
     concentrated in Inezgane-Aït Melloul (+29.0%) and Agadir Ida Outanane (+23.1%), while Tiznit (−4.5%) and Tata
     (−3.1%) declined.
   </p>
-  <figure class="shot shot--wide">
-    <img src="images/popparprov.png" alt="Mirrored area chart of population by territory, RGPH 2004 and RGPH 2014" loading="lazy" />
-    <figcaption>Population by territory, RGPH 2004 (above) and RGPH 2014 (below). Source: HCP censuses.</figcaption>
-  </figure>
   <p>
     Regional bank credit equals 59.9% of deposits (29.70 billion DH of credit against 49.56 billion DH of deposits).
     Agadir Ida Outanane has the highest ratio, at 80.2%.
   </p>
-  <p>
-    The figure below compares the sectoral structure of Souss-Massa with Morocco for 2015 and 2016.
-  </p>
-  <figure class="shot shot--wide">
-    <img src="images/economy_sector_structure.png" alt="Sectoral structure of Souss-Massa compared with Morocco, 2015 and 2016" loading="lazy" />
-    <figcaption>Sectoral structure of Souss-Massa and Morocco, 2015 and 2016 (shares, in per cent).</figcaption>
-  </figure>
 </section>
 
 <section id="limitations">
