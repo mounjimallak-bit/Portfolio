@@ -92,8 +92,8 @@
 
 <p>
 Photovoltaic plants fail quietly. Shading and other partial faults do
-not stop production; they bend it downward by a few percent, for days or weeks,
-until someone compares an invoice to an expectation. The output still looks like
+not stop production; they bend it downward, for days or weeks,
+until someone compares an invoice to an expectation. The staged faults in this dataset cost about 18% of output; milder faults of a few percent were not available to test. The output still looks like
 output.
 </p>
 
@@ -339,7 +339,10 @@ power, irradiance above 1,500 W/m², sub-zero panel temperature. All three came 
 empty. One check did not: 57 rows carry <code>Va = Vg = Fg = 0</code>
 simultaneously, the artefact the descriptive statistics had already hinted at. A
 grid-connected inverter cannot have zero voltage and zero frequency while the sun is
-up. That is a disconnected acquisition unit, not a plant state.
+up. That looks like a disconnected acquisition unit rather than a plant state. One check came later and changed
+the reading: 56 of these 57 rows are labelled Fault 1 (uniform shading), half of all Fault 1 data. Removing them
+therefore also removed labelled faults. They all fall in training, so no reported metric changes, but they are
+better described as fault rows with zero voltages than as sensor errors.
 </p>
 
 <details class="codebox"><summary>Show code: removing disconnected-sensor rows</summary><pre><code class="python">avant = len(df)
@@ -463,11 +466,11 @@ than a raw level.
 This is the most consequential plot in the exploration. The record runs to April
 2023, but the last labelled anomaly occurs on 19 May 2022. Everything after it (35,684 rows, 67% of the record) is pure normal operation. A chronological split
 over the full series would have placed the entire test partition in that empty zone,
-and the final evaluation would have been run on a period containing no faults at
-all: a perfect, meaningless score. The study period had to be truncated, and this
-figure is why. The 33,226 scored points after 26 May were then not used for any
-measurement, although they are the only part of the record that covers other seasons;
-they are analysed in the seasonal section below.
+and detection could not have been measured at all. For measuring detection, the study period
+had to be truncated, and this figure is why. That reasoning was incomplete: a fault-free period
+cannot measure detection, but it measures the false-alarm rate directly, and it is the only part
+of the record that covers other seasons. The 33,226 scored points after 26 May were left out of
+the original analysis; they are analysed in the seasonal section below.
 </p>
 
 <h3>Day, night, and why sequences must break</h3>
@@ -667,9 +670,10 @@ has to mean in practice.
 <p class="note">
 One property of this split is uncomfortable and was kept deliberately: the three test
 incidents are all of type 3.1, a type appearing <em>nowhere</em> in training or
-validation. The final evaluation is therefore on a fault type absent from development. That
-is harder than a random split, and closer to what
-deployment on a new plant looks like.
+validation. The final evaluation is therefore on a sub-type absent from development. The
+limit is that 3.1 (shading on one third of a module) is the smaller version of 3.2 (two thirds),
+which is in validation: the test measures a familiar signature at a new intensity, not a new
+family of faults.
 </p>
 </section>
 
@@ -887,7 +891,7 @@ transfer to 3.1 can only be answered on the test partition, at the end.
 
 <figure class="shot shot--wide">
   <img src="images/fig_6_2_6_boxplots_candidates.png" alt="Boxplots of the candidate features across normal, fault 3.1 and fault 3.2" loading="lazy" />
-  <figcaption>Normal, type 3.1 and type 3.2 compared feature by feature</figcaption>
+  <figcaption>Candidates compared feature by feature on development data: normal, type 3.2 and type 4.0 (type 3.1 has no development points)</figcaption>
 </figure>
 
 <figure class="shot shot--wide">
@@ -1090,7 +1094,9 @@ will matter a great deal.
 <p>
 The Isolation Forest performs respectably: 0.581 PR-AUC, all four validation episodes
 detected, median delay zero. It was still removed. Every fusion tested later shows the
-same thing: AE + LSTM scores 0.7234, and adding the forest brings it down to 0.6871.
+same thing: AE + LSTM scores 0.7234, and adding the forest brings it down to 0.6871. That gap is smaller than
+the spread between seeds of one identical autoencoder (0.54 to 0.69), and it rests on four validation episodes,
+so the decision is defensible but not demonstrated.
 It correlates 0.628 with the dense autoencoder (both judge points in isolation), so
 it contributes little independent signal while diluting the sequence model's
 contribution. It remains in the notebook as what it was built to be: a reference point
@@ -1473,8 +1479,9 @@ have topped this table, which is precisely why the second axis of this figure ex
 
 <p>
 On the common support of 4,006 points, the retained fusion reaches
-<strong>0.7234</strong> against 0.6903 for the best single detector: +0.0331, earned
-from the two models disagreeing usefully rather than from either being better.
+<strong>0.7234</strong> against 0.6903 for the best single detector: +0.0331. That gain is of the
+same order as seed-to-seed variation and was measured on the same four episodes that chose the
+method, so it is suggestive rather than significant.
 </p>
 </section>
 
@@ -1642,8 +1649,9 @@ The score is computed twice by code written independently: once from the models 
 throughout the notebook, once from the artefacts reloaded from disk. Maximum
 point-by-point deviation: <strong>0.00e+00</strong> across 4,006 points, with identical
 PR-AUC to six decimals. Instantiating the deployable class and feeding it the same data
-gives the same answer again, including through the streaming path with its six-point
-sliding window. One rank convention, one score, one threshold, three implementations.
+gives the same answer again. The streaming path, with its six-point sliding window, is checked
+outside the notebook, by tests that replay part of the test partition through the consumer's message
+handling and compare scores and alarms with the batch path.
 </p>
 
 <p>
@@ -1700,10 +1708,10 @@ episode is detected one measurement after its first point; the other two on thei
 The test recall (0.973) is far above the validation recall (0.727), which is not the
 usual direction and must not be read as the model improving. The two partitions contain
 different faults: test carries type 3.1 exclusively, validation carries 3.2 and 4.0. The
-system happens to be better at the family that landed in the test window, and, since
-3.1 appears nowhere in development, this is generalisation to a sub-type never used in
-development, not to a new family of faults, since 3.1 is a near-twin of 3.2 (in validation) and
-the score is not evidence of tuning paying off. With three episodes, the fair statement is that the
+system happens to be better at the family that landed in the test window. Type 3.1 appears
+nowhere in development, but it is a near-twin of 3.2, which is in validation and is detected
+just as well there (recall 0.98). The result is generalisation to a sub-type never used in
+development, not to a new family of faults, and it is not evidence of tuning paying off. With three episodes, the fair statement is that the
 point-level metrics are informative and the 3/3 episode score is a small sample.
 </p>
 <p>
@@ -1839,16 +1847,21 @@ dataframe.
         self.gap = pd.Timedelta(f"{gap_minutes}min")
         self.points = deque(maxlen=seq_len)
 
-    def ajouter(self, horodatage, mesure: dict):
+    def ajouter(self, offset: int, horodatage, mesure: dict):
         """Returns a seq_len-row DataFrame once the window is complete."""
-        if self.points and horodatage - self.points[-1][0] > self.gap:
+        if self.points and horodatage - self.points[-1][1] > self.gap:
             self.points.clear()
-        self.points.append((horodatage, mesure))
+        self.points.append((offset, horodatage, mesure))
 
         if len(self.points) < self.seq_len:
             return None
-        return pd.DataFrame([m for _, m in self.points],
-                            index=pd.DatetimeIndex([t for t, _ in self.points]))</code></pre></details>
+        return pd.DataFrame(
+            [m for _, _, m in self.points],
+            index=pd.DatetimeIndex([t for _, t, _ in self.points]))
+
+    def offset_a_commiter(self):
+        # oldest buffered message: after a restart the window is rebuilt from it
+        return self.points[0][0]</code></pre></details>
 
 <p class="reading">
 A <code>deque</code> with <code>maxlen</code> makes the sliding window free: pushing a
@@ -1911,10 +1924,10 @@ The study period stops on 26 May 2022, so the detector has never been evaluated 
 </table>
 <p>
 From June to September the system raises between 4 and 11 events a week. From October to April it
-raises at most about one a week. In the warm months, about two thirds of the flagged points fall at
+raises at most about one a week. In the winter months (June to September in La Réunion), about two thirds of the flagged points fall at
 09h and 17h local time (05h and 13h UTC), when the sun is low and shadows are long. The alarms may
-reflect real shading that nobody labelled, or this seasonal geometry; the data cannot tell these apart. The data here cannot tell these apart, so all of them
-count as false alarms.
+reflect real shading that nobody labelled, or this seasonal geometry. The data cannot tell these apart, so all of them
+count as false alarms. Training covers only late spring and summer, so every winter sun position is new to the model.
 </p>
 <p>
 The earlier argument for leaving these months out, that a fault-free period gives a perfect and
@@ -1930,7 +1943,7 @@ is the only data in this record that covers other seasons. It should be evaluate
 <div class="limits">
 <ul>
   <li><strong>One plant, one dataset.</strong> Everything here comes from a single installation. The pipeline transfers; the threshold does not, and would have to be re-derived from a healthy period on any new site.</li>
-  <li><strong>One season.</strong> The study period stops on 26 May 2022, and winter was never evaluated as a period of faults. The seasonal section reports the false-alarm rate by month.</li>
+  <li><strong>One season.</strong> The study period stops on 26 May 2022, and the networks were trained on late spring and summer only. No fault was ever measured in winter. The seasonal section reports the false-alarm rate by month.</li>
   <li><strong>Simple baselines.</strong> A nearest-neighbour distance on six raw sensors scores higher on test (PR-AUC 0.88 against 0.78) and lower on validation. The ensemble's advantage over it is not established.</li>
   <li><strong>Label quality.</strong> 56 of the 57 rows removed as a disconnected acquisition unit are labelled Fault 1, which is half of all Fault 1 data. The removal therefore changes the labelled fault set, and should be described that way. Intermittent shading is labelled by period but scored point by point, and episode boundaries are blurred by the five-minute aggregation.</li>
   <li><strong>Streaming robustness.</strong> The consumer scores daytime points only (GTI above 50 W/m²), as the notebook does. Every point it cannot score is logged with its reason. A message with no valid timestamp is skipped and its offset advanced, so it cannot stop the consumer on restart. Messages are still assumed to arrive in order: a late message is not re-sorted. The message handling is covered by tests that replay the test partition through it and compare the scores with the batch path.</li>
@@ -1939,7 +1952,7 @@ is the only data in this record that covers other seasons. It should be evaluate
   <li><strong>Recall hits a wall.</strong> The operating-point table shows precision collapsing from 0.731 to 0.283 for seven points of extra recall. Some faults are simply not separable in this feature space, and no threshold fixes that.</li>
   <li><strong>Labels shaped the design.</strong> The networks never see a fault, but labels were used to choose features, tune hyperparameters, choose the fusion and the threshold, and to report every number here. A site with no labelled history would need a different way to set the cut.</li>
   <li><strong>Throughput.</strong> Roughly 0.2 to 0.4 s per point on a CPU, ten networks queried serially. Fine for one plant, unsuitable for a fleet.</li>
-  <li><strong>Frozen references age.</strong> The rank references are a snapshot of a healthy period. Panel ageing shifts the healthy baseline over years, which would slowly deflate every score.</li>
+  <li><strong>Frozen references age.</strong> The rank references are the deployed networks' scores on the validation period, including its 176 fault points, which is why test faults cannot rank above them and sit on a plateau just above the threshold. Panel ageing shifts the healthy baseline over years, which would slowly deflate every score.</li>
 </ul>
 </div>
 
