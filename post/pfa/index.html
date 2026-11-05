@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Photovoltaic Anomaly Detection · Case study · Malak Mounji</title>
-<meta name="description" content="Case study: unsupervised anomaly detection on photovoltaic time series. Raw sensor inspection, cleaning, feature engineering validated by ablation, chronological splitting, an Isolation Forest baseline, dense and LSTM autoencoder ensembles fused by rank, and a real-time Kafka to TimescaleDB to Grafana scoring pipeline." />
+<meta name="description" content="Case study: semi-supervised anomaly detection on photovoltaic time series. Raw sensor inspection, cleaning, feature engineering validated by ablation, chronological splitting, an Isolation Forest baseline, dense and LSTM autoencoder ensembles fused by rank, and a real-time Kafka to TimescaleDB to Grafana scoring pipeline." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -41,13 +41,13 @@
       did not work. Three million raw sensor rows reduced to a study period, a
       feature set chosen by ablation rather than intuition, a baseline that was later
       removed from the final system, two autoencoders combined by rank, a threshold
-      that encodes an economic judgement, and a single opening of the test partition
+      that encodes a judgement about the relative cost of the two errors, and a single opening of the test partition
       at the very end.
     </p>
     <div class="summary">
       <p><strong>Problem.</strong> Detect shading faults on a PV plant when no labelled fault may be used for training.</p>
       <p><strong>Approach.</strong> Five dense and five LSTM autoencoders trained on healthy data only, fused by rank averaging against a frozen reference. Alarm threshold chosen by F2 on validation.</p>
-      <p><strong>Result on the held-out test.</strong> PR-AUC 0.7765 (29.9 times the base rate), recall 0.973, precision 0.703, 3 of 3 fault episodes caught on their first scored point.</p>
+      <p><strong>Result on the held-out test.</strong> PR-AUC 0.7765 (29.9 times the base rate), recall 0.973, precision 0.703, 3 of 3 fault episodes caught, the 10 May episode one measurement after its first point.</p>
       <p><strong>Deployment.</strong> Kafka, a Python scoring consumer, TimescaleDB and a provisioned Grafana dashboard, started with one <code>docker compose up</code>.</p>
     </div>
     <div class="proj-links">
@@ -79,7 +79,9 @@
     <li><a href="#packaging">Packaging the system</a></li>
     <li><a href="#validation">Final validation</a></li>
     <li><a href="#test">The test partition</a></li>
+    <li><a href="#baselines">Simple baselines</a></li>
     <li><a href="#streaming">Running system</a></li>
+    <li><a href="#seasons">Seasonal false alarms</a></li>
     <li><a href="#limits">Limits and next steps</a></li>
   </ol>
 </nav>
@@ -105,7 +107,7 @@ fault is ever shown during training.
 
 <h3>Constraints that shaped every later decision</h3>
 <ul>
-  <li><strong>No labels at training time.</strong> Labels exist in this dataset, but they are used only to select a threshold and to report results: never to fit a model.</li>
+  <li><strong>No labels to fit the networks.</strong> The networks are trained on healthy points only. Labels are used elsewhere in the design, for feature selection, tuning, fusion, the threshold, and to report results, so the method is semi-supervised rather than unsupervised.</li>
   <li><strong>Recall over precision.</strong> A missed fault costs weeks of production; a false alarm costs one technician one look.</li>
   <li><strong>Early detection.</strong> A fault caught on its first measurement is worth far more than the same fault caught on its fortieth.</li>
   <li><strong>Streaming.</strong> The system must score one five-minute measurement at a time, without access to the batch it belongs to.</li>
@@ -463,7 +465,9 @@ This is the most consequential plot in the exploration. The record runs to April
 over the full series would have placed the entire test partition in that empty zone,
 and the final evaluation would have been run on a period containing no faults at
 all: a perfect, meaningless score. The study period had to be truncated, and this
-figure is why.
+figure is why. The 33,226 scored points after 26 May were then not used for any
+measurement, although they are the only part of the record that covers other seasons;
+they are analysed in the seasonal section below.
 </p>
 
 <h3>Day, night, and why sequences must break</h3>
@@ -613,13 +617,13 @@ legal cut positions.
                 return jours[j].date()
     raise ValueError("No incident-free day found")
 
-# cut_train: COMPUTED — nearest free day to 60% of observations
+# cut_train: COMPUTED, nearest free day to 60% of observations
 cut_train = cutoff_libre(0.60)
 
 # cut_val: CHOSEN BY HAND, and stated as such.
 # cutoff_libre(0.80) would return 2022-04-23, pushing the two Fault 3.2 incidents
 # of 25 and 27 April into the TEST set. Test would then contain 3.1 AND 3.2, and
-# would no longer measure generalisation to a fault type NEVER SEEN — which is the
+# would no longer measure generalisation to a fault type NEVER SEEN, which is the
 # central claim of the final section. The cutoff is pushed to 2022-04-28 to keep
 # both 3.2 incidents in validation. This is a PROTOCOL constraint, not a measured
 # optimum, and it is recorded in data/split_meta.json.
@@ -663,8 +667,8 @@ has to mean in practice.
 <p class="note">
 One property of this split is uncomfortable and was kept deliberately: the three test
 incidents are all of type 3.1, a type appearing <em>nowhere</em> in training or
-validation. The final evaluation is therefore on a fault family the system has never
-encountered in any form. That is harder than a random split, and closer to what
+validation. The final evaluation is therefore on a fault type absent from development. That
+is harder than a random split, and closer to what
 deployment on a new plant looks like.
 </p>
 </section>
@@ -871,15 +875,14 @@ Both were dropped in favour of the simpler member.
 </p>
 
 <figure class="shot shot--wide">
-  <img src="images/fig_6_2_5_scatter_fault3.png" alt="Scatter plots separating fault 3.1 from 3.2 in the retained candidate space" loading="lazy" />
-  <figcaption>Types 3.1 and 3.2 in the retained feature space</figcaption>
+  <img src="images/fig_6_2_5_scatter_fault3.png" alt="Scatter plots of fault 3.2 in the retained candidate space; no fault 3.1 points in development data" loading="lazy" />
+  <figcaption>Type 3.2 in the retained feature space. Type 3.1 has no development points, so its series is empty.</figcaption>
 </figure>
 
 <p class="reading">
-The two subtypes occupy different regions, which is a warning as much as a result: a
-feature set separating 3.2 well may not separate 3.1, and 3.1 is what the test
-partition contains. This figure is the reason the project never claimed that tuning
-on 3.2 would transfer: that claim is only settled at the very end, on the test.
+This figure plots development data only. Type 3.1 has no points there, so the figure
+shows type 3.2 alone and cannot compare the subtypes. Whether the retained features
+transfer to 3.1 can only be answered on the test partition, at the end.
 </p>
 
 <figure class="shot shot--wide">
@@ -969,7 +972,7 @@ A short section with consequences out of proportion to its length. Two normalisa
 strategies were compared, and they differ only in what the scaler is fitted on.
 </p>
 
-<details class="codebox"><summary>Show code: two scalers, two framings</summary><pre><code class="python"># healthy subset of the training partition — the basis of the Novelty framing
+<details class="codebox"><summary>Show code: two scalers, two framings</summary><pre><code class="python"># healthy subset of the training partition, the basis of the Novelty framing
 train_sain_c = train_c[train_c["Fault"] == 0]
 
 scaler_novelty = StandardScaler().fit(train_sain_c[FEATURES_IF])   # healthy only
@@ -1182,8 +1185,8 @@ the point: capacity is the enemy here, because a model able to reconstruct anyth
 reconstructs faults too and the error stops discriminating. The
 <code>sigmoid</code> output pairs with the <code>MinMaxScaler</code>, both bounded to
 [0, 1], so the network never has to learn an output scale. And the target is the input
-itself (<code>fit(X, X)</code>), which is what makes the whole thing unsupervised: no
-label appears anywhere in this block.
+itself (<code>fit(X, X)</code>), which means no label enters the training of this network:
+the block contains none.
 </p>
 
 <h3>An ensemble, and a documented discrepancy</h3>
@@ -1420,7 +1423,7 @@ are averaged.
 
 <details class="codebox"><summary>Show code: ranking against a frozen reference</summary><pre><code class="python">def _rang(self, valeurs, reference_triee):
     """Rank within the pre-sorted reference: fraction of reference <= value.
-    A rank is NEVER recomputed on the current batch — that would be transductive."""
+    A rank is NEVER recomputed on the current batch, that would be transductive."""
     return np.searchsorted(reference_triee, valeurs, side="right") / len(reference_triee)
 
 r_ae   = self._rang(err_ae,   self.ref_ae)     # reference: 4,219 validation points
@@ -1481,7 +1484,7 @@ from the two models disagreeing usefully rather than from either being better.
 
 <p>
 A fused score is a ranking. Turning it into an alarm requires a cut, and that cut
-encodes an economic judgement the model cannot make for itself.
+encodes a judgement about the relative cost of the two errors, which the data cannot settle.
 </p>
 
 <p>
@@ -1516,6 +1519,23 @@ zero.
   <img src="images/fig_seuil_fusion_final.png" alt="F2 score and operating points as a function of the fusion threshold" loading="lazy" />
   <figcaption>F2 against threshold, with the selected operating point and the alternatives</figcaption>
 </figure>
+
+<p>
+Most test fault points sit just above the threshold: 80% of them score between 0.959 and
+0.967, against a threshold of 0.946. Recall therefore depends on a narrow margin. A threshold
+chosen on other seeds or other data could move the operating point substantially, which is
+why the threshold must be recomputed together with the references whenever the networks are
+retrained.
+</p>
+<p>
+A sensitivity analysis retrained the same architecture with five other seeds (5 to 9) and the same
+settings, in a separate folder. The deployed models were not changed. The retrained system selects a
+threshold of 0.933 (against 0.946), with validation PR-AUC 0.710 and test PR-AUC 0.705 (against
+0.723 and 0.777). At its threshold it keeps test recall at 0.97 with test precision 0.47 (against
+0.70), and it raises 4.5 false-alarm events a week in the unused months (against 2.6). It still
+detects all three test episodes. The operating point therefore depends on the seeds, and the
+deployed figures should be read as one realisation of the procedure.
+</p>
 
 <table class="minitable">
 <thead><tr><th>Criterion</th><th>Threshold</th><th>Precision</th><th>Recall</th><th>Missed</th></tr></thead>
@@ -1567,7 +1587,7 @@ must be recomputed immediately afterwards, which the following section then does
 
 <p>
 A single class, <code>DetecteurPV</code>, loads those artefacts and exposes one method.
-It is defined once in the notebook and copied verbatim into <code>src/detecteur.py</code>
+It is defined once in the notebook and copied into <code>src/detecteur.py</code>
 for deployment, with the notebook remaining the source of truth. The next section
 verifies that the copy behaves identically.
 </p>
@@ -1672,8 +1692,8 @@ on validation.
 
 <p>
 At the 0.9460 threshold the test confusion matrix reads 71 true positives, 2 false
-negatives, 30 false positives, 2,710 true negatives. All three episodes were caught on
-their first scored point.
+negatives, 30 false positives, 2,710 true negatives. All three episodes were caught. The 10 May
+episode is detected one measurement after its first point; the other two on their first.
 </p>
 
 <p class="reading">
@@ -1681,9 +1701,97 @@ The test recall (0.973) is far above the validation recall (0.727), which is not
 usual direction and must not be read as the model improving. The two partitions contain
 different faults: test carries type 3.1 exclusively, validation carries 3.2 and 4.0. The
 system happens to be better at the family that landed in the test window, and, since
-3.1 appears nowhere in development, this is genuinely out-of-family generalisation
-rather than tuning paying off. With three episodes, the fair statement is that the
+3.1 appears nowhere in development, this is generalisation to a sub-type never used in
+development, not to a new family of faults, since 3.1 is a near-twin of 3.2 (in validation) and
+the score is not evidence of tuning paying off. With three episodes, the fair statement is that the
 point-level metrics are informative and the 3/3 episode score is a small sample.
+</p>
+<p>
+Validation was used for every design decision: the feature set, the bottleneck size, the
+learning rate, the fusion method, the removal of the Isolation Forest, the reference vectors
+and the threshold. The validation scores are therefore optimistic. The test partition is the
+only unbiased check, and it rests on three episodes.
+</p>
+<p>
+The three test episodes are one staged experiment repeated. Each starts at 05:45 UTC and
+lasts about two hours. An exact 95% interval for the episode detection rate after 3 of 3
+detections is 0.29 to 1.00. A block bootstrap over test days (10,000 resamples) gives a 95% interval
+for the test PR-AUC of 0.49 to 0.94, around the point estimate of 0.78.
+</p>
+</section>
+
+<!-- ===================== BASELINES ===================== -->
+<section class="cs" id="baselines">
+<h2>Simple baselines</h2>
+<p>
+The ensemble is the most complex part of the system: ten networks, two reference vectors and a
+rank fusion. Before accepting that complexity, the same scored points and the same threshold
+rule were used to test two simple detectors. Neither was part of the original notebook. Both
+were added afterwards for this comparison.
+</p>
+<ul>
+<li><strong>kNN:</strong> mean distance to the 10 nearest healthy training points, on the six raw sensors after standardisation. No training beyond the scaler.</li>
+<li><strong>Mahalanobis:</strong> distance from the healthy mean, using the healthy covariance of the same six sensors.</li>
+</ul>
+<p>
+Each method's threshold is its own F2 maximum on validation. The test results were examined after
+the thresholds were fixed.
+</p>
+<table class="results-table">
+<caption>Same scored points for all methods: 4,006 validation and 2,813 test points. Events per week use the 279 days of the unused period.</caption>
+<thead>
+<tr><th scope="col">Method</th><th scope="col" class="num">Validation PR-AUC</th><th scope="col" class="num">Test PR-AUC</th><th scope="col" class="num">Test precision</th><th scope="col" class="num">Test recall</th><th scope="col">Test episodes</th><th scope="col" class="num">Unused months: events per week</th></tr>
+</thead>
+<tbody>
+<tr><td>Ensemble (deployed)</td><td class="num">0.723</td><td class="num">0.776</td><td class="num">0.70</td><td class="num">0.97</td><td>3 of 3</td><td class="num">2.6</td></tr>
+<tr><td>kNN</td><td class="num">0.636</td><td class="num">0.880</td><td class="num">0.89</td><td class="num">0.86</td><td>3 of 3</td><td class="num">2.3</td></tr>
+<tr><td>Mahalanobis</td><td class="num">0.664</td><td class="num">0.734</td><td class="num">0.80</td><td class="num">0.27</td><td>3 of 3</td><td class="num">1.9</td></tr>
+</tbody>
+</table>
+<p>
+On validation the ensemble is ahead of kNN (0.72 against 0.64). On test the order reverses
+(0.78 against 0.88). The two curves cross at a recall of about 0.8.
+</p>
+<figure class="shot shot--wide">
+  <img src="images/pfa_pr_curves.png" alt="Precision-recall curves of the ensemble, kNN and Mahalanobis on validation and on test" loading="lazy" />
+  <figcaption>Precision-recall curves on the validation set (left) and the test set (right), for the same scored points. Dotted line: random level.</figcaption>
+</figure>
+<p>
+Figure below sweeps the threshold of each method and counts, on the unused months, the false-alarm
+events per week against the test recall. At about 1 event a week, kNN recalls more test faults.
+Between about 1.2 and 4 events a week, the ensemble recalls more. The comparison uses hindsight on
+the false alarms, so it ranks the methods but cannot choose a deployed threshold.
+</p>
+<figure class="shot shot--wide">
+  <img src="images/pfa_recall_vs_alarms.png" alt="Test recall against false-alarm events per week for the ensemble, kNN and Mahalanobis" loading="lazy" />
+  <figcaption>Test recall against false-alarm events per week in the unused months. Each curve sweeps the threshold; dots mark each method's F2 threshold.</figcaption>
+</figure>
+<figure class="shot shot--wide">
+  <img src="images/pfa_episode_timelines.png" alt="Ensemble and kNN scores relative to their thresholds around the three test episodes" loading="lazy" />
+  <figcaption>Score divided by each method's threshold, around the three test episodes (shaded). Values above the dashed line raise an alarm. The ensemble stays just above its threshold for the whole of each episode. The kNN score varies more and falls below its threshold for about an hour during the 16 May episode.</figcaption>
+</figure>
+<p>
+The ensemble's advantage over these simple baselines is therefore not established. On this
+evidence a nearest-neighbour distance is a credible alternative that needs no training. The design
+should be judged on a larger set of episodes.
+</p>
+
+<h3>What each family contributes</h3>
+<table class="results-table">
+<caption>PR-AUC of each family alone, ranked against the same references, on the same scored points.</caption>
+<thead>
+<tr><th scope="col">Set</th><th scope="col" class="num">Dense autoencoders</th><th scope="col" class="num">LSTM autoencoders</th><th scope="col" class="num">Fusion (deployed)</th></tr>
+</thead>
+<tbody>
+<tr><td>Validation</td><td class="num">0.690</td><td class="num">0.658</td><td class="num">0.723</td></tr>
+<tr><td>Test</td><td class="num">0.751</td><td class="num">0.274</td><td class="num">0.776</td></tr>
+</tbody>
+</table>
+<p>
+On validation each family alone scores close to the fusion. On test, the LSTM family alone scores
+0.27, well below the dense family, and the fusion adds about 0.03 to the dense family alone. Most of
+the test result comes from the dense autoencoders, so the test result is not evidence for the value
+of temporal modelling.
 </p>
 </section>
 
@@ -1748,8 +1856,9 @@ seventh point evicts the first automatically, with no index arithmetic to get wr
 The gap check happens <em>before</em> the append, so the incoming point starts the new
 segment rather than being discarded with the old one. This class is the streaming
 counterpart of <code>fabriquer_sequences</code>, and the final validation verifies that
-both produce identical scores: the batch path and the one-message-at-a-time path agree
-to 0.00e+00.
+both produce identical scores: the batch path and the one-message-at-a-time path give
+the same score and alarm on every replayed test point (checked by replaying the stream,
+outside the notebook).
 </p>
 
 <p class="reading">
@@ -1767,10 +1876,50 @@ visible on a dashboard.
 </figure>
 
 <p>
-Throughput is the main weak point: scoring one measurement takes about 0.9 s, because
+Throughput is the main weak point: scoring one measurement takes roughly 0.2 to 0.4 s on a CPU, because
 the ten networks are queried one after another. That is 300× faster than the five-minute
 measurement cadence, so it is comfortable for one plant and would not survive scoring
 many from a single process.
+</p>
+</section>
+
+<!-- ===================== SEASONS ===================== -->
+<section class="cs" id="seasons">
+<h2>Seasonal false alarms</h2>
+<p>
+The study period stops on 26 May 2022, so the detector has never been evaluated on a winter period. The 33,226 scored points after that date contain no labelled fault, so every alarm in them is a false alarm. At the deployed threshold of 0.946 the system raises 252 flagged points over 279 days, about 2.6 false-alarm events a week. The rate is strongly seasonal.
+</p>
+<table class="results-table">
+<caption>False-alarm events by month in the unused period, deployed threshold 0.946. Events per week use the days with scored data in each month.</caption>
+<thead>
+<tr><th scope="col">Month</th><th scope="col" class="num">Scored points</th><th scope="col" class="num">Flagged points</th><th scope="col" class="num">Events</th><th scope="col" class="num">Events per week</th><th scope="col" class="num">Alarm days</th><th scope="col" class="num">Days with data</th></tr>
+</thead>
+<tbody>
+<tr><td>May 2022 (from 26th)</td><td class="num">618</td><td class="num">22</td><td class="num">8</td><td class="num">9.33</td><td class="num">5</td><td class="num">6</td></tr>
+<tr><td>June 2022</td><td class="num">3,178</td><td class="num">56</td><td class="num">24</td><td class="num">5.60</td><td class="num">20</td><td class="num">30</td></tr>
+<tr><td>July 2022</td><td class="num">2,127</td><td class="num">71</td><td class="num">31</td><td class="num">10.85</td><td class="num">15</td><td class="num">20</td></tr>
+<tr><td>August 2022</td><td class="num">2,468</td><td class="num">67</td><td class="num">18</td><td class="num">5.73</td><td class="num">13</td><td class="num">22</td></tr>
+<tr><td>September 2022</td><td class="num">3,651</td><td class="num">31</td><td class="num">18</td><td class="num">4.20</td><td class="num">14</td><td class="num">30</td></tr>
+<tr><td>October 2022</td><td class="num">3,951</td><td class="num">0</td><td class="num">0</td><td class="num">0.00</td><td class="num">0</td><td class="num">31</td></tr>
+<tr><td>November 2022</td><td class="num">3,840</td><td class="num">0</td><td class="num">0</td><td class="num">0.00</td><td class="num">0</td><td class="num">30</td></tr>
+<tr><td>December 2022</td><td class="num">2,618</td><td class="num">1</td><td class="num">1</td><td class="num">0.35</td><td class="num">1</td><td class="num">20</td></tr>
+<tr><td>January 2023</td><td class="num">2,047</td><td class="num">0</td><td class="num">0</td><td class="num">0.00</td><td class="num">0</td><td class="num">18</td></tr>
+<tr><td>February 2023</td><td class="num">3,508</td><td class="num">0</td><td class="num">0</td><td class="num">0.00</td><td class="num">0</td><td class="num">28</td></tr>
+<tr><td>March 2023</td><td class="num">3,717</td><td class="num">2</td><td class="num">2</td><td class="num">0.45</td><td class="num">2</td><td class="num">31</td></tr>
+<tr><td>April 2023</td><td class="num">1,503</td><td class="num">2</td><td class="num">2</td><td class="num">1.08</td><td class="num">2</td><td class="num">13</td></tr>
+</tbody>
+</table>
+<p>
+From June to September the system raises between 4 and 11 events a week. From October to April it
+raises at most about one a week. In the warm months, about two thirds of the flagged points fall at
+09h and 17h local time (05h and 13h UTC), when the sun is low and shadows are long. The alarms may
+reflect real shading that nobody labelled, or this seasonal geometry; the data cannot tell these apart. The data here cannot tell these apart, so all of them
+count as false alarms.
+</p>
+<p>
+The earlier argument for leaving these months out, that a fault-free period gives a perfect and
+meaningless score, does not hold. A fault-free period measures the false-alarm rate directly, and it
+is the only data in this record that covers other seasons. It should be evaluated, not discarded.
 </p>
 </section>
 
@@ -1781,21 +1930,31 @@ many from a single process.
 <div class="limits">
 <ul>
   <li><strong>One plant, one dataset.</strong> Everything here comes from a single installation. The pipeline transfers; the threshold does not, and would have to be re-derived from a healthy period on any new site.</li>
+  <li><strong>One season.</strong> The study period stops on 26 May 2022, and winter was never evaluated as a period of faults. The seasonal section reports the false-alarm rate by month.</li>
+  <li><strong>Simple baselines.</strong> A nearest-neighbour distance on six raw sensors scores higher on test (PR-AUC 0.88 against 0.78) and lower on validation. The ensemble's advantage over it is not established.</li>
+  <li><strong>Label quality.</strong> 56 of the 57 rows removed as a disconnected acquisition unit are labelled Fault 1, which is half of all Fault 1 data. The removal therefore changes the labelled fault set, and should be described that way. Intermittent shading is labelled by period but scored point by point, and episode boundaries are blurred by the five-minute aggregation.</li>
+  <li><strong>Streaming robustness.</strong> The consumer scores daytime points only (GTI above 50 W/m²), as the notebook does. Every point it cannot score is logged with its reason. A message with no valid timestamp is skipped and its offset advanced, so it cannot stop the consumer on restart. Messages are still assumed to arrive in order: a late message is not re-sorted. The message handling is covered by tests that replay the test partition through it and compare the scores with the batch path.</li>
   <li><strong>Three test episodes.</strong> 3/3 detected is a good result on a small sample. The point-level metrics rest on 2,813 measurements and are far more informative than the episode count.</li>
   <li><strong>ROC-AUC is flattering.</strong> 0.9964 looks conclusive and largely reflects the 2.6% positive rate. PR-AUC at 0.7765 (a lift of ×29.9 over the base rate) is the figure to compare against.</li>
   <li><strong>Recall hits a wall.</strong> The operating-point table shows precision collapsing from 0.731 to 0.283 for seven points of extra recall. Some faults are simply not separable in this feature space, and no threshold fixes that.</li>
-  <li><strong>Labels are used, just not for training.</strong> The models never see a fault, but the labels select the threshold and produce every number reported here. A site with no labelled history at all would need a different way to set the cut.</li>
-  <li><strong>Throughput.</strong> 0.9 s per point, ten networks queried serially. Fine for one plant, unsuitable for a fleet.</li>
+  <li><strong>Labels shaped the design.</strong> The networks never see a fault, but labels were used to choose features, tune hyperparameters, choose the fusion and the threshold, and to report every number here. A site with no labelled history would need a different way to set the cut.</li>
+  <li><strong>Throughput.</strong> Roughly 0.2 to 0.4 s per point on a CPU, ten networks queried serially. Fine for one plant, unsuitable for a fleet.</li>
   <li><strong>Frozen references age.</strong> The rank references are a snapshot of a healthy period. Panel ageing shifts the healthy baseline over years, which would slowly deflate every score.</li>
 </ul>
 </div>
 
 <h3>Next steps</h3>
+<p>The following are methodological changes. They are not part of the reported results, and were not implemented:</p>
 <ul>
   <li>Batch the ten networks into a single vectorised call and drop per-point latency by an order of magnitude.</li>
   <li>Monitor drift on the reference distributions, and define a re-calibration procedure recomputing references and threshold together.</li>
   <li>Attribute each alarm to a feature (which of the six sensors drove the reconstruction error), so an alert says where to look, not only when.</li>
   <li>Validate on a second installation, which is the only real test of whether the approach generalises.</li>
+  <li>Rotate the evaluation through all 17 incidents, holding out one at a time, and report per-episode results with intervals.</li>
+  <li>Set the threshold from a false-alarm budget measured on healthy days, rather than from F2 on validation.</li>
+  <li>Choose the operating point on episode detection, and report the trade-off curve of episodes caught against false alarms per week.</li>
+  <li>Group consecutive flagged points into single alarm events, and consider requiring persistence before an alarm is raised.</li>
+  <li>Evaluate the detector over a full year of healthy data, including winter, and decide whether recurring winter alarms are reported or masked.</li>
 </ul>
 </section>
 
