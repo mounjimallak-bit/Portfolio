@@ -385,3 +385,45 @@
   margin: 0 0 1.8rem;
 }
 .summary p{ margin: 0 0 .8rem; font-size: .95rem; }
+
+/* ---- results tables (baselines, seasons, research overview) ---- */
+.results-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .86rem;
+  margin: 1rem 0 1.8rem;
+}
+.results-table caption{
+  caption-side: bottom;
+  text-align: left;
+  font-size: .8rem;
+  color: var(--ink-soft);
+  padding-top: .6rem;
+}
+.results-table th,
+.results-table td{
+  text-align: left;
+  padding: .55rem .8rem .55rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.results-table thead th{
+  font-size: .72rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom-color: var(--ink);
+}
+.results-table td.num,
+.results-table th.num{ font-family: var(--mono); text-align: right; }
+
+/* the research overview reads as three columns of prose */
+#overview .results-table td:first-child,
+#revealed .results-table td:first-child{ font-weight: 600; width: 24%; }
+
+/* narrow screens: wide tables scroll inside themselves instead of the page */
+@media (max-width: 640px){
+  .minitable,
+  .srctable,
+  .results-table{ display: block; overflow-x: auto; }
+}
