@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Photovoltaic Anomaly Detection · Case study · Malak Mounji</title>
+<title>Detecting faults from few labels · Case study · Malak Mounji</title>
 <meta name="description" content="Case study: semi-supervised anomaly detection on photovoltaic time series. Raw sensor inspection, cleaning, feature engineering validated by ablation, chronological splitting, an Isolation Forest baseline, dense and LSTM autoencoder ensembles fused by rank, and a real-time Kafka to TimescaleDB to Grafana scoring pipeline." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,28 +30,27 @@
 
 <section class="hero case-hero">
   <div class="wrap">
-    <p class="eyebrow">Case study · Summer internship (PFA) · Albarray Consulting · Individual · 2026</p>
-    <h1>Photovoltaic anomaly detection</h1>
+    <p class="eyebrow">Research case study · Internship (PFA) · Albarray Consulting · 2026</p>
+    <h1>Detecting faults from few labels: what a photovoltaic detector shows, and what it does not</h1>
     <p class="standfirst">
-      Detecting shading faults on a solar plant without ever training
-      on a labelled fault, then scoring incoming measurements as they arrive.
+      A model of normal operation, learned from healthy data only, detects staged shading faults on a
+      solar plant and runs on a live stream. Re-examining that result showed how little a handful of
+      fault episodes can establish, and which questions remain open.
     </p>
     <p class="lede">
-      This page follows the work in the order it was done, including the parts that
-      did not work. Three million raw sensor rows reduced to a study period, a
-      feature set chosen by ablation rather than intuition, a baseline that was later
-      removed from the final system, two autoencoders combined by rank, a threshold
-      that encodes a judgement about the relative cost of the two errors, and a single opening of the test partition
-      at the very end.
+      <strong>Research question.</strong> With only a few labelled fault episodes, how far can a model
+      of normal operation be trusted, and what evidence does it take to show it?
     </p>
     <div class="summary">
-      <p><strong>Problem.</strong> Detect shading faults on a PV plant when no labelled fault may be used for training.</p>
-      <p><strong>Approach.</strong> Five dense and five LSTM autoencoders trained on healthy data only, fused by rank averaging against a frozen reference. Alarm threshold chosen by F2 on validation.</p>
-      <p><strong>Result on the held-out test.</strong> PR-AUC 0.7765 (29.9 times the base rate), recall 0.973, precision 0.703, 3 of 3 fault episodes caught, the 10 May episode one measurement after its first point.</p>
-      <p><strong>Deployment.</strong> Kafka, a Python scoring consumer, TimescaleDB and a provisioned Grafana dashboard, started with one <code>docker compose up</code>.</p>
+      <p><strong>Setting.</strong> A 4 kW grid-connected plant in La Réunion, 18 months of electrical and weather data at five-minute resolution, 17 staged shading incidents, all between February and May 2022.</p>
+      <p><strong>What was built.</strong> Five dense and five LSTM autoencoders trained on healthy points only, fused by rank against a frozen reference, evaluated on a strictly chronological split, and ported to a Kafka streaming prototype that reproduces the offline scores exactly.</p>
+      <p><strong>What the test showed.</strong> All 3 test episodes detected, recall 0.97, precision 0.70, PR-AUC 0.78 (base rate 0.026).</p>
+      <p><strong>What re-examination showed.</strong> A training-free nearest-neighbour distance does as well as the ten networks. The temporal half of the ensemble adds nothing on test. The 3/3 result has a 95% interval of 0.29 to 1. And in the austral winter, a season absent from training, the detector raises 4 to 11 false alarms a week.</p>
+      <p><strong>What it means.</strong> The method works as a proof of concept for one fault signature, in one season, on one plant. It is not yet a measured operating performance.</p>
     </div>
     <div class="proj-links">
       <a class="btn btn-solid" href="https://github.com/mounjimallak-bit/pfa-photovoltaique" target="_blank" rel="noopener">View source</a>
+      <a class="btn" href="https://github.com/mounjimallak-bit/pfa-photovoltaique/tree/main/notebooks" target="_blank" rel="noopener">Notebooks</a>
       <a class="btn" href="../../index.html#work">All projects</a>
     </div>
   </div>
@@ -59,9 +58,88 @@
 
 <div class="wrap case">
 
+<!-- ===================== RESEARCH OVERVIEW ===================== -->
+<section class="cs" id="overview">
+<h2>Questions, experiments and evidence</h2>
+<p>
+The project started as an engineering task: detect shading faults without training on labelled
+faults, and score measurements as they arrive. It became a study of evidence. Each row below is a
+question the work had to answer, the experiment used, and what the data actually supports. The full
+study follows, in the order it was done.
+</p>
+<table class="results-table">
+<caption>Every number links to a section below and is produced by a cell of the project notebook in the repository.</caption>
+<thead>
+<tr><th scope="col">Question</th><th scope="col">Experiment</th><th scope="col">What the evidence supports</th></tr>
+</thead>
+<tbody>
+<tr><td>Can normal operation serve as the reference?</td><td>Autoencoders trained on 9,618 healthy points; chronological split with cut days outside every incident</td><td>For staged shading, yes: 4 of 4 validation and 3 of 3 test episodes detected, test ROC-AUC 0.996. Only one fault signature was tested. <a href="#test">Test</a></td></tr>
+<tr><td>Is the complexity needed?</td><td>Ensemble against kNN and Mahalanobis distances on the same points, same threshold rule</td><td>Not shown. kNN scores 0.88 on test against 0.78, lower on validation; no difference is significant. <a href="#baselines">Baselines</a></td></tr>
+<tr><td>Does temporal context help?</td><td>Dense autoencoders against LSTM autoencoders, alone and fused</td><td>Not on test: the LSTM family alone scores 0.27, and the test result comes from the dense models. <a href="#families">Families</a></td></tr>
+<tr><td>How solid is the test result?</td><td>Exact interval on episodes; block bootstrap over days</td><td>3/3 episodes gives 0.29 to 1; test PR-AUC 0.48 to 0.94. The 3 test episodes repeat one staged experiment. <a href="#test">Test</a></td></tr>
+<tr><td>Does the detector hold over time?</td><td>Deployed system scored on the 10.5 fault-free months after the study period</td><td>No: 4 to 11 false-alarm events a week from June to September, 0 to 1 the rest of the year. <a href="#seasons">Seasons</a></td></tr>
+<tr><td>Is the operating point stable?</td><td>Same architecture retrained with five other seeds; references and threshold recomputed</td><td>Partly. Ranking quality holds (test PR-AUC 0.78 to 0.82 over three ensembles), but test precision ranges from 0.53 to 0.74 and false alarms from 2.4 to 5.1 a week. <a href="#threshold">Threshold</a></td></tr>
+<tr><td>Does the protocol survive streaming?</td><td>Kafka replay of the test period against offline scoring; crash and restart; automated tests</td><td>Yes: identical scores and alarms on every replayed point, no duplicate alarm after a crash. <a href="#streaming">Running system</a></td></tr>
+</tbody>
+</table>
+<figure class="shot shot--wide">
+  <img src="images/pfa_monthly_false_alarms.png" alt="Bar chart of false-alarm events per week by month, from May 2022 to April 2023: 4 to 11 a week from June to September, near zero from October to April" loading="lazy" />
+  <figcaption>The result that changed the reading of the project: a detector validated in late summer and autumn, run through a full year.</figcaption>
+</figure>
+</section>
+
+<!-- ===================== WHAT THIS REVEALED ===================== -->
+<section class="cs" id="revealed">
+<h2>What this experiment revealed</h2>
+<p>
+A high score on three staged episodes was the easy part. The harder questions are the ones the
+evaluation exposed. None of them is solved here; they are the questions I would pursue next.
+</p>
+<table class="results-table">
+<thead>
+<tr><th scope="col">Observation</th><th scope="col">Limitation it exposes</th><th scope="col">Open question</th></tr>
+</thead>
+<tbody>
+<tr><td>Winter false alarms recur at fixed hours, around 08:00 and 16:00 local, with a shading-like signature</td><td>The plant is a system driven by the sun and the seasons; a model trained on one season sees every winter sun position as new</td><td>How can a detector separate the slow, driven drift of a system from a genuine departure, for instance by modelling the system in its state space or by detecting the distribution shift explicitly?</td></tr>
+<tr><td>A nearest-neighbour distance does as well as ten networks</td><td>With seven episodes, a learned representation cannot be shown to beat a neighbour search in the raw state space</td><td>When does a learned model of normal dynamics beat local neighbours, and how many events does it take to tell?</td></tr>
+<tr><td>The threshold was chosen on four validation episodes</td><td>A site with no labelled history cannot calibrate this way, and the operating point moves with the seeds</td><td>Can the alarm threshold be set from a false-alarm budget measured on healthy data alone, with stated uncertainty?</td></tr>
+<tr><td>The LSTM looked strong on validation and collapsed on the test sub-type</td><td>Validation performance did not transfer, and the reason was not established</td><td>What does a temporal model of normal operation actually learn, and how can that be checked before deployment?</td></tr>
+<tr><td>Every fault is staged shading on one plant</td><td>Rare, real faults (soiling, degradation, inverter or sensor faults) were never observed</td><td>How should a detector of rare events be evaluated when the events of interest are almost never labelled?</td></tr>
+</tbody>
+</table>
+<p class="reading">
+This project changed what I think the problem is. Detecting an anomaly is not only about scoring
+departures from normal; it is about knowing what normal variability looks like across all the
+conditions a system goes through, and about how much a small number of rare events can prove. Those
+are the questions I want to work on: learning the normal dynamics of complex systems from data, and
+detecting when they depart from it, with few labelled events and under changing conditions.
+</p>
+</section>
+
+<!-- ===================== ROLE AND REPRODUCIBILITY ===================== -->
+<section class="cs" id="role">
+<h2>My role, and how the results were checked</h2>
+<ul>
+<li><strong>Topic.</strong> Chosen with my internship supervisor; the dataset (Zenodo record 7358042) was provided by the supervisor.</li>
+<li><strong>My work.</strong> Data merging and cleaning, the chronological protocol, feature investigation, the three detectors and the fusion, the evaluation, and the streaming prototype (Kafka, scoring consumer, TimescaleDB, Grafana, tests).</li>
+<li><strong>External review.</strong> After the internship, an external review of the project, prepared with an AI assistant and checked by a faculty reviewer, re-ran the pipeline and identified the gaps in the evaluation: no simple baselines, no uncertainty, no seasonal test, and claims stronger than the evidence. The baselines, intervals, seasonal analysis and seed sensitivity on this page were added in response, and the write-up was corrected.</li>
+<li><strong>Reproducibility.</strong> One notebook covers the whole study: sections 1 to 15 the original work, section 16 every number added after the review. It runs from a clone without the raw 2.3 GB files. The deployed models, scalers, references and threshold are versioned, and the streaming path is covered by automated tests.</li>
+</ul>
+</section>
+
+<h2 class="part-head">The full study, in the order it was done</h2>
+<p class="note">
+The sections below follow the work chronologically, including the parts that did not work. The
+baselines, intervals, seasonal analysis and seed sensitivity were added after the external review and
+are marked as such where they appear.
+</p>
+
 <nav class="toc" aria-label="On this page">
   <p class="toc-head">On this page</p>
   <ol>
+    <li><a href="#overview">Questions and evidence</a></li>
+    <li><a href="#revealed">What this revealed</a></li>
+    <li><a href="#role">Role and checks</a></li>
     <li><a href="#objective">Objective</a></li>
     <li><a href="#raw">First look at the data</a></li>
     <li><a href="#merge">Merging two clocks</a></li>
@@ -1536,13 +1614,17 @@ retrained.
 </p>
 <p>
 A sensitivity analysis retrained the same architecture with five other seeds (5 to 9) and the same
-settings, in a separate folder. The deployed models were not changed. The retrained system selects a
-threshold of 0.933 (against 0.946), with validation PR-AUC 0.710 and test PR-AUC 0.705 (against
-0.723 and 0.777). At its threshold it keeps test recall at 0.97 with test precision 0.47 (against
-0.70), and it raises 4.5 false-alarm events a week in the unused months (against 2.6). It still
-detects all three test episodes. The operating point therefore depends on the seeds, and the
-deployed figures should be read as one realisation of the procedure.
-</p>
+settings, in a separate folder; the deployed models were not changed. References and threshold were
+recomputed on validation for the new networks, as an update of the system would require. The
+retrained system selects a threshold of 0.954 (against 0.946), with validation PR-AUC 0.723 and test
+PR-AUC 0.799 (against 0.723 and 0.777). At its threshold it reaches test recall 0.96 and precision
+0.74 (against 0.97 and 0.70), detects all three test episodes, and raises 2.4 false-alarm events a
+week in the unused months (against 2.6). Its LSTM family alone again scores low on test (0.33).
+The same seeds, retrained independently on another machine for the external review, gave a threshold
+of 0.931, test precision 0.53 and 5.1 events a week: training is not bit-reproducible across
+machines, and the operating point moves with it. Ranking quality is fairly stable (test PR-AUC 0.78
+to 0.82 across the three ensembles), but precision ranges from 0.53 to 0.74 and the false-alarm rate
+from 2.4 to 5.1 events a week. The deployed figures are one realisation of the procedure.</p>
 
 <table class="minitable">
 <thead><tr><th>Criterion</th><th>Threshold</th><th>Precision</th><th>Recall</th><th>Missed</th></tr></thead>
@@ -1594,8 +1676,8 @@ must be recomputed immediately afterwards, which the following section then does
 
 <p>
 A single class, <code>DetecteurPV</code>, loads those artefacts and exposes one method.
-It is defined once in the notebook and copied into <code>src/detecteur.py</code>
-for deployment, with the notebook remaining the source of truth. The next section
+It is defined once in the notebook and ported to <code>src/detecteur.py</code>
+for deployment (the port adds a float32 cast and calls each network directly instead of through <code>predict</code>, which is faster and gives the same scores), with the notebook remaining the source of truth. The next section
 verifies that the copy behaves identically.
 </p>
 </section>
@@ -1724,7 +1806,7 @@ only unbiased check, and it rests on three episodes.
 The three test episodes are one staged experiment repeated. Each starts at 05:45 UTC and
 lasts about two hours. An exact 95% interval for the episode detection rate after 3 of 3
 detections is 0.29 to 1.00. A block bootstrap over test days (10,000 resamples) gives a 95% interval
-for the test PR-AUC of 0.49 to 0.94, around the point estimate of 0.78.
+for the test PR-AUC of 0.48 to 0.94, around the point estimate of 0.78.
 </p>
 </section>
 
@@ -1779,12 +1861,18 @@ the false alarms, so it ranks the methods but cannot choose a deployed threshold
   <figcaption>Score divided by each method's threshold, around the three test episodes (shaded). Values above the dashed line raise an alarm. The ensemble stays just above its threshold for the whole of each episode. The kNN score varies more and falls below its threshold for about an hour during the 16 May episode.</figcaption>
 </figure>
 <p>
+A paired bootstrap over days puts numbers on this. On test, kNN is ahead of the ensemble in 91% of
+resamples, and the 95% interval of the difference (ensemble minus kNN, −0.32 to +0.04) includes
+zero. On validation, the ensemble is ahead of Mahalanobis in 97% of resamples, a borderline lead that
+is also biased in its favour, since validation is the set it was tuned on.
+</p>
+<p>
 The ensemble's advantage over these simple baselines is therefore not established. On this
 evidence a nearest-neighbour distance is a credible alternative that needs no training. The design
 should be judged on a larger set of episodes.
 </p>
 
-<h3>What each family contributes</h3>
+<h3 id="families">What each family contributes</h3>
 <table class="results-table">
 <caption>PR-AUC of each family alone, ranked against the same references, on the same scored points.</caption>
 <thead>
@@ -1925,7 +2013,7 @@ The study period stops on 26 May 2022, so the detector has never been evaluated 
 <p>
 From June to September the system raises between 4 and 11 events a week. From October to April it
 raises at most about one a week. In the winter months (June to September in La Réunion), about two thirds of the flagged points fall at
-09h and 17h local time (05h and 13h UTC), when the sun is low and shadows are long. The alarms may
+08h and 16h local time (04h and 12h UTC), when the sun is low and shadows are long. The alarms may
 reflect real shading that nobody labelled, or this seasonal geometry. The data cannot tell these apart, so all of them
 count as false alarms. Training covers only late spring and summer, so every winter sun position is new to the model.
 </p>
@@ -1948,6 +2036,7 @@ is the only data in this record that covers other seasons. It should be evaluate
   <li><strong>Label quality.</strong> 56 of the 57 rows removed as a disconnected acquisition unit are labelled Fault 1, which is half of all Fault 1 data. The removal therefore changes the labelled fault set, and should be described that way. Intermittent shading is labelled by period but scored point by point, and episode boundaries are blurred by the five-minute aggregation.</li>
   <li><strong>Streaming robustness.</strong> The consumer scores daytime points only (GTI above 50 W/m²), as the notebook does. Every point it cannot score is logged with its reason. A message with no valid timestamp is skipped and its offset advanced, so it cannot stop the consumer on restart. Messages are still assumed to arrive in order: a late message is not re-sorted. The message handling is covered by tests that replay the test partition through it and compare the scores with the batch path.</li>
   <li><strong>Three test episodes.</strong> 3/3 detected is a good result on a small sample. The point-level metrics rest on 2,813 measurements and are far more informative than the episode count.</li>
+  <li><strong>Precision depends on how rare faults are.</strong> The test precision of 0.70 holds at the staged fault rate of 2.6% of points. At a more realistic 1% it would fall to about 0.5, and at 0.2% to about 0.15 to 0.2.</li>
   <li><strong>ROC-AUC is flattering.</strong> 0.9964 looks conclusive and largely reflects the 2.6% positive rate. PR-AUC at 0.7765 (a lift of ×29.9 over the base rate) is the figure to compare against.</li>
   <li><strong>Recall hits a wall.</strong> The operating-point table shows precision collapsing from 0.731 to 0.283 for seven points of extra recall. Some faults are simply not separable in this feature space, and no threshold fixes that.</li>
   <li><strong>Labels shaped the design.</strong> The networks never see a fault, but labels were used to choose features, tune hyperparameters, choose the fusion and the threshold, and to report every number here. A site with no labelled history would need a different way to set the cut.</li>
