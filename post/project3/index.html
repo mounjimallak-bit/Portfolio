@@ -279,9 +279,12 @@ END;</code></pre>
 </div>
 
 <p>
-Each application user maps to an Oracle account, so <code>USER</code> is a
+When each user connects with their own Oracle account, <code>USER</code> is a
 trustworthy identity, not a value the client can set. The same pattern protects
-messaging through <code>trg_secu_message_identity</code>.
+messaging through <code>trg_secu_message_identity</code>. The Flask application
+itself connects through a single application account, so in the web app the
+identity comes from the Flask session, and these triggers protect direct SQL
+clients rather than the web routes (see Known weaknesses).
 </p>
 
 <h3>Ownership enforcement</h3>
@@ -298,8 +301,10 @@ modified, following the foreign key back to <code>BIEN</code> where needed:
 
 <h3>Database roles</h3>
 <p>
-Access is granted through five Oracle roles rather than a single application
-account, so privileges are enforced by the database engine itself.
+Five Oracle roles define what each kind of account may read and change, so for
+direct database connections the privileges are enforced by the engine itself.
+The web application uses one application account, so these roles are not yet
+what protects the web routes.
 </p>
 
 <table class="srctable">
@@ -389,8 +394,9 @@ views) carry the rules, backed by five database roles.
 <h3 class="limits-head">Known weaknesses</h3>
 
 <div class="limits">
-<p>Two of these I would fix before deploying this anywhere real:</p>
+<p>Three of these I would fix before deploying this anywhere real:</p>
 <ul>
+    <li><strong>The web app does not use the database identity model.</strong> Flask connects through a single Oracle account, so the identity triggers and the five roles protect direct SQL connections, not the web routes, where identity comes from the Flask session. Mapping each web session to its own database identity (or a proxy user with per-user context) would let the database enforce what it was designed to enforce.</li>
   <li><strong>Password hashing uses MD5 without a salt.</strong> <code>sInscrire()</code> and <code>seConnecter()</code> hash through <code>DBMS_CRYPTO.HASH_MD5</code>. MD5 is broken for password storage and an unsalted digest is vulnerable to rainbow tables; a slow salted algorithm is what this should use.</li>
   <li><strong>The availability check is not concurrency-safe.</strong> <code>verifierDisponibilite()</code> counts conflicts and <code>creerReservation()</code> then inserts. Two concurrent transactions can both pass the check before either commits, and both bookings are written. Closing this requires locking the property row or enforcing non-overlap as a constraint rather than a procedural check.</li>
   <li><strong>Identity correction is silent.</strong> <code>trg_secu_resa_locataire</code> rewrites a mismatched tenant identifier rather than raising. It prevents the attack, but leaves no signal that one was attempted; raising an error would also make the rule visible during debugging.</li>
