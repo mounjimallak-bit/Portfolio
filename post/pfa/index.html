@@ -45,7 +45,7 @@
       <p><strong>Setting.</strong> A 4 kW grid-connected plant in La Réunion, 18 months of electrical and weather data at five-minute resolution, 17 staged shading incidents, all between February and May 2022.</p>
       <p><strong>What was built.</strong> Five dense and five LSTM autoencoders trained on healthy points only, fused by rank against a frozen reference, evaluated on a strictly chronological split, and ported to a Kafka streaming prototype that reproduces the offline scores exactly.</p>
       <p><strong>What the test showed.</strong> All 3 test episodes detected, recall 0.97, precision 0.70, PR-AUC 0.78 (base rate 0.026).</p>
-      <p><strong>What re-examination showed.</strong> A training-free nearest-neighbour distance does as well as the ten networks. The temporal half of the ensemble adds nothing on test. The 3/3 result has a 95% interval of 0.29 to 1. And in the austral winter, a season absent from training, the detector raises 4 to 11 false alarms a week.</p>
+      <p><strong>What re-examination showed.</strong> A training-free nearest-neighbour distance does as well as the ten networks. The temporal half of the ensemble adds nothing on test. The 3/3 result has a 95% interval of 0.29 to 1. And in the austral winter, a season absent from training, the detector raises 4 to 11 false alarms a week. A leave-one-incident-out evaluation over all 17 incidents then showed that no method is significantly better than the nearest-neighbour baseline, and located the real difficulty: separating faults from normal variability across days, not within a day.</p>
       <p><strong>What it means.</strong> The method works as a proof of concept for one fault signature, in one season, on one plant. It is not yet a measured operating performance.</p>
     </div>
     <div class="proj-links">
@@ -74,11 +74,12 @@ study follows, in the order it was done.
 </thead>
 <tbody>
 <tr><td>Can normal operation serve as the reference?</td><td>Autoencoders trained on 9,618 healthy points; chronological split with cut days outside every incident</td><td>For staged shading, yes: 4 of 4 validation and 3 of 3 test episodes detected, test ROC-AUC 0.996. Only one fault signature was tested. <a href="#test">Test</a></td></tr>
-<tr><td>Is the complexity needed?</td><td>Ensemble against kNN and Mahalanobis distances on the same points, same threshold rule</td><td>Not shown. kNN scores 0.88 on test against 0.78, lower on validation; no difference is significant. <a href="#baselines">Baselines</a></td></tr>
-<tr><td>Does temporal context help?</td><td>Dense autoencoders against LSTM autoencoders, alone and fused</td><td>Not on test: the LSTM family alone scores 0.27, and the test result comes from the dense models. <a href="#families">Families</a></td></tr>
+<tr><td>Is the complexity needed?</td><td>Ensemble against kNN and Mahalanobis distances on the same points, same threshold rule</td><td>Not shown. On the 3 test episodes kNN scores 0.88 against 0.78; across all 17 incidents, refitted inside each fold, no method differs significantly from kNN, and none dominates on every criterion. <a href="#loio">17 incidents</a></td></tr>
+<tr><td>Does temporal context help?</td><td>Dense autoencoders against LSTM autoencoders, alone and fused</td><td>Not established. The LSTM scores best on intermittent shading across the 17 incidents, but the gap rests mainly on one incident, and temporal context without an LSTM does not help. <a href="#loio">17 incidents</a></td></tr>
 <tr><td>How solid is the test result?</td><td>Exact interval on episodes; block bootstrap over days</td><td>3/3 episodes gives 0.29 to 1; test PR-AUC 0.48 to 0.94. The 3 test episodes repeat one staged experiment. <a href="#test">Test</a></td></tr>
 <tr><td>Does the detector hold over time?</td><td>Deployed system scored on the 10.5 fault-free months after the study period</td><td>No: 4 to 11 false-alarm events a week from June to September, 0 to 1 the rest of the year. <a href="#seasons">Seasons</a></td></tr>
 <tr><td>Is the operating point stable?</td><td>Same architecture retrained with five other seeds; references and threshold recomputed</td><td>Partly. Ranking quality holds (test PR-AUC 0.78 to 0.82 over three ensembles), but test precision ranges from 0.53 to 0.74 and false alarms from 2.4 to 5.1 a week. <a href="#threshold">Threshold</a></td></tr>
+<tr><td>Where does detection actually fail?</td><td>Same deployed predictions evaluated within each fault day and across all 27 test days</td><td>Across days. Within a fault day most methods are near perfect (PR-AUC 0.96 to 0.996); over 27 days they fall to 0.26 to 0.88, because healthy points of other days score as high as faults. <a href="#loio">17 incidents</a></td></tr>
 <tr><td>Does the protocol survive streaming?</td><td>Kafka replay of the test period against offline scoring; crash and restart; automated tests</td><td>Yes: identical scores and alarms on every replayed point, no duplicate alarm after a crash. <a href="#streaming">Running system</a></td></tr>
 </tbody>
 </table>
@@ -101,16 +102,19 @@ evaluation exposed. None of them is solved here; they are the questions I would 
 </thead>
 <tbody>
 <tr><td>Winter false alarms recur at fixed hours, around 08:00 and 16:00 local, with a shading-like signature</td><td>The plant is a system driven by the sun and the seasons; a model trained on one season sees every winter sun position as new</td><td>How can a detector separate the slow, driven drift of a system from a genuine departure, for instance by modelling the system in its state space or by detecting the distribution shift explicitly?</td></tr>
-<tr><td>A nearest-neighbour distance does as well as ten networks</td><td>With seven episodes, a learned representation cannot be shown to beat a neighbour search in the raw state space</td><td>When does a learned model of normal dynamics beat local neighbours, and how many events does it take to tell?</td></tr>
+<tr><td>Within a fault day most detectors rank faults almost perfectly; across 27 days their precision falls sharply</td><td>Scores are not comparable from one day to the next: normal variability between days (sun position, season) looks like a fault</td><td>How can anomaly scores be made comparable across days and seasons, so that a detector separates faults from normal operating variability rather than from its immediate context?</td></tr>
+<tr><td>Across 17 incidents, no method differs significantly from a nearest-neighbour distance, and none dominates on every criterion</td><td>With this evidence, a learned representation cannot be shown to beat a neighbour search in the raw state space; the choice is a trade-off between recall, false alarms and cost</td><td>When does a learned model of normal dynamics beat local neighbours, and how many events does it take to tell?</td></tr>
 <tr><td>The threshold was chosen on four validation episodes</td><td>A site with no labelled history cannot calibrate this way, and the operating point moves with the seeds</td><td>Can the alarm threshold be set from a false-alarm budget measured on healthy data alone, with stated uncertainty?</td></tr>
-<tr><td>The LSTM looked strong on validation and collapsed on the test sub-type</td><td>Validation performance did not transfer, and the reason was not established</td><td>What does a temporal model of normal operation actually learn, and how can that be checked before deployment?</td></tr>
+<tr><td>The LSTM's collapse on the test sub-type was a scope effect: it ranks faults well within each day, but healthy points of other days outscore them</td><td>A first explanation (the healthy reference was too far in time) was tested and rejected</td><td>What does a temporal model of normal operation actually learn, and why are its scores less comparable across days than those of a point-wise model?</td></tr>
 <tr><td>Every fault is staged shading on one plant</td><td>Rare, real faults (soiling, degradation, inverter or sensor faults) were never observed</td><td>How should a detector of rare events be evaluated when the events of interest are almost never labelled?</td></tr>
 </tbody>
 </table>
 <p class="reading">
 This project changed what I think the problem is. Detecting an anomaly is not only about scoring
 departures from normal; it is about knowing what normal variability looks like across all the
-conditions a system goes through, and about how much a small number of rare events can prove. Those
+conditions a system goes through, and about how much a small number of rare events can prove. The
+evaluation over 17 incidents made this concrete: the detectors rarely fail to see a fault against its own
+day; they fail to tell it apart from the normal variability of other days. Those
 are the questions I want to work on: learning the normal dynamics of complex systems from data, and
 detecting when they depart from it, with few labelled events and under changing conditions.
 </p>
@@ -121,9 +125,10 @@ detecting when they depart from it, with few labelled events and under changing 
 <h2>My role, and how the results were checked</h2>
 <ul>
 <li><strong>Topic.</strong> Chosen with my internship supervisor; the dataset (Zenodo record 7358042) was provided by the supervisor.</li>
-<li><strong>My work.</strong> Data merging and cleaning, the chronological protocol, feature investigation, the three detectors and the fusion, the evaluation, and the streaming prototype (Kafka, scoring consumer, TimescaleDB, Grafana, tests).</li>
+<li><strong>My work.</strong> Data merging and cleaning, the chronological protocol, the leave-one-incident-out evaluation, feature investigation, the three detectors and the fusion, the evaluation, and the streaming prototype (Kafka, scoring consumer, TimescaleDB, Grafana, tests).</li>
 <li><strong>External review.</strong> After the internship, an external review of the project re-ran the pipeline and identified the gaps in the evaluation: no simple baselines, no uncertainty, no seasonal test, and claims stronger than the evidence. The baselines, intervals, seasonal analysis and seed sensitivity on this page were added in response, and the write-up was corrected.</li>
-<li><strong>Reproducibility.</strong> One notebook covers the whole study: sections 1 to 15 the original work, section 16 every number added after the review. It runs from a clone without the raw 2.3 GB files. The deployed models, scalers, references and threshold are versioned, and the streaming path is covered by automated tests.</li>
+<li><strong>Reproducibility.</strong> One notebook covers the whole study: sections 1 to 15 the original work, section 16 every number added after the review, and section 17 the
+evaluation across all 17 incidents, with its cached scores. It runs from a clone without the raw 2.3 GB files. The deployed models, scalers, references and threshold are versioned, and the streaming path is covered by automated tests.</li>
 </ul>
 </section>
 
@@ -158,6 +163,7 @@ are marked as such where they appear.
     <li><a href="#validation">Final validation</a></li>
     <li><a href="#test">The test partition</a></li>
     <li><a href="#baselines">Simple baselines</a></li>
+    <li><a href="#loio">Evaluation across 17 incidents</a></li>
     <li><a href="#streaming">Running system</a></li>
     <li><a href="#seasons">Seasonal false alarms</a></li>
     <li><a href="#limits">Limits and next steps</a></li>
@@ -1891,6 +1897,99 @@ of temporal modelling.
 </p>
 </section>
 
+<!-- ===================== LEAVE-ONE-INCIDENT-OUT ===================== -->
+<section class="cs" id="loio">
+<h2>Evaluation across all 17 incidents</h2>
+<p>
+The test partition holds three episodes of one staged experiment: it cannot rank the detectors. The
+17 incidents of the study period carry far more information, so the comparison was repeated as a
+leave-one-incident-out evaluation. The protocol was fixed before the results were seen and was not
+changed after.
+</p>
+<ul>
+<li><strong>Folds.</strong> One per incident. The incident's days are held out, with a one-day buffer on each side.</li>
+<li><strong>Refitting.</strong> Every detector is refitted inside each fold on the healthy points of the other days only (scalers, covariance, networks). Labels are used to exclude known faults from fitting, as everywhere in this project.</li>
+<li><strong>Thresholds without labels.</strong> One healthy day in four is kept for calibration; each method alarms above the 99th percentile of its scores on the same calibration points (1% false alarms on healthy data).</li>
+<li><strong>Same points for all.</strong> Seven methods, compared on exactly the same held-out points. Results are aggregated over the 17 incidents and over 12 groups, because incidents from the same test campaign are not independent.</li>
+</ul>
+
+<table class="results-table">
+<caption>17 incidents. ROC-AUC is the main comparison metric because it does not depend on the fault rate, which ranges from 3% to 90% of the held-out points. Thresholds fixed on healthy calibration days. Section 17 of the notebook.</caption>
+<thead>
+<tr><th scope="col">Method</th><th scope="col" class="num">ROC-AUC mean</th><th scope="col" class="num">ROC-AUC min</th><th scope="col">Incidents detected</th><th scope="col" class="num">Recall mean</th><th scope="col" class="num">False-alarm events / day</th></tr>
+</thead>
+<tbody>
+<tr><td>kNN</td><td class="num">0.973</td><td class="num">0.857</td><td>17 of 17</td><td class="num">0.82</td><td class="num">0.68</td></tr>
+<tr><td>Mahalanobis</td><td class="num">0.978</td><td class="num">0.848</td><td>17 of 17</td><td class="num">0.76</td><td class="num">0.41</td></tr>
+<tr><td>Mahalanobis (Ledoit-Wolf)</td><td class="num">0.974</td><td class="num">0.805</td><td>16 of 17</td><td class="num">0.65</td><td class="num">0.35</td></tr>
+<tr><td>Isolation Forest</td><td class="num">0.973</td><td class="num">0.792</td><td>17 of 17</td><td class="num">0.78</td><td class="num">0.59</td></tr>
+<tr><td>Dense AE ×5</td><td class="num">0.931</td><td class="num">0.684</td><td>16 of 17</td><td class="num">0.70</td><td class="num">0.41</td></tr>
+<tr><td>LSTM AE ×5</td><td class="num">0.971</td><td class="num">0.920</td><td>17 of 17</td><td class="num">0.77</td><td class="num">0.88</td></tr>
+<tr><td>Fusion (deployed design)</td><td class="num">0.971</td><td class="num">0.817</td><td>16 of 17</td><td class="num">0.76</td><td class="num">0.29</td></tr>
+</tbody>
+</table>
+
+<figure class="shot shot--wide">
+  <img src="images/pfa_loio_roc.png" alt="ROC-AUC of six detectors on each of the 17 held-out incidents; all are near 1 except on intermittent shading incidents, where all methods drop" loading="lazy" />
+  <figcaption>Each incident held out in turn. Most incidents are separated almost perfectly by every method; intermittent shading (grey) is hard for all of them.</figcaption>
+</figure>
+
+<p class="reading">
+No method differs significantly from kNN. Paired over the 12 groups, the closest call is the dense
+autoencoder ensemble (Wilcoxon p = 0.016), which becomes p = 0.097 after a Holm correction for six
+comparisons. These p-values are exploratory: folds share part of their healthy training data, so groups
+are not strictly independent, and an absence of difference is not evidence of equivalence. No method
+dominates on every criterion either: kNN has the highest recall, the deployed fusion the fewest false
+alarms (0.29 a day, a figure that depends on this calibration and protocol). The simple detectors reach
+these results at a small fraction of the cost: about 1 to 2 ms per point and under a second of fitting,
+against about 190 ms per point for the fusion and around 30 minutes of fitting per fold for its ten networks.
+</p>
+
+<h3>A hypothesis tested and rejected</h3>
+<p>
+On the 17 incidents, the LSTM separates the type 3.1 incidents well (ROC-AUC 0.95 to 0.97), while on the
+chronological test it had collapsed (PR-AUC 0.27). The first explanation was that the refitted models'
+healthy reference contained days close to each incident, which the deployed LSTM, trained on October to
+March, never saw. That explanation compared a PR-AUC with a ROC-AUC over different scopes, so it was
+tested with the same metric and the deployed models' original predictions.
+</p>
+<table class="results-table">
+<caption>Deployed models, raw scores, chronological test. Fault rate: 22.6% on the three fault days, 2.6% over the 27 days.</caption>
+<thead>
+<tr><th scope="col">Method</th><th scope="col" class="num">PR-AUC within each fault day</th><th scope="col" class="num">PR-AUC, 3 fault days</th><th scope="col" class="num">PR-AUC, all 27 days</th></tr>
+</thead>
+<tbody>
+<tr><td>kNN</td><td class="num">0.962</td><td class="num">0.979</td><td class="num">0.880</td></tr>
+<tr><td>Mahalanobis</td><td class="num">0.990</td><td class="num">0.990</td><td class="num">0.734</td></tr>
+<tr><td>Dense AE ×5</td><td class="num">0.955</td><td class="num">0.957</td><td class="num">0.749</td></tr>
+<tr><td>LSTM AE ×5</td><td class="num">0.702</td><td class="num">0.684</td><td class="num">0.264</td></tr>
+<tr><td>Fusion (deployed)</td><td class="num">0.996</td><td class="num">0.997</td><td class="num">0.776</td></tr>
+</tbody>
+</table>
+<p class="reading">
+Within each fault day, the deployed LSTM already ranks faults as well as the refitted one (ROC-AUC 0.93 to
+0.97 against 0.95 to 0.97): the proximity of the reference does not explain the gap, and the hypothesis is
+rejected. What the check revealed instead applies to every method. Within a fault day, most detectors are
+close to perfect; over all 27 days, precision falls sharply, because healthy points of other days, early
+in the morning or late in the afternoon, score as high as faults. The main difficulty is not ranking a fault
+against its own day, but separating it from the normal variability of other days: the same problem as the
+winter false alarms. It also means the leave-one-incident-out results, computed within incident days, are
+optimistic by construction.
+</p>
+<p>
+An exploratory follow-up, decided after these results, applied kNN to six-point windows, giving it the
+LSTM's temporal context without the network. It did not help on intermittent shading (0.918 against 0.936
+for point-wise kNN). The LSTM's lead on that type (0.946) rests mainly on one incident, 25 March, and does
+not show that it is more robust.
+</p>
+<p class="note">
+Limits of this evaluation: hyperparameters were chosen before it, on a period containing 4 of the incidents
+(excluding those folds does not change the conclusions, but it is a sensitivity check, not an independent
+validation); evaluation within incident days is optimistic; the healthy reference includes days before and
+after each incident, which is not a deployment scenario; all incidents are staged shading on one plant.
+</p>
+</section>
+
 <!-- ===================== STREAMING ===================== -->
 <section class="cs" id="streaming">
 <h2>Running system</h2>
@@ -2032,7 +2131,7 @@ is the only data in this record that covers other seasons. It should be evaluate
 <ul>
   <li><strong>One plant, one dataset.</strong> Everything here comes from a single installation. The pipeline transfers; the threshold does not, and would have to be re-derived from a healthy period on any new site.</li>
   <li><strong>One season.</strong> The study period stops on 26 May 2022, and the networks were trained on late spring and summer only. No fault was ever measured in winter. The seasonal section reports the false-alarm rate by month.</li>
-  <li><strong>Simple baselines.</strong> A nearest-neighbour distance on six raw sensors scores higher on test (PR-AUC 0.88 against 0.78) and lower on validation. The ensemble's advantage over it is not established.</li>
+  <li><strong>Simple baselines.</strong> A nearest-neighbour distance on six raw sensors scores higher on test (PR-AUC 0.88 against 0.78) and lower on validation. Across all 17 incidents no method differs significantly from it. The ensemble's advantage is not established.</li>
   <li><strong>Label quality.</strong> 56 of the 57 rows removed as a disconnected acquisition unit are labelled Fault 1, which is half of all Fault 1 data. The removal therefore changes the labelled fault set, and should be described that way. Intermittent shading is labelled by period but scored point by point, and episode boundaries are blurred by the five-minute aggregation.</li>
   <li><strong>Streaming robustness.</strong> The consumer scores daytime points only (GTI above 50 W/m²), as the notebook does. Every point it cannot score is logged with its reason. A message with no valid timestamp is skipped and its offset advanced, so it cannot stop the consumer on restart. Messages are still assumed to arrive in order: a late message is not re-sorted. The message handling is covered by tests that replay the test partition through it and compare the scores with the batch path.</li>
   <li><strong>Three test episodes.</strong> 3/3 detected is a good result on a small sample. The point-level metrics rest on 2,813 measurements and are far more informative than the episode count.</li>
@@ -2052,7 +2151,7 @@ is the only data in this record that covers other seasons. It should be evaluate
   <li>Monitor drift on the reference distributions, and define a re-calibration procedure recomputing references and threshold together.</li>
   <li>Attribute each alarm to a feature (which of the six sensors drove the reconstruction error), so an alert says where to look, not only when.</li>
   <li>Validate on a second installation, which is the only real test of whether the approach generalises.</li>
-  <li>Rotate the evaluation through all 17 incidents, holding out one at a time, and report per-episode results with intervals.</li>
+  <li>Make scores comparable across days before thresholding, for example by conditioning the model of normal operation on the time of day and the season, and measure the effect on the across-day precision of section 17.</li>
   <li>Set the threshold from a false-alarm budget measured on healthy days, rather than from F2 on validation.</li>
   <li>Choose the operating point on episode detection, and report the trade-off curve of episodes caught against false alarms per week.</li>
   <li>Group consecutive flagged points into single alarm events, and consider requiring persistence before an alarm is raised.</li>
