@@ -36,10 +36,10 @@
     <p class="eyebrow">Data &amp; AI Engineering · ENSA Agadir, Morocco</p>
     <h1>Malak Mounji</h1>
     <p class="lede">
-      Engineering student in data science. I build anomaly detection models on
-      sensor time series and the pipelines that run them. Looking for a 6-month
-      end-of-studies internship from February 2027, and a research Master's from
-      Fall 2027.
+      Engineering student in data science, applying to PhD programmes for 2027.
+      I work on detecting anomalies in sensor time series: learning what normal
+      operation looks like from data, and testing how far that model can be trusted
+      when labelled faults are rare and conditions change.
     </p>
   </div>
 </section>
@@ -55,35 +55,44 @@
         <span class="ctx">Albarray Consulting · Individual · Jul–Aug 2026</span>
       </div>
 
-      <h3>Photovoltaic anomaly detection with a real-time scoring pipeline</h3>
+      <h3>Detecting faults from few labels: photovoltaic anomaly detection</h3>
 
       <p class="proj-lede">
         Photovoltaic plants degrade quietly. Shading and other partial faults
         cut output for days or weeks before anyone notices, and labelled fault data is
-        almost never available. This project detects shading faults without
-        training on any labelled fault, then scores incoming measurements as they arrive.
+        almost never available. This project learns normal operation from healthy data,
+        detects staged shading faults, and then asks how much a handful of fault episodes
+        can actually establish.
       </p>
 
       <div class="proj-cols">
         <div>
           <h4>Approach</h4>
           <p>
-            An unsupervised ensemble of ten networks: five dense autoencoders and
-            five LSTM autoencoders, each trained on a different seed. An Isolation
-            Forest served as the baseline and was left out of the final system,
-            because adding it lowered the fused score. Their reconstruction errors are converted to ranks and
-            fused, which keeps the ensemble stable when individual models disagree.
-            The decision threshold was selected by maximising F2 on a validation
-            split, favouring recall: a missed fault costs more than a false alarm.
+            A semi-supervised ensemble: five dense and five LSTM autoencoders trained
+            on healthy data only, their reconstruction errors ranked against a frozen
+            reference and fused. Labels were used to select features, tune the models
+            and set the alarm threshold (maximum F2 on validation), never to fit the
+            networks. Evaluation follows a strictly chronological split.
+          </p>
+
+          <h4>What re-examination showed</h4>
+          <p>
+            After an external review, the result was tested further. A training-free
+            nearest-neighbour distance performs comparably to the ten networks; the
+            LSTM half adds nothing on test; the 3/3 episode result has a 95% interval
+            of 0.29 to 1; and in the austral winter, absent from training, the
+            detector raises 4 to 11 false alarms a week. A proof of concept for one
+            fault signature, in one season, on one plant.
           </p>
 
           <h4>Deployment</h4>
           <p>
-            The trained system runs as a streaming pipeline. A replayer publishes
+            The detector also runs as a streaming prototype. A replayer publishes
             five-minute measurements to Kafka, a Python consumer scores each point
             and writes to TimescaleDB, and a provisioned Grafana dashboard renders
-            the result live. The whole stack starts from a single
-            <code>docker compose up</code>, dashboard included.
+            the result live, with the same scores as offline. The whole stack starts
+            from a single <code>docker compose up</code>.
           </p>
         </div>
 
@@ -91,15 +100,16 @@
           <h4>Results</h4>
           <table class="restable">
             <tbody>
-              <tr><th>PR-AUC (test)</th><td>0.7765</td></tr>
-              <tr><th>Recall</th><td>0.973</td></tr>
-              <tr><th>Precision</th><td>0.703</td></tr>
-              <tr><th>Points scored</th><td>2,813</td></tr>
+              <tr><th>PR-AUC (test)</th><td>0.78</td></tr>
+              <tr><th>Test episodes</th><td>3 / 3</td></tr>
+              <tr><th>kNN baseline (test)</th><td>0.88</td></tr>
+              <tr><th>Winter false alarms</th><td>4–11 / week</td></tr>
             </tbody>
           </table>
           <p class="fineprint">
-            Evaluated on a held-out partition never seen during training or
-            threshold selection. Dataset: public Zenodo record of a 4&nbsp;kW PV installation in La Réunion, with labelled shading faults, provided by the project supervisor.
+            Test partition opened once, after every design choice was fixed; base rate
+            0.026. The 3 test episodes repeat one staged experiment, so the uncertainty
+            is large (test PR-AUC 0.48 to 0.94). Dataset: public Zenodo record of a 4&nbsp;kW PV installation in La Réunion, with labelled shading faults, provided by the project supervisor.
           </p>
 
           <h4>Stack</h4>
@@ -158,12 +168,6 @@
       <article class="project">
         <div class="proj-meta">
           <span class="tag">Coursework</span>
-          <span class="ctx">Pair project with Rawane Cerbouche · 2025</span>
-        </div>
-
-      <article class="project">
-        <div class="proj-meta">
-          <span class="tag">Coursework</span>
           <span class="ctx">Individual · 2024</span>
         </div>
 
@@ -211,8 +215,9 @@
         That interest came from a practical problem. Labelled failure data is rare in
         industrial settings, so the useful question is usually how to detect
         something abnormal without ever having been shown what abnormal looks like.
-        Unsupervised anomaly detection on time series is what I want to keep working
-        on, first in my end-of-studies internship, then at Master's level.
+        My PFA internship turned that question into a question about evidence: how to
+        tell a genuine anomaly from normal variability across changing conditions, and
+        how much a few rare events can prove. That is what I want to study in a PhD.
       </p>
       <p>
         Before my PFA internship I interned at Morocco's High Commission for
@@ -230,8 +235,8 @@
   <div class="wrap">
     <h2 class="section-title">Contact</h2>
     <p class="section-note">
-      Open to a 6-month end-of-studies internship (PFE) from February 2027, and to
-      research Master's programmes in data science and machine learning from Fall 2027.
+      Applying to PhD programmes starting in 2027, in machine learning and data-driven
+      modelling of complex systems.
     </p>
     <ul class="contact-list">
       <li><span>Email</span><a href="mailto:mounji.mallak@gmail.com">mounji.mallak@gmail.com</a></li>
