@@ -56,6 +56,8 @@
   @media (max-width: 700px) {
     .results-table {
       font-size: 0.82rem;
+      display: block;
+      overflow-x: auto;
     }
 
     .results-table th,
@@ -184,7 +186,7 @@
     The analysis uses 179 geographic units with a rate available
     in all three years. These consist of 175 communes and four
     urban centre units (AC). Three additional AC records from
-    Chtouka-Aït Baha have no rate in the 2004 or 2014 sheets and
+    Chtouka-Aït Baha have no rate in the 2004 and 2007 sheets and
     are excluded. Because the sample is a complete-case sample,
     the results describe these 179 geographic units only.
   </p>
@@ -319,11 +321,13 @@
 
   <p>
     The median poverty rate fell from 23.0% to 10.2%, a decrease
-    of 12.8 percentage points, or 55.7% of the 2004 median.
+    of 12.8 percentage points, or 55.5% of the 2004 median.
     The decline was not evenly spread over the period.
     The median fell by 9.0 points between 2004 and 2007 and by
-    3.8 points between 2007 and 2014, so most of the decrease
-    occurred in the first three years.
+    3.8 points between 2007 and 2014. On the published figures,
+    most of the decrease therefore falls in the first three years,
+    but this depends on the three HCP poverty maps being comparable
+    over time, which was not checked (see Limitations).
   </p>
 
   <p>
@@ -479,7 +483,7 @@
         <td>Chtouka-Aït Baha</td>
         <td class="num">23</td>
         <td class="num">17.3%</td>
-        <td class="num">7.2%</td>
+        <td class="num">7.3%</td>
         <td class="num">−12.5 points</td>
         <td>20 of 23</td>
       </tr>
@@ -551,8 +555,9 @@
     The results show that poverty declined in 171 of the 179
     observed geographic units between 2004 and 2014, but the
     magnitude of the decline varied substantially across
-    territories. Most of the regional decline occurred before
-    2007. Tata experienced the smallest median unit-level
+    territories. On the published figures, most of the regional
+    decline falls before 2007, a pattern that should be confirmed
+    against the HCP methodology before it is interpreted. Tata experienced the smallest median unit-level
     reduction and retained the highest median poverty rate
     in 2014. These findings describe where poverty declined
     and by how much, but do not establish the causes of these
@@ -819,6 +824,15 @@
     </li>
 
     <li>
+      <strong>Comparability over time.</strong>
+      The 2004, 2007 and 2014 rates come from three separate HCP
+      poverty maps. Their comparability was not checked against the
+      HCP methodology notes. Many units fall sharply in 2007 and
+      rise again by 2014, which may reflect a change of method rather
+      than a real change; a few 2007 values (for example Drargua
+      centre, 0.5%) are being re-checked against the source sheets.
+    </li>
+    <li>
       <strong>Scope.</strong>
       The analysis covers Souss-Massa only and is descriptive.
       Vulnerability rates are in the dataset but are not
@@ -840,7 +854,9 @@
     Google Gemini API. Modelling: scikit-learn
     (linear regression for trend lines).
     The live application and the source code, including
-    the tables and the validation script, are public.
+    the tables, the validation script and the analysis script
+    (analyse_pauvrete.py, which reproduces every number on this
+    page), are public.
   </p>
 
   <p>
