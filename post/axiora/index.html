@@ -6,7 +6,7 @@
 
 <title>Axiora Data · Case study · Malak Mounji</title>
 
-<meta name="description" content="Axiora Data: a quality-checked dataset of 93 HCP tables for the Souss-Massa region, and a statistical analysis of poverty change between 2004 and 2014." />
+<meta name="description" content="Axiora Data: a quality-checked dataset of 48 HCP tables for the Souss-Massa region, and a statistical analysis of poverty change between 2004 and 2014." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -99,7 +99,7 @@
     <p class="standfirst">
       A quality-checked dataset and a statistical analysis of poverty
       and population across the Souss-Massa region of Morocco, built
-      from 93 tables published by the High Commission for Planning (HCP).
+      from 48 tables published by the High Commission for Planning (HCP).
     </p>
 
     <div class="case-actions">
@@ -133,7 +133,7 @@
   <p>
     Official statistics for the six territories of Souss-Massa are
     published in tables that are difficult to compare across years
-    and places. This project transcribed 93 of these tables, checked
+    and places. This project transcribed 48 of these tables, checked
     them for internal consistency, and used them to answer descriptive
     questions about population, housing, finance and poverty.
     The main analysis examines changes in poverty rates between
@@ -547,14 +547,16 @@
   <h2>Data and validation</h2>
 
   <p>
-    The 93 tables are stored as aligned columns and pass an
-    automated check before they are used. The check verifies
+    The 48 tables are stored as aligned columns in a data
+    module; the application repeats 45 of them, so the check
+    reads 93 tables in all. Every table passes an automated
+    check before it is used. The check verifies
     that columns have equal length, that urban plus rural
     equals total and men plus women equals total, that the
-    regional row equals the sum of the provinces (within the
-    larger of one unit or 1% of the compared values), that
-    the copies of each table in the data module and in the
-    application agree, and that every province and commune
+    regional row equals the sum of the provinces (exactly, for
+    counts), that each copy in the application has the same
+    values as its table in the data module (copies are paired
+    by structure and year, never by their values), and that every province and commune
     row used in a map reaches exactly one polygon of the official
     HCP boundary files, inside its own province (a commune name
     alone is not unique in Morocco: Tabia and Oulad Aissa also
@@ -564,8 +566,16 @@
   </p>
 
   <p>
-    On the current dataset the check reports no errors
-    and no warnings. It also identified a misaligned row
+    On the current dataset the check reports no errors and
+    two small discrepancies, kept as warnings until they are
+    checked against the yearbooks: in the 2018 first-year
+    enrolment table, boys plus girls in Tiznit make 3,828
+    against a total of 3,826, and in the 2017 investment
+    projects table the Total row differs by one from the sum
+    of the provinces in three columns. A test script
+    introduces typical errors one at a time (a total off by
+    one, a 2018 table filled with the 2017 figures) and
+    checks that each is reported. The check also identified a misaligned row
     in a 2017 housing table, which was corrected against
     the yearbook. These checks test internal consistency
     only, so every value of the tables taken from the
@@ -603,7 +613,7 @@
   <ul>
     <li>
       <strong>Data harmonisation:</strong>
-      transcription of 93 HCP statistical tables into a
+      transcription of 48 HCP statistical tables into a
       structured, column-aligned dataset.
     </li>
 
