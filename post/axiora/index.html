@@ -547,54 +547,39 @@
   <h2>Data and validation</h2>
 
   <p>
-    The 48 tables are stored as aligned columns in a data
-    module; the application repeats 45 of them, so the check
-    reads 93 tables in all. Every table passes an automated
-    check before it is used. The check verifies
-    that columns have equal length, that urban plus rural
-    equals total and men plus women equals total, that the
-    regional row equals the sum of the provinces (exactly, for
-    counts), that each copy in the application has the same
-    values as its table in the data module (copies are paired
-    by structure and year, never by their values), and that every province and commune
-    row used in a map reaches exactly one polygon of the official
-    HCP boundary files, inside its own province (a commune name
-    alone is not unique in Morocco: Tabia and Oulad Aissa also
-    exist in other regions). Exact zeros in rate columns are
-    reported as warnings for review rather than treated
-    as missing values.
+    The 48 tables are stored as aligned columns in a single data
+    module, each with the publication it comes from, and every
+    table passes an automated check before it is used. The check
+    verifies that columns have equal length; that totals equal the
+    sum of their parts, exactly for counts (urban and rural, men and
+    women, provinces and region); that the tables repeated in the
+    application are identical to their source; and that every
+    province and commune shown on a map reaches exactly one polygon
+    of the official HCP boundary files, inside its own province
+    (a commune name alone is not unique in Morocco). A test script
+    introduces typical transcription errors one at a time and checks
+    that each is reported. On the current data the check reports no
+    errors.
   </p>
 
   <p>
-    On the current dataset the check reports no errors and
-    two small discrepancies, kept as warnings until they are
-    checked against the yearbooks: in the 2018 first-year
-    enrolment table, boys plus girls in Tiznit make 3,828
-    against a total of 3,826, and in the 2017 investment
-    projects table the Total row differs by one from the sum
-    of the provinces in three columns. A test script
-    introduces typical errors one at a time (a total off by
-    one, a 2018 table filled with the 2017 figures) and
-    checks that each is reported. The check also identified a misaligned row
-    in a 2017 housing table, which was corrected against
-    the yearbook, and one published figure that does not add
-    up: the 2016 yearbook prints 12,984 unemployed aged 35–44
-    in the region, while the urban and rural parts
-    (9,538 + 2,510) and the row total both give 12,048, the
-    value used and flagged in the app. These checks test internal consistency
-    only, so every value of the tables taken from the
-    2016, 2017 and 2018 regional yearbooks was also compared
-    with the yearbook itself. This found two transcription
-    errors, both corrected: four cells of the 2017
-    administrative division (communes and circles of
-    Agadir Ida Outanane, Inezgane-Aït Melloul and
-    Chtouka-Aït Baha), and the 2015 column of the table of
-    companies created, whose three values had been
-    swapped. In the three ENE labour tables for 2017 to 2020,
-    the 2019 and 2020 values match the HCP's published ENE
-    indicators; the 2017 and 2018 values, and the rates for
-    people with a diploma (which the HCP publishes split into
-    two levels), could not be matched to a published table.
+    These checks establish internal consistency; agreement with the
+    sources was established by comparing every value taken from the
+    2016, 2017 and 2018 regional yearbooks with the yearbooks
+    themselves. This comparison also identified three figures that
+    do not add up in the publications: the 2016 yearbook prints
+    12,984 unemployed aged 35–44 in the region, whereas the urban
+    and rural parts (9,538 + 2,510) and the regional total give
+    12,048, the value used; and two published totals differ from
+    the sum of their parts by one or two units (first-year
+    enrolment in Tiznit, 2018; investment projects, 2017), which
+    are kept as published. In the ENE labour tables for 2017 to
+    2020, the 2019 and 2020 values match the HCP's published
+    indicators, except the rates for people with a diploma, which
+    the HCP publishes split into two levels; the 2017 activity rates
+    by setting match the 2017 yearbook; the other 2017 and 2018
+    values could not be matched to a published table. None of these
+    values is used for any result on this page.
   </p>
 </section>
 
@@ -679,11 +664,11 @@
       <tr>
         <td>Population by territory</td>
         <td>
-          <a href="https://www.hcp.ma/region-agadir/Evolution-de-la-population-legale-selon-les-Provinces-et-les-Communes-de-la-Region-Souss-Massa_a24.html"
+          <a href="https://www.hcp.ma/region-agadir/Annuaire-statistique-regional_a2.html"
              target="_blank"
              rel="noopener">
-            HCP: Evolution de la population légale selon
-            les provinces et les communes
+            HCP: Annuaire statistique régional, Souss-Massa,
+            2017 (table 2, RGPH)
           </a>
         </td>
         <td>2004, 2014</td>
@@ -777,14 +762,6 @@
 
   <ul>
     <li>
-      <strong>Chtouka-Aït Baha, urban population in 2004.</strong>
-      The HCP sheets do not give this figure. The value
-      39,694 is an inference, chosen so that the province
-      figures sum to the published regional total.
-      It affects the 2004 urban share of the region.
-    </li>
-
-    <li>
       <strong>Weighting below the territory level.</strong>
       Unit-level statistics count each commune once. Weighted
       figures are available only for whole territories (the HCP
@@ -795,8 +772,9 @@
     <li>
       <strong>Labour tables for 2017 to 2020.</strong>
       Their 2019 and 2020 values match the HCP's published ENE
-      indicators; the 2017 and 2018 values, and the rates for
-      people with a diploma, could not be matched to a published
+      indicators, and the 2017 activity rates by setting match the
+      2017 yearbook; the other 2017 and 2018 values, and the rates
+      for people with a diploma, could not be matched to a published
       table. They are not used for any result on this page.
       Every table taken from the 2016 to
       2018 regional yearbooks was compared value by value
