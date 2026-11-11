@@ -45,7 +45,7 @@
 <!-- ============ WORK ============ -->
 <section class="section" id="work">
   <div class="wrap">
-   
+    <h2 class="section-title">Work</h2>
 
     <!-- ---------- FEATURED ---------- -->
     <article class="project featured">
@@ -125,76 +125,119 @@
       </div>
     </article>
 
-    <!-- ---------- OTHERS ---------- -->
-    <div class="proj-grid">
+   
+    <!-- ---------- SECOND FEATURED: AXIORA ---------- -->
+    <article class="project featured">
+      <div class="proj-meta">
+        <span class="tag tag-lead">Personal project</span>
+        <span class="ctx">Individual · 2025–2026 · extends my HCP internship work</span>
+      </div>
 
-      <article class="project">
-        <div class="proj-meta">
-          <span class="tag">Personal project</span>
-          <span class="ctx">Individual · 2025 · extends my HCP internship work</span>
+      <h3>Did poverty fall evenly across Souss-Massa? A validated dataset of official statistics</h3>
+
+      <p class="proj-lede">
+        Morocco's statistics institute (HCP) publishes regional figures mainly as
+        PDF yearbooks, which makes comparisons across years and territories slow and
+        error-prone. I transcribed 48 HCP tables for the Souss-Massa region, checked
+        them automatically, and used them to ask whether poverty declined uniformly
+        across the region's communes between 2004 and 2014.
+      </p>
+
+      <div class="proj-cols">
+        <div>
+          <h4>Data validation</h4>
+          <p>
+            A validator reads the tables without running the application and checks
+            that totals equal the sum of their parts, that every copy of a table
+            matches its source, and that each commune on a map reaches exactly one
+            polygon of the official boundaries, inside its own province. To show the
+            checks work, a test suite seeds six typical transcription errors into a
+            copy of the data and confirms that each one is reported.
+          </p>
+
+          <h4>Analysis</h4>
+          <p>
+            Poverty is described at two levels: the 179 communes and urban centres
+            with a published rate in 2004, 2007 and 2014, each counted once, and the
+            population-weighted rate that the HCP publishes for each province. The two
+            levels answer different questions and rank the territories differently.
+            The analysis is descriptive: it does not identify causes.
+          </p>
+
+          <h4>Application</h4>
+          <p>
+            The data can be explored in a Streamlit application with provincial and
+            commune choropleth maps, a PDF report generator and a question-answering
+            assistant built on the Gemini API.
+          </p>
         </div>
 
-        <h3>Axiora Data: socio-economic analytics platform</h3>
+        <div>
+          <h4>Results</h4>
+          <table class="restable">
+            <tbody>
+              <tr><th>Units analysed</th><td>179</td></tr>
+              <tr><th>Median rate, 2004 → 2014</th><td>23.0% → 10.2%</td></tr>
+              <tr><th>Units with a decline</th><td>171 / 179</td></tr>
+              <tr><th>Smallest relative decline</th><td>Tata, −30.6%</td></tr>
+            </tbody>
+          </table>
+          <p class="fineprint">
+            The 179 units are every unit with a published rate, not a sample, so no
+            significance test is reported. The 2004, 2007 and 2014 rates come from
+            three separate HCP poverty maps whose comparability over time has not
+            been established. Tata's figure is its population-weighted rate; the
+            other five territories fell by 57% to 77%.
+          </p>
 
-        <p class="proj-lede">
-          Morocco's national statistics institute publishes its data as
-          PDFs and spreadsheets, which makes comparison across regions slow. Axiora
-          brings a hand-transcribed set of those tables, checked against their own
-          totals, into an interactive platform covering six domains: population,
-          labour, housing, finance, education and poverty.
-        </p>
-
-        <p>
-          For the Souss-Massa region, it renders choropleth maps at provincial and
-          commune level from official
-          boundary shapefiles, and generates formatted PDF reports from uploaded Excel files. A
-          conversational module built on the Gemini API answers questions about the
-          loaded indicators in plain language.
-        </p>
-
-        <p class="stack">
-          Streamlit · pandas · GeoPandas · Plotly · fpdf · Gemini API
-        </p>
-
-        <div class="proj-links">
-          <a class="btn btn-solid" href="post/axiora/">Read the case study</a>
-          <a class="btn btn-solid" href="https://axiora-data.streamlit.app/" target="_blank" rel="noopener">Open the app</a>
-          <a class="btn" href="https://github.com/mounjimallak-bit/Axiora-data-app" target="_blank" rel="noopener">View source</a>
+          <h4>Stack</h4>
+          <p class="stack">
+            Python · pandas · GeoPandas · Plotly · Streamlit · Gemini API
+          </p>
         </div>
-      </article>
+      </div>
 
-      <article class="project">
-        <div class="proj-meta">
-          <span class="tag">Coursework</span>
-          <span class="ctx">Individual · 2024</span>
-        </div>
+      <div class="proj-links">
+        <a class="btn btn-solid" href="post/axiora/">Read the case study</a>
+        <a class="btn" href="https://axiora-data.streamlit.app/" target="_blank" rel="noopener">Open the app</a>
+        <a class="btn" href="https://github.com/mounjimallak-bit/Axiora-data-app" target="_blank" rel="noopener">View source</a>
+      </div>
+    </article>
 
-        <h3>Real estate rental platform: Flask &amp; Oracle PL/SQL</h3>
+    <!-- ---------- EARLIER COURSEWORK ---------- -->
+    <h2 class="section-title">Earlier coursework</h2>
 
-        <p class="proj-lede">
-          A full-stack rental application where the business rules live in the
-          database rather than the application layer.
-        </p>
+    <article class="project">
+      <div class="proj-meta">
+        <span class="tag">Coursework</span>
+        <span class="ctx">Individual · 2024</span>
+      </div>
 
-        <p>
-          Tenants browse listings, check availability and request reservations;
-          owners manage properties and accept or reject requests. Oracle PL/SQL
-          handles login, reservation creation and rule enforcement through stored
-          procedures and triggers: no overlapping confirmed bookings on the same
-          property, one review per confirmed rental, and database roles designed
-          for direct SQL access.
-        </p>
+      <h3>Real estate rental platform: Flask &amp; Oracle PL/SQL</h3>
 
-        <p class="stack">Python · Flask · Oracle SQL · PL/SQL · TailwindCSS</p>
+      <p class="proj-lede">
+        A full-stack rental application where the business rules live in the
+        database rather than the application layer.
+      </p>
 
-        <div class="proj-links">
-          <a class="btn btn-solid" href="post/project3/">Read the case study</a>
-          <a class="btn btn-solid" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener">Watch the demo</a>
-          <a class="btn" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener">View source</a>
-        </div>
-      </article>
+      <p>
+        Tenants browse listings, check availability and request reservations;
+        owners manage properties and accept or reject requests. Oracle PL/SQL
+        handles login, reservation creation and rule enforcement through stored
+        procedures and triggers: no overlapping confirmed bookings on the same
+        property, one review per confirmed rental, and database roles designed
+        for direct SQL access.
+      </p>
 
-    </div>
+      <p class="stack">Python · Flask · Oracle SQL · PL/SQL · TailwindCSS</p>
+
+      <div class="proj-links">
+        <a class="btn" href="post/project3/">Read the case study</a>
+        <a class="btn" href="https://youtu.be/xxOOS9JRwuo" target="_blank" rel="noopener">Watch the demo</a>
+        <a class="btn" href="https://github.com/mounjimallak-bit/Estate-rental-web-application-Flask-Oracle" target="_blank" rel="noopener">View source</a>
+      </div>
+    </article>
+
   </div>
 </section>
 
@@ -211,8 +254,6 @@
         French, English and Arabic.
       </p>
     </div>
-
-    
   </div>
 </section>
 
