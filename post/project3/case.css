@@ -7,12 +7,12 @@
    its parent, so text, figures, tables and code align by construction
    rather than by a max-width repeated on every element. */
 .case{
-  width: min(100%, 760px);
+  width: min(90%, 760px);
   margin-inline: auto;
   padding-bottom: var(--gap);
 }
 
-.case-hero .wrap{ width: min(100%, 760px); }
+.case-hero .wrap{ width: min(90%, 760px); }
 
 .case-hero{ padding-bottom: clamp(2rem, 5vw, 3.5rem); }
 
@@ -375,3 +375,9 @@
 
 /* wide screenshots fill the column; the column is already the reading width */
 .shot--wide img{ width: 100%; }
+
+
+/* ---- small screens: wide tables scroll inside their own box, never the page ---- */
+@media (max-width: 560px){
+  .srctable{ display: block; overflow-x: auto; }
+}
