@@ -2294,9 +2294,15 @@ dataframe.
             [m for _, _, m in self.points],
             index=pd.DatetimeIndex([t for _, t, _ in self.points]))
 
-    def offset_a_commiter(self):
-        # oldest buffered message: after a restart the window is rebuilt from it
-        return self.points[0][0]</code></pre></details>
+       def offset_a_commiter(self, offset_courant: int) -> int:
+        """Next offset to re-read after a restart (Kafka convention).
+
+        Only the last seq_len - 1 points are kept: exactly what the NEXT window
+        needs, so the current point, already scored, is not scored again.
+        Empty buffer: offset_courant + 1.
+        """
+        a_garder = list(self.points)[-(self.seq_len - 1):] if self.seq_len > 1 else []
+        return a_garder[0][0] if a_garder else offset_courant + 1</code></pre></details>
 
 <p class="reading">
 A <code>deque</code> with <code>maxlen</code> makes the sliding window free: pushing a
