@@ -162,8 +162,8 @@ detecting when they depart from it, with few labelled events and under changing 
 <ul>
 <li><strong>Topic.</strong> Chosen with my internship supervisor; the dataset (Zenodo record 7828879, described in Graillet et al., <em>Data in Brief</em> 46, 2023) was provided by the supervisor.</li>
 <li><strong>My work.</strong> Data merging and cleaning, the chronological protocol, the leave-one-incident-out evaluation, feature investigation, the three detectors and the fusion, the evaluation, and the streaming prototype (Kafka, scoring consumer, TimescaleDB, Grafana, tests).</li>
-<li><strong>Review with an AI assistant.</strong> After the internship, I re-examined the project with an AI coding assistant. It re-ran the pipeline, identified the gaps in the evaluation (no simple baselines, no uncertainty, no seasonal test, and claims stronger than the evidence), and drafted much of the code and text of the analyses added in response. I decided which analyses to keep, ran them, checked every result and committed every change. The baselines, intervals, seasonal analysis, seed sensitivity and mathematical notes on this page come from that review, and the write-up was corrected.</li>
-<li><strong>Reproducibility.</strong> One notebook covers the whole study: sections 1 to 15 the original work, section 16 every number added after the review, and section 17 the
+<li>Re-examination after the internship. After the internship, the evaluation was re-examined and extended: simple baselines, uncertainty intervals, a seasonal false-alarm analysis, seed sensitivity ... </li>
+<li><strong>Reproducibility.</strong> One notebook covers the whole study: sections 1 to 15 the original work, section 16 every number added after the internship, and section 17 the
 evaluation across all 17 incidents, with its cached scores. It runs from a clone without the raw 2.3 GB files. The deployed models, scalers, references and threshold are versioned, and the streaming path is covered by automated tests.</li>
 </ul>
 </section>
@@ -171,7 +171,7 @@ evaluation across all 17 incidents, with its cached scores. It runs from a clone
 <h2 class="part-head">The full study, in the order it was done</h2>
 <p class="note">
 The sections below follow the work chronologically, including the parts that did not work. The
-baselines, intervals, seasonal analysis and seed sensitivity were added after this review and
+baselines, intervals, seasonal analysis and seed sensitivity were added after the internship and
 are marked as such where they appear.
 </p>
 
@@ -1759,7 +1759,7 @@ retrained system selects a threshold of 0.954 (against 0.946), with validation P
 PR-AUC 0.799 (against 0.723 and 0.777). At its threshold it reaches test recall 0.96 and precision
 0.74 (against 0.97 and 0.70), detects all three test episodes, and raises 2.4 false-alarm events a
 week in the unused months (against 2.6). Its LSTM family alone again scores low on test (0.33).
-The same seeds, retrained independently on another machine for the external review, gave a threshold
+The same seeds, retrained independently on another machine, gave a threshold
 of 0.931, test precision 0.53 and 5.1 events a week: training is not bit-reproducible across
 machines, and the operating point moves with it. Ranking quality is fairly stable (test PR-AUC 0.78
 to 0.82 across the three ensembles), but precision ranges from 0.53 to 0.74 and the false-alarm rate
