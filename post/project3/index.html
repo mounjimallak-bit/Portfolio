@@ -397,16 +397,15 @@ views) carry the rules, backed by five database roles.
 <p>Three of these I would fix before deploying this anywhere real:</p>
 <ul>
     <li><strong>The web app does not use the database identity model.</strong> Flask connects through a single Oracle account, so the identity triggers and the five roles protect direct SQL connections, not the web routes, where identity comes from the Flask session. Mapping each web session to its own database identity (or a proxy user with per-user context) would let the database enforce what it was designed to enforce.</li>
-  <li><strong>Password hashing uses MD5 without a salt.</strong> <code>sInscrire()</code> and <code>seConnecter()</code> hash through <code>DBMS_CRYPTO.HASH_MD5</code>. MD5 is broken for password storage and an unsalted digest is vulnerable to rainbow tables; a slow salted algorithm is what this should use.</li>
+  <li><strong>Password hashing (fixed after the project).</strong> <code>sInscrire()</code> and <code>seConnecter()</code> originally hashed through <code>DBMS_CRYPTO.HASH_MD5</code>, without a salt. Passwords are now hashed with Argon2id in the Flask layer (per-password random salt, constant-time verification); Oracle stores only the hash and <code>sInscrire()</code> rejects anything that is not an Argon2id hash, and legacy MD5 hashes are upgraded at the next successful login.</li>
   <li><strong>The availability check is not concurrency-safe.</strong> <code>verifierDisponibilite()</code> counts conflicts and <code>creerReservation()</code> then inserts. Two concurrent transactions can both pass the check before either commits, and both bookings are written. Closing this requires locking the property row or enforcing non-overlap as a constraint rather than a procedural check.</li>
   <li><strong>Identity correction is silent.</strong> <code>trg_secu_resa_locataire</code> rewrites a mismatched tenant identifier rather than raising. It prevents the attack, but leaves no signal that one was attempted; raising an error would also make the rule visible during debugging.</li>
-  <li><strong>No automated tests.</strong> The procedures are exercised manually. Edge cases around dates, status transitions and concurrency deserve a test suite.</li>
+  <li><strong>Few automated tests.</strong> The password layer and the registration and login routes have 17 automated tests; the PL/SQL procedures are still exercised manually. Edge cases around dates, status transitions and concurrency deserve a test suite.</li>
 </ul>
 </div>
 
 <h3>Next steps</h3>
 <ul>
-  <li>Replace MD5 with a salted, slow hash and migrate stored credentials.</li>
   <li>Make booking concurrency-safe through row locking or an exclusion constraint.</li>
   <li>Add an audit table for payment and status changes.</li>
   <li>Build a PL/SQL test suite covering the eight integrity rules.</li>

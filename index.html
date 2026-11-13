@@ -70,14 +70,14 @@
           <p>
             A semi-supervised ensemble: five dense and five LSTM autoencoders trained
             on healthy data only, their reconstruction errors ranked against a frozen
-            reference and fused. Labels were used to select features, tune the models
-            and set the alarm threshold (maximum F2 on validation), never to fit the
-            networks. Evaluation follows a strictly chronological split.
+            reference and fused. Labels were used to remove known faults from the training data, select
+            features, tune the models and set the alarm threshold (maximum F2 on
+            validation), never as a training target for the networks. Evaluation follows a strictly chronological split.
           </p>
 
           <h4>What re-examination showed</h4>
           <p>
-            After an external review, the result was tested further. A training-free
+            After a review carried out with an AI coding assistant, the result was tested further. A training-free
             nearest-neighbour distance performs comparably to the ten networks; the
             LSTM half adds nothing on test; the 3/3 episode result has a 95% interval
             of 0.29 to 1; and in the austral winter, absent from training, the
@@ -106,9 +106,9 @@
             </tbody>
           </table>
           <p class="fineprint">
-            Test partition opened once, after every design choice was fixed; base rate
-            0.026. The 3 test episodes repeat one staged experiment, so the uncertainty
-            is large (test PR-AUC 0.48 to 0.94). Dataset: public Zenodo record of a 4&nbsp;kW PV installation in La Réunion, with labelled shading faults, provided by the project supervisor.
+            Test partition opened once for the deployed system, after every design choice
+            was fixed (later comparisons reuse it to rank methods only); base rate 0.026. The 3 test episodes repeat one staged experiment, so the uncertainty
+            is large (test PR-AUC 0.48 to 0.94). Dataset: public Zenodo record of a 4&nbsp;kW PV installation in La Réunion, with labelled shading faults, provided by the project supervisor. The test suite runs automatically on every commit (GitHub Actions).
           </p>
 
           <h4>Stack</h4>
@@ -152,7 +152,8 @@
             matches its source, and that each commune on a map reaches exactly one
             polygon of the official boundaries, inside its own province. To show the
             checks work, a test suite seeds six typical transcription errors into a
-            copy of the data and confirms that each one is reported.
+            copy of the data and confirms that each one is reported; the checks, the
+            tests and every page of the application run automatically on every commit.
           </p>
 
           <h4>Analysis</h4>
@@ -222,8 +223,9 @@
 
       <p>
         Tenants browse listings, check availability and request reservations;
-        owners manage properties and accept or reject requests. Oracle PL/SQL
-        handles login, reservation creation and rule enforcement through stored
+        owners manage properties and accept or reject requests. Passwords are hashed with
+        Argon2id in Flask, and Oracle PL/SQL handles registration, reservation creation
+        and rule enforcement through stored
         procedures and triggers: no overlapping confirmed bookings on the same
         property, one review per confirmed rental, and database roles designed
         for direct SQL access.

@@ -162,7 +162,7 @@ detecting when they depart from it, with few labelled events and under changing 
 <ul>
 <li><strong>Topic.</strong> Chosen with my internship supervisor; the dataset (Zenodo record 7828879, described in Graillet et al., <em>Data in Brief</em> 46, 2023) was provided by the supervisor.</li>
 <li><strong>My work.</strong> Data merging and cleaning, the chronological protocol, the leave-one-incident-out evaluation, feature investigation, the three detectors and the fusion, the evaluation, and the streaming prototype (Kafka, scoring consumer, TimescaleDB, Grafana, tests).</li>
-<li><strong>External review.</strong> After the internship, an external review of the project re-ran the pipeline and identified the gaps in the evaluation: no simple baselines, no uncertainty, no seasonal test, and claims stronger than the evidence. The baselines, intervals, seasonal analysis and seed sensitivity on this page were added in response, and the write-up was corrected.</li>
+<li><strong>Review with an AI assistant.</strong> After the internship, I re-examined the project with an AI coding assistant. It re-ran the pipeline, identified the gaps in the evaluation (no simple baselines, no uncertainty, no seasonal test, and claims stronger than the evidence), and drafted much of the code and text of the analyses added in response. I decided which analyses to keep, ran them, checked every result and committed every change. The baselines, intervals, seasonal analysis, seed sensitivity and mathematical notes on this page come from that review, and the write-up was corrected.</li>
 <li><strong>Reproducibility.</strong> One notebook covers the whole study: sections 1 to 15 the original work, section 16 every number added after the review, and section 17 the
 evaluation across all 17 incidents, with its cached scores. It runs from a clone without the raw 2.3 GB files. The deployed models, scalers, references and threshold are versioned, and the streaming path is covered by automated tests.</li>
 </ul>
@@ -171,7 +171,7 @@ evaluation across all 17 incidents, with its cached scores. It runs from a clone
 <h2 class="part-head">The full study, in the order it was done</h2>
 <p class="note">
 The sections below follow the work chronologically, including the parts that did not work. The
-baselines, intervals, seasonal analysis and seed sensitivity were added after the external review and
+baselines, intervals, seasonal analysis and seed sensitivity were added after this review and
 are marked as such where they appear.
 </p>
 
@@ -227,7 +227,7 @@ fault is ever shown during training.
 
 <h3>Constraints that shaped every later decision</h3>
 <ul>
-  <li><strong>No labels to fit the networks.</strong> The networks are trained on healthy points only. Labels are used elsewhere in the design, for feature selection, tuning, fusion, the threshold, and to report results, so the method is semi-supervised rather than unsupervised.</li>
+  <li><strong>No labels to fit the networks.</strong> The networks are trained on healthy points only. Labels are used elsewhere in the design: to remove known faults from the training set, for feature selection, tuning, fusion, the threshold, and to report results, so the method is semi-supervised rather than unsupervised.</li>
   <li><strong>Recall over precision.</strong> A missed fault costs weeks of production; a false alarm costs one technician one look.</li>
   <li><strong>Early detection.</strong> A fault caught on its first measurement is worth far more than the same fault caught on its fortieth.</li>
   <li><strong>Streaming.</strong> The system must score one five-minute measurement at a time, without access to the batch it belongs to.</li>
@@ -1930,7 +1930,7 @@ development partition.
 <h2>The test partition</h2>
 
 <p>
-Opened once, with the threshold already fixed, after feature ablation, hyperparameter
+Opened once for the deployed system, with the threshold already fixed, after feature ablation, hyperparameter
 search, ensemble sizing, fusion selection and threshold calibration had all been settled
 on validation.
 </p>
@@ -2064,6 +2064,15 @@ A paired bootstrap over days puts numbers on this. On test, kNN is ahead of the 
 resamples, and the 95% interval of the difference (ensemble minus kNN, −0.32 to +0.04) includes
 zero. On validation, the ensemble is ahead of Mahalanobis in 97% of resamples, a borderline lead that
 is also biased in its favour, since validation is the set it was tuned on.
+</p>
+<p>
+Two further checks qualify the test gap. It comes from six healthy early-morning points: removing
+them raises the ensemble's test PR-AUC to 0.97. And a kNN chosen on validation with the ensemble's
+own selection rule scores 0.70 on test, below the ensemble's 0.78. These points matter because the LSTM needs six consecutive points: the first five points
+of each day are never scored, by any method in this comparison, and they are mostly healthy dawn
+points with a low sun. Scored on all test points, kNN drops from 0.88 to 0.39 and the dense
+autoencoder alone from 0.75 to 0.34. In the deployed system the LSTM window therefore acts as an
+implicit dawn mask (<code>analysis/knn_vs_ensemble.py</code>).
 </p>
 <p>
 The ensemble's advantage over these simple baselines is therefore not established. On this
@@ -2359,8 +2368,13 @@ The study period stops on 26 May 2022, so the detector has never been evaluated 
 From June to September the system raises between 4 and 11 events a week. From October to April it
 raises at most about one a week. In the winter months (June to September in La Réunion), about two thirds of the flagged points fall at
 08h and 16h local time (04h and 12h UTC), when the sun is low and shadows are long. The alarms may
-reflect real shading that nobody labelled, or this seasonal geometry. The data cannot tell these apart, so all of them
-count as false alarms. Training covers only late spring and summer, so every winter sun position is new to the model.
+reflect real shading that nobody labelled, or this seasonal geometry. The labels cannot tell these apart, so all of them
+count as false alarms. The dataset's fault-free control inverter, on the same roof, points to the
+second explanation: at the winter alarms the production ratio between the two inverters stays at
+its healthy value (1.02 to 1.05), whereas real faults drop it to 0.00 to 0.85
+(<code>analysis/control_inverter.py</code>). Most winter alarms therefore come from a cause common
+to both arrays, such as the low-sun geometry and an irradiance sensor that under-reads in the
+afternoon, rather than from the faulted array. Training covers only late spring and summer, so every winter sun position is new to the model.
 </p>
 <p>
 The earlier argument for leaving these months out, that a fault-free period gives a perfect and
@@ -2408,7 +2422,7 @@ is the only data in this record that covers other seasons. It should be evaluate
   <li><strong>Streaming robustness.</strong> The consumer scores daytime points only (GTI above 50 W/m²), as the notebook does. Every point it cannot score is logged with its reason. A message with no valid timestamp is skipped and its offset advanced, so it cannot stop the consumer on restart. Messages are still assumed to arrive in order: a late message is not re-sorted. The message handling is covered by tests that replay the test partition through it and compare the scores with the batch path.</li>
   <li><strong>Three test episodes.</strong> 3/3 detected is a good result on a small sample. The point-level metrics rest on 2,813 measurements and are far more informative than the episode count.</li>
   <li><strong>Precision depends on how rare faults are.</strong> The test precision of 0.70 holds at the staged fault rate of 2.6% of points. At a more realistic 1% it would fall to about 0.5, and at 0.2% to about 0.15 to 0.2.</li>
-  <li><strong>ROC-AUC is flattering.</strong> 0.9964 looks conclusive and largely reflects the 2.6% positive rate. PR-AUC at 0.7765 (a lift of ×29.9 over the base rate) is the figure to compare against.</li>
+  <li><strong>ROC-AUC is flattering.</strong> 0.9964 looks conclusive, but ROC-AUC counts false positives as a rate over the 2,740 healthy test points, 37 for each faulty one, so a false-positive rate of 1% still means many false alarms. PR-AUC at 0.7765 (a lift of ×29.9 over the base rate) is the figure to compare against.</li>
   <li><strong>Recall hits a wall.</strong> The operating-point table shows precision collapsing from 0.731 to 0.283 for seven points of extra recall. Some faults are simply not separable in this feature space, and no threshold fixes that.</li>
   <li><strong>Labels shaped the design.</strong> The networks never see a fault, but labels were used to choose features, tune hyperparameters, choose the fusion and the threshold, and to report every number here. A site with no labelled history would need a different way to set the cut.</li>
   <li><strong>Throughput.</strong> Roughly 0.2 to 0.4 s per point on a CPU, ten networks queried serially. Fine for one plant, unsuitable for a fleet.</li>
