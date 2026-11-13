@@ -76,7 +76,7 @@
     </p>
     <div class="summary">
       <p><strong>Setting.</strong> A 4 kW grid-connected plant in La Réunion, 18 months of electrical and weather data at five-minute resolution, 17 staged shading incidents, all between February and May 2022.</p>
-      <p><strong>What was built.</strong> Five dense and five LSTM autoencoders trained on healthy points only, fused by rank against a frozen reference, evaluated on a strictly chronological split, and ported to a Kafka streaming prototype that reproduces the offline scores exactly.</p>
+      <p><strong>What was built.</strong> Five dense and five LSTM autoencoders trained on healthy points only, fused by rank against a frozen reference, evaluated on a strictly chronological split, and ported to a Kafka streaming prototype that raises the same alarms as the offline scoring, with scores equal to within one step of the frozen rank reference.</p>
       <p><strong>What the test showed.</strong> All 3 test episodes detected, recall 0.97, precision 0.70, PR-AUC 0.78 (base rate 0.026).</p>
       <p><strong>What re-examination showed.</strong> A training-free nearest-neighbour distance does as well as the ten networks. The temporal half of the ensemble adds nothing on test. The 3/3 result has a 95% interval of 0.29 to 1. And in the austral winter, a season absent from training, the detector raises 4 to 11 false alarms a week. A leave-one-incident-out evaluation over all 17 incidents then showed that no method is significantly better than the nearest-neighbour baseline, and located the real difficulty: separating faults from normal variability across days, not within a day.</p>
       <p><strong>What it means.</strong> The method works as a proof of concept for one fault signature, in one season, on one plant. It is not yet a measured operating performance.</p>
@@ -116,7 +116,7 @@ study follows, in the order it was done.
 <tr><td>Does the detector hold over time?</td><td>Deployed system scored on the 10.5 fault-free months after the study period</td><td>No: 4 to 11 false-alarm events a week from June to September, 0 to 1 the rest of the year. <a href="#seasons">Seasons</a></td></tr>
 <tr><td>Is the operating point stable?</td><td>Same architecture retrained with five other seeds; references and threshold recomputed</td><td>Partly. Ranking quality holds (test PR-AUC 0.78 to 0.82 over three ensembles), but test precision ranges from 0.53 to 0.74 and false alarms from 2.4 to 5.1 a week. <a href="#threshold">Threshold</a></td></tr>
 <tr><td>Where does detection actually fail?</td><td>Same deployed predictions evaluated within each fault day and across all 27 test days</td><td>Across days. Within a fault day most methods are near perfect (PR-AUC 0.96 to 0.996); over 27 days they fall to 0.26 to 0.88, because healthy points of other days score as high as faults. <a href="#loio">17 incidents</a></td></tr>
-<tr><td>Does the protocol survive streaming?</td><td>Kafka replay of the test period against offline scoring; crash and restart; automated tests</td><td>Yes: identical scores and alarms on every replayed point, no duplicate alarm after a crash. <a href="#streaming">Running system</a></td></tr>
+<tr><td>Does the protocol survive streaming?</td><td>Kafka replay of the test period against offline scoring; crash and restart; automated tests</td><td>Yes: identical alarms on every replayed point (101 of 101), scores equal to within one rank step (at most 1.25 × 10<sup>−4</sup>), no duplicate alarm after a crash. <a href="#streaming">Running system</a></td></tr>
 </tbody>
 </table>
 <figure class="shot shot--wide">
@@ -244,10 +244,10 @@ final fusion ranks against a frozen reference rather than against the current da
 <summary><span class="mn-tag">Mathematical note</span>Anomaly detection as a decision problem<span class="mn-dom">· probability · decision theory</span></summary>
 <div class="mn-body">
 <p>A measurement is \(x \in \mathbb{R}^d\) (\(d = 6\): GTI, Pg, Va, Vg, Ia, TPV) with label \(y \in \{0, 1\}\). Healthy points follow a law \(P_0\) with density \(p_0\), faults a law \(P_1\) with density \(p_1\), and \(\pi = P(Y = 1)\). A detector is a score \(s\) and a threshold \(t\), with error rates</p>
-\[ \alpha(t) = P_0\big(s(X) \ge t\big) \;\text{(false alarms)}, \qquad 1 - \beta(t) = P_1\big(s(X) \lt t\big) \;\text{(misses)}. \]
-<p><span class="prov prov-theory">Theory</span> By the Neyman–Pearson lemma, the most powerful test at false-alarm rate \(\alpha\) thresholds the likelihood ratio \(\Lambda(x) = p_1(x)/p_0(x)\). With costs \(c_{\mathrm{FN}}\) and \(c_{\mathrm{FP}}\), the expected cost \(c_{\mathrm{FN}}\,\pi(1 - \beta) + c_{\mathrm{FP}}(1 - \pi)\,\alpha\) is minimal when one alarms if</p>
+\[ \alpha(t) = P_0\big(s(X) \ge t\big) \;\text{(false-alarm rate)}, \qquad \beta(t) = P_1\big(s(X) \lt t\big) \;\text{(miss rate)}, \qquad 1 - \beta(t) \;\text{(detection rate, or power)}. \]
+<p><span class="prov prov-theory">Theory</span> By the Neyman–Pearson lemma, the test with the highest detection rate \(1 - \beta\) at a given false-alarm rate \(\alpha\) thresholds the likelihood ratio \(\Lambda(x) = p_1(x)/p_0(x)\) (with randomisation on ties if \(\Lambda(X)\) has atoms). With costs \(c_{\mathrm{FN}}\) and \(c_{\mathrm{FP}}\), the expected cost \(c_{\mathrm{FN}}\,\pi\,\beta + c_{\mathrm{FP}}(1 - \pi)\,\alpha\) is minimal when one alarms if</p>
 \[ \Lambda(x) \;\ge\; \frac{c_{\mathrm{FP}}\,(1 - \pi)}{c_{\mathrm{FN}}\,\pi} . \]
-<p>The optimal detector needs \(p_1\), which a few staged faults cannot provide. Novelty detection replaces \(\Lambda\) by a score that grows as \(p_0(x)\) shrinks; it coincides with the optimal test only if faults fall where healthy data are rare. Every detector in this study (autoencoders, kNN, Mahalanobis, Isolation Forest) is a different estimate of how far \(x\) lies from the bulk of \(P_0\). The threshold depends on \(\pi\) and on the cost ratio, which is why it cannot be carried over from a staged experiment to a plant in service.</p>
+<p>The optimal detector needs \(p_1\), which a few staged faults cannot provide. Novelty detection replaces \(\Lambda\) by a score that grows as \(p_0(x)\) shrinks. Thresholding such a score gives the optimal test only when \(\Lambda\) is itself a decreasing function of \(p_0\) alone, for instance when \(p_1\) is constant over the region where measurements occur (density level detection as classification against a uniform law; Steinwart, Hush and Scovel, 2005). It is not enough that faults fall where healthy data are rare: healthy states that are rare under the training data are flagged as well, which is consistent with the winter false alarms of the seasonal section. Every detector in this study (autoencoders, kNN, Mahalanobis, Isolation Forest) is a different estimate of how far \(x\) lies from the bulk of \(P_0\). The threshold depends on \(\pi\) and on the cost ratio, which is why it cannot be carried over from a staged experiment to a plant in service.</p>
 </div>
 </details>
 <!-- MATH:END -->
@@ -1389,17 +1389,17 @@ longer budget might lower the loss a little further; that was not tested.
 <h5>The minimiser is the projection onto the principal subspace <span class="prov prov-theory">Theory</span></h5>
 <p>Write \(X = U D V^\top\) (singular value decomposition, \(\sigma_j^2 = (N - 1)\lambda_j\)). By the Eckart–Young–Mirsky theorem, the matrix of rank at most \(m\) closest to \(X\) in Frobenius norm is \(U_m D_m V_m^\top = X V_m V_m^\top\). Since \(X M^\top\) has rank at most \(m\), no linear autoencoder can do better, and the bound is reached by \(M = V_m V_m^\top\), the orthogonal projector onto the first \(m\) principal directions:</p>
 \[ \min_{A, B} L = \frac{1}{N}\sum_{j \gt m} \sigma_j^2 = \frac{N - 1}{N}\sum_{j \gt m} \lambda_j . \]
-<p>Equivalently, among projectors \(VV^\top\) with \(V^\top V = I_m\), \(\lVert X - XVV^\top\rVert_F^2 = \operatorname{tr}(X^\top X) - \operatorname{tr}(V^\top X^\top X V)\), and \(\operatorname{tr}(V^\top \hat\Sigma V)\) is maximised by the \(m\) leading eigenvectors (Ky Fan's principle). Baldi and Hornik (1989) showed that gradient training cannot get stuck elsewhere: every local minimum of \(L\) is global.</p>
+<p>Equivalently, among projectors \(VV^\top\) with \(V^\top V = I_m\), \(\lVert X - XVV^\top\rVert_F^2 = \operatorname{tr}(X^\top X) - \operatorname{tr}(V^\top X^\top X V)\), and \(\operatorname{tr}(V^\top \hat\Sigma V)\) is maximised by the \(m\) leading eigenvectors (Ky Fan's principle). Baldi and Hornik (1989) showed that, when \(\hat\Sigma\) has full rank and distinct eigenvalues, every local minimum of \(L\) is global and every other critical point is a saddle point. This rules out spurious local minima; it does not guarantee fast convergence, since gradient training can be slow near saddle points and along nearly flat directions (see below).</p>
 <h5>What is identified, and what is not <span class="prov prov-theory">Theory</span></h5>
-<p>For any invertible \(G \in \mathbb{R}^{m \times m}\), \((A, B)\) and \((GA, BG^{-1})\) give the same \(M\) and the same loss. The weights are therefore not identifiable: the encoder need not be orthonormal and its rows need not be the principal axes. Only the <em>subspace</em> \(\operatorname{range}(B)\) is identified, and even that only as well as the eigengap allows. By the Davis–Kahan theorem, a perturbation \(E\) of the covariance (sampling noise, incomplete training) moves the estimated \(m\)-dimensional subspace by an angle \(\Theta\) with \(\lVert \sin\Theta \rVert \le \lVert E \rVert / (\lambda_m - \lambda_{m+1})\) up to a constant: directions separated by a small eigengap are poorly determined.</p>
+<p>For any invertible \(G \in \mathbb{R}^{m \times m}\), \((A, B)\) and \((GA, BG^{-1})\) give the same \(M\) and the same loss. The weights are therefore not identifiable: the encoder need not be orthonormal and its rows need not be the principal axes. Only the <em>subspace</em> \(\operatorname{range}(B)\) is identified, and how sharply depends on the eigengap \(\lambda_m - \lambda_{m+1}\), for two distinct reasons. <em>Statistically</em>, by the Davis–Kahan theorem, a perturbation \(E\) of the covariance (for instance sampling noise) moves the leading \(m\)-dimensional subspace by principal angles \(\Theta\) with \(\lVert \sin\Theta \rVert \le C\,\lVert E \rVert / (\lambda_m - \lambda_{m+1})\) for a constant \(C\). <em>Numerically</em>, on fixed data, rotating the learned subspace by an angle \(\theta\) from \(v_m\) towards \(v_{m+1}\) lowers the captured variance by only \((\lambda_m - \lambda_{m+1})\sin^2\theta\): the loss is nearly flat in that direction, and early-stopped gradient training can leave a residual angle there. The comparison below measures the second effect, an optimisation error, not a sampling perturbation.</p>
 <h5>The measured comparison <span class="prov prov-new">New computation</span></h5>
 <p>On the 9,618 healthy training points in the autoencoder's min-max scaled space, the six eigenvalues are \(2.1\times10^{-1},\, 6.2\times10^{-3},\, 6.4\times10^{-4},\, 2.7\times10^{-4},\, 1.7\times10^{-4},\, 4.2\times10^{-5}\): the first component alone carries about 97 % of the variance, and four components keep 99.90 %. A linear autoencoder with \(m = 4\) (no activation, Adam, early stopping, one seed) was trained on the same points.</p>
 <div class="mn-scroll"><table>
 <thead><tr><th>Quantity</th><th>Value</th><th>What it shows</th></tr></thead>
 <tbody>
-<tr><td>Principal angles between the linear autoencoder's subspace and the PCA subspace</td><td class="num">0.00°, 0.01°, 0.58°, 4.06°</td><td>The first three directions are recovered; the fourth, with eigenvalue ratio \(\lambda_4/\lambda_5 \approx 1.6\) (against \(\lambda_1/\lambda_2 \approx 35\)), is the least determined, as Davis–Kahan predicts</td></tr>
+<tr><td>Principal angles between the linear autoencoder's subspace and the PCA subspace</td><td class="num">0.00°, 0.01°, 0.58°, 4.06°</td><td>The learned subspace is close to the principal subspace, with one residual angle of about 4°, consistent with the small gap \(\lambda_4 - \lambda_5 \approx 1.0\times10^{-4}\) along which the loss is nearly flat. Principal angles compare the two subspaces as a whole; they are not attached to individual eigenvectors</td></tr>
 <tr><td>\(\lVert W_{\mathrm{enc}}W_{\mathrm{dec}} - V_4V_4^\top\rVert_F\) and \(\lVert W_{\mathrm{enc}}^\top W_{\mathrm{enc}} - I\rVert_F\)</td><td class="num">0.108 · 0.82</td><td>The product is close to the projector while the encoder alone is far from orthonormal: only the subspace is identified</td></tr>
-<tr><td>Training reconstruction error, linear autoencoder and PCA</td><td class="num">3.76e-5 · 3.60e-5</td><td>PCA is the lower bound for any linear autoencoder; training reaches it within 5 %</td></tr>
+<tr><td>Training reconstruction error per coordinate (\(L/d\), the mean squared error reported by Keras), linear autoencoder and PCA</td><td class="num">3.76e-5 · 3.60e-5</td><td>PCA attains the minimum \(\tfrac{N - 1}{N}\sum_{j \gt 4}\lambda_j / d\) (with \(d = 6\)) of any linear autoencoder; training reaches it within 5 %</td></tr>
 <tr><td>Validation PR-AUC on the same 4,006 points: PCA residual (\(m = 4\)), linear autoencoder, deployed dense autoencoders ×5</td><td class="num">0.669 · 0.698 · 0.690</td><td>On validation, the non-linear networks do no better than a linear model</td></tr>
 <tr><td>Spearman correlation of scores: PCA and linear autoencoder; PCA and dense ensemble</td><td class="num">0.96 · 0.28</td><td>Similar AP, very different orderings: the linear and non-linear models make different errors</td></tr>
 </tbody></table></div>
@@ -1416,12 +1416,8 @@ longer budget might lower the loss a little further; that was not tested.
 <details class="mathnote">
 <summary><span class="mn-tag">Mathematical note</span>Generalisation, overfitting and distribution shift<span class="mn-dom">· statistical learning · statistics</span></summary>
 <div class="mn-body">
-<h5>Bias–variance decomposition <span class="prov prov-theory">Theory</span></h5>
-<p>For a predictor \(\hat f\) fitted on a random training set and a target \(Y = f(x) + \varepsilon\) with \(\operatorname{Var}\varepsilon = \sigma^2\),</p>
-\[ \mathbb{E}\big[(Y - \hat f(x))^2\big] = \sigma^2 + \big(f(x) - \mathbb{E}\hat f(x)\big)^2 + \operatorname{Var}\hat f(x) . \]
-<p>A larger model lowers the bias term and raises the variance term. Averaging \(K\) networks with score correlation \(\rho\) reduces the variance term to \(\sigma_{\hat f}^2(\rho + (1 - \rho)/K)\), but not below \(\rho\sigma_{\hat f}^2\). <span class="prov prov-proj">Project result</span> Retrained with other seeds, test PR-AUC still moved between 0.78 and 0.82 and test precision between 0.53 and 0.74.</p>
 <h5>Overfitting the selection, not only the weights</h5>
-<p>Choosing among \(K\) configurations by their validation score selects \(\max_k \hat\theta_k\), and \(\mathbb{E}[\max_k\hat\theta_k] \ge \max_k \theta_k\): the chosen configuration's validation score is biased upwards. <span class="prov prov-proj">Project result</span> The fusion table shows the two faces of this: the weighted average gains 0.0009 with a weight fitted on validation, and stacking, evaluated with honest cross-validation on 176 anomalies, falls to 0.5233. The more decisions are taken on one validation set, the less its scores say about generalisation; the test set, opened once, is the only unbiased check.</p>
+<p>Choosing among \(K\) configurations by their validation score selects \(\max_k \hat\theta_k\), and \(\mathbb{E}[\max_k\hat\theta_k] \ge \max_k \theta_k\): the chosen configuration's validation score is biased upwards. <span class="prov prov-proj">Project result</span> The fusion table shows this on a small scale: the weighted average gains 0.0009 with a weight fitted on validation, a gain of the size that selection alone can produce. The more decisions are taken on one validation set, the less its scores say about generalisation; the test set, opened once, is the only unbiased check.</p>
 <h5>Overfitting or distribution shift? <span class="prov prov-new">New computation</span></h5>
 <p>The deployed dense ensemble's reconstruction error on healthy points:</p>
 <div class="mn-scroll"><table>
@@ -1597,17 +1593,12 @@ sample from a distribution with a 0.029 standard deviation; the ensemble's 0.658
 what the system delivers every time it is rebuilt. On a system meant to run
 unattended, the second number is the one that can be promised.
 </p>
-<!-- MATH:BEGIN -->
-<details class="mathnote">
-<summary><span class="mn-tag">Mathematical note</span>LSTM equations, and why the memory path keeps gradients alive<span class="mn-dom">· linear algebra · time series</span></summary>
-<div class="mn-body">
-<p>At each step, with input \(x_t\), hidden state \(h_{t-1}\) and memory \(c_{t-1}\):</p>
-\[ \begin{aligned} i_t &amp;= \sigma(W_i x_t + U_i h_{t-1} + b_i), &amp; f_t &amp;= \sigma(W_f x_t + U_f h_{t-1} + b_f), &amp; o_t &amp;= \sigma(W_o x_t + U_o h_{t-1} + b_o),\\ \tilde c_t &amp;= \tanh(W_c x_t + U_c h_{t-1} + b_c), &amp; c_t &amp;= f_t \odot c_{t-1} + i_t \odot \tilde c_t, &amp; h_t &amp;= o_t \odot \tanh(c_t). \end{aligned} \]
-<p><span class="prov prov-theory">Theory</span> In a plain recurrent network \(h_t = \phi(Wh_{t-1} + Ux_t)\), the Jacobian \(\partial h_t/\partial h_{t-k}\) is a product of \(k\) matrices \(\operatorname{diag}(\phi')W\); its norm behaves like \(\rho(W)^k\) (spectral radius) and vanishes or explodes with \(k\). In the LSTM the memory is updated additively, so along that path \(\partial c_t/\partial c_{t-1} = \operatorname{diag}(f_t)\), a gate the network can hold near one (Hochreiter and Schmidhuber, 1997).</p>
-<p>The deployed model reads windows of \(L = 6\) points (30 minutes). Consecutive windows share five of their six points, so consecutive LSTM scores are strongly dependent, and a model of 30-minute dynamics carries no information on how a whole day compares with other days, which is consistent with the across-day weakness found over the 17 incidents (an interpretation, not a test).</p>
-</div>
-</details>
-<!-- MATH:END -->
+<p>
+The deployed LSTM reads windows of six points (30 minutes). Consecutive windows share five of
+their six points, so consecutive LSTM scores are strongly dependent, and a model of 30-minute
+dynamics carries no information on how a whole day compares with other days. This is consistent
+with the across-day weakness found over the 17 incidents (an interpretation, not a test).
+</p>
 
 </section>
 
@@ -1652,7 +1643,7 @@ than a re-ranking.
 
 <figure class="shot shot--wide">
   <img src="images/fig_fusion_methodes.png" alt="Five fusion methods compared by PR-AUC on the common support" loading="lazy" />
-  <figcaption>Five ways of combining the two detectors, on the same 4,006 points</figcaption>
+  <figcaption>Five ways of combining the two detectors, on the same 4,006 points. The colours show the overfitting risk assumed when the figure was made; the stacking bar uses pooled out-of-fold scores and is not comparable with the others (see below)</figcaption>
 </figure>
 
 <table class="minitable">
@@ -1662,23 +1653,25 @@ than a re-ranking.
 <tr><td><strong>Rank average</strong></td><td><strong>0.7234</strong></td><td>–</td><td>None</td></tr>
 <tr><td>Z-score average</td><td>0.7140</td><td>−0.0094</td><td>None</td></tr>
 <tr><td>Rank maximum</td><td>0.6618</td><td>−0.0617</td><td>None</td></tr>
-<tr><td>Stacking (honest cross-validation)</td><td>0.5233</td><td>−0.2002</td><td>High</td></tr>
+<tr><td>Stacking (5-fold CV, pooled out-of-fold scores)</td><td>0.5233</td><td>−0.2002</td><td>Low (3 parameters); score not comparable, see below</td></tr>
 </tbody>
 </table>
-
-<figure class="shot shot--wide">
-  <img src="images/fig_fusion_scatter.png" alt="Fusion methods plotted as performance against overfitting risk" loading="lazy" />
-  <figcaption>Performance against overfitting risk: the axis that decided the choice</figcaption>
-</figure>
 
 <p class="reading">
 The weighted average wins by 0.0009, and buys that with a weight fitted on the same
 validation set used to report the number. Plain rank averaging was kept: a
 nine-ten-thousandths gain does not justify a parameter chosen on the evaluation data.
-The stacking result is the instructive one: a meta-model, evaluated with honest
-cross-validation, scores 0.5233, far below both of its inputs. With 176 anomalies to
-learn from, the meta-model overfits comprehensively. Evaluated dishonestly it would
-have topped this table, which is precisely why the second axis of this figure exists.
+The stacking line needs a caveat. Its 0.5233 pools into one ranking the out-of-fold
+probabilities of five logistic regressions, one per fold; each has its own intercept and
+scale (the coefficients differ by a factor of about two between folds), so the pooled
+average precision mixes scores that are not on a common scale. <span class="prov prov-new">New computation</span>
+Within each fold, stacking ranks the points almost exactly like the rank average (average
+precision per fold 1.00, 0.29, 0.97, 0.63, 1.00, against 1.00, 0.28, 0.96, 0.62, 1.00), and
+its two weights are positive and of similar size in every fold (ratio 0.7 to 0.9). With
+three parameters and 176 anomalies the meta-model does not overfit: it learns a
+near-equal weighting, which adds nothing over the rank average. Fitted on all validation
+points it reaches 0.7241, below the weighted average. Plain rank averaging was kept
+because it needs no fitted parameter.
 </p>
 
 <p>
@@ -1791,13 +1784,13 @@ decision, and it is the real answer to "why not just set the threshold lower".
 </p>
 <!-- MATH:BEGIN -->
 <details class="mathnote">
-<summary><span class="mn-tag">Mathematical note</span>What the threshold 0.946 means: bounds, calibration and the sampling error of a rank<span class="mn-dom">· probability · statistics</span></summary>
+<summary><span class="mn-tag">Mathematical note</span>What the threshold 0.946 means: reference values, calibration and the sampling error of a rank<span class="mn-dom">· probability · statistics</span></summary>
 <div class="mn-body">
-<h5>Bounds on the alarm rate <span class="prov prov-theory">Theory</span></h5>
-<p>On the reference both ranks are approximately uniform. Independent ranks are uniform on the unit square, and \(S = \tfrac12(r_{\mathrm{AE}} + r_{\mathrm{LSTM}}) \ge t\) is the triangle above \(u + v = 2t\), of legs \(2 - 2t\) for \(t \ge \tfrac12\); identical ranks give \(S = r_{\mathrm{AE}}\). Hence</p>
-\[ 2(1 - t)^2 \;\le\; P(S \ge t) \;\le\; 1 - t \quad\Longrightarrow\quad 0.58\,\% \le P(S \ge 0.946) \le 5.4\,\% \]
-<p>for any positively dependent pair of ranks between these two extremes. 0.946 is therefore not a percentile.</p>
-<p><span class="prov prov-new">New computation</span> Measured on validation: 4.34 %. With one rank shuffled (independence) 0.62 %, close to the lower bound; <span class="prov prov-sim">Simulation</span> with a Gaussian copula of the same \(\rho_S = 0.42\), about 2.0 %. The measured rate is twice the Gaussian one because of the upper-tail dependence shown in the Fusion note.</p>
+<h5>Reference values of the alarm rate <span class="prov prov-theory">Theory</span></h5>
+<p>On the reference both ranks are approximately uniform. Independent ranks are uniform on the unit square, and \(S = \tfrac12(r_{\mathrm{AE}} + r_{\mathrm{LSTM}}) \ge t\) is the triangle above \(u + v = 2t\), of legs \(2 - 2t\) for \(t \ge \tfrac12\); identical ranks give \(S = r_{\mathrm{AE}}\). The two reference couplings therefore give</p>
+\[ P(S \ge t) = 2(1 - t)^2 \;\text{(independent ranks)}, \qquad P(S \ge t) = 1 - t \;\text{(identical ranks)}, \]
+<p>that is 0.58 % and 5.4 % at \(t = 0.946\). These are reference values, not bounds for every positively dependent pair: \(\{S \ge t\}\) is a half-plane, and orderings of dependence such as positive quadrant dependence do not order half-plane probabilities, so a positively quadrant-dependent pair can give a rate below \(2(1 - t)^2\). Over all couplings of two uniform ranks the rate ranges from 0 to \(2(1 - t)\) = 10.8 %. 0.946 is therefore not a percentile.</p>
+<p><span class="prov prov-new">New computation</span> Measured on validation: 4.34 %. With one rank shuffled (independence) 0.62 %, close to the independence value; <span class="prov prov-sim">Simulation</span> with a Gaussian copula of the same \(\rho_S = 0.42\), about 2.0 %. The measured rate is twice the Gaussian one because of the upper-tail dependence shown in the Fusion note.</p>
 <h5>A rank is not a probability <span class="prov prov-new">New computation</span></h5>
 <p>Share of faults among validation points, by fused score (in-sample: the threshold was chosen on these points):</p>
 <div class="mn-scroll"><table>
@@ -1811,7 +1804,7 @@ decision, and it is the real answer to "why not just set the threshold lower".
 </tbody></table></div>
 <p>The relation between \(S\) and the probability of a fault is steep near the top and not even monotone below 0.9; a score of 0.95 means "73 % of such points were faults on validation", not "95 % probability". Calibrating \(S\) into a probability (for instance by isotonic regression on held-out data) would need more fault episodes than the project has.</p>
 <h5>How precise is a rank? <span class="prov prov-theory">Theory</span> <span class="prov prov-new">New computation</span></h5>
-<p>The empirical distribution function is an unbiased estimator of \(F(e)\), with variance \(F(1 - F)/n\) for independent reference draws: at \(F = 0.946\) and \(n = 4{,}219\), a standard error of 0.0035. The reference errors are not independent: the AE rank has a lag-1 autocorrelation of 0.69 within validation days, so the effective size is about \(n(1 - \phi)/(1 + \phi) \approx 770\) and the standard error about 0.008. Uniformly over all \(e\), the Dvoretzky–Kiefer–Wolfowitz inequality \(P(\sup_e|\hat F_n - F| \gt \varepsilon) \le 2e^{-2n\varepsilon^2}\) (Massart, 1990) gives a 95 % band of 0.021 for independent draws. These are the same order as the margin between the threshold (0.946) and most test faults (0.959 to 0.967), and they ignore the season-to-season movement of \(F\) itself.</p>
+<p>The empirical distribution function is an unbiased estimator of \(F(e)\), with variance \(F(1 - F)/n\) for independent reference draws: at \(F = 0.946\) and \(n = 4{,}219\), a standard error of 0.0035. The reference errors are not independent. As an order of magnitude only: the AE rank has a lag-1 autocorrelation of 0.69 within validation days, and the AR(1) correction \(n(1 - \phi)/(1 + \phi) \approx 770\) gives a standard error near 0.008. The exact correction would use the autocorrelation of the indicator \(\mathbf{1}\{e_i \le e\}\) at the level \(F = 0.946\), not that of the rank, so this figure indicates the scale of the effect rather than its value. Uniformly over all \(e\), the Dvoretzky–Kiefer–Wolfowitz inequality \(P(\sup_e|\hat F_n - F| \gt \varepsilon) \le 2e^{-2n\varepsilon^2}\) (Massart, 1990) gives a 95 % band of 0.021 for independent draws. These are the same order as the margin between the threshold (0.946) and most test faults (0.959 to 0.967), and they ignore the season-to-season movement of \(F\) itself.</p>
 <h5>F₂ is a convention, not a cost <span class="prov prov-theory">Theory</span></h5>
 <p>\(F_\beta = (1 + \beta^2)PR/(\beta^2P + R)\) is a weighted harmonic mean of precision and recall. Maximising it does not correspond to a fixed cost ratio in the decision rule of the Objective's note, and its value on validation is optimistic because the threshold was chosen there.</p>
 </div>
@@ -2310,10 +2303,12 @@ A <code>deque</code> with <code>maxlen</code> makes the sliding window free: pus
 seventh point evicts the first automatically, with no index arithmetic to get wrong.
 The gap check happens <em>before</em> the append, so the incoming point starts the new
 segment rather than being discarded with the old one. This class is the streaming
-counterpart of <code>fabriquer_sequences</code>, and the final validation verifies that
-both produce identical scores: the batch path and the one-message-at-a-time path give
-the same score and alarm on every replayed test point (checked by replaying the stream,
-outside the notebook).
+counterpart of <code>fabriquer_sequences</code>, and replaying the whole test partition through the consumer's message handling,
+outside the notebook, gives the same alarm as the batch path on every scored point (101
+alarms in both). The scores agree to within one position in a rank reference (at most
+1.25 × 10<sup>−4</sup> on the fused score), a difference that changed no alarm in this replay.
+The automated tests check a 200-message slice with a tolerance of 10<sup>−3</sup> on the score
+and exact equality of the alarms.
 </p>
 
 <p class="reading">
@@ -2398,7 +2393,7 @@ is the only data in this record that covers other seasons. It should be evaluate
 <tr><td>Pooled within-day ACF</td><td class="num">0.83</td><td class="num">0.74</td><td class="num">0.67</td><td class="num">0.60</td><td class="num">0.46</td><td class="num">0.35</td><td class="num">0.27</td><td class="num">0.20</td></tr>
 <tr><td>AR(1), \(\phi^h\)</td><td class="num">0.83</td><td class="num">0.69</td><td class="num">0.57</td><td class="num">0.47</td><td class="num">0.33</td><td class="num">0.22</td><td class="num">0.15</td><td class="num">0.11</td></tr>
 </tbody></table></div>
-<p>The autocorrelation decays more slowly than an AR(1) process with the same lag-1 value: the integrated time over 12 lags is \(\tau \approx 12.2\) against 10.7 for the AR(1) model, consistent with a slowly varying daily component added to short-range noise. Either way, about 11 to 12 consecutive points carry one independent observation (<span class="prov prov-proj">Project result</span> median lag-1 autocorrelation 0.84 in <code>docs/experimental_design.md</code>), which is why the evaluation counts days and episodes, splits by whole days and resamples days.</p>
+<p>The autocorrelation decays more slowly than an AR(1) process with the same lag-1 value: summed over the same first 12 lags, the integrated time is \(\tau_{12} \approx 12.2\) for the data against 9.7 for the AR(1) model (10.7 for its infinite sum), consistent with a slowly varying daily component added to short-range noise. Because the empirical autocorrelation is still 0.20 at lag 12, the full integrated time exceeds 12.2. An AR(1) model with the median lag-1 autocorrelation of 0.84 (<span class="prov prov-proj">Project result</span> <code>docs/experimental_design.md</code>) gives about 11 consecutive points per independent observation, and the slower empirical decay implies at least as many, which is why the evaluation counts days and episodes, splits by whole days and resamples days.</p>
 <h5>The false-alarm rate depends on the season <span class="prov prov-theory">Theory</span></h5>
 <p>The detector learned \(P_0^{(\mathrm{train})}\) from late spring and summer, while \(P_0 = P_0^{(\tau)}\) changes with the season \(\tau\); the false-alarm rate \(\alpha(t; \tau) = P_0^{(\tau)}(s(X) \ge t)\) is a function of time, not a constant of the detector.</p>
 <h5>Counting alarms <span class="prov prov-theory">Theory</span></h5>
