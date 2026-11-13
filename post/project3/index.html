@@ -360,9 +360,10 @@ what protects the web routes.
 <h2>Views</h2>
 
 <p>
-Ten views serve as the read interface. Flask queries views rather than base
-tables, which keeps SQL out of the route handlers and limits what each role can
-read to exactly what its pages need.
+Ten views serve as the read interface for direct database clients: granting a
+role a view rather than a table limits what it can read to exactly what it needs.
+The Flask routes, which connect through a single application account, still
+query most base tables directly (see Known weaknesses).
 </p>
 
 <table class="srctable">
