@@ -192,6 +192,17 @@ Search results stay consistent with this rule: <code>rechercherBiens()</code>
 excludes conflicting properties through a <code>NOT EXISTS</code> subquery, so a
 property that cannot be booked never appears as available in the first place.
 </p>
+
+<p>
+The procedure is not the guarantee, though: a tenant account may also insert into
+<code>RESERVATION</code> directly, and two requests arriving at the same time can both
+pass a count before either commits. The rule is therefore also enforced by a compound
+trigger, <code>trg_resa_sans_chevauchement</code>, which locks the property row and
+rejects any pair of overlapping active reservations (pending or confirmed), whatever
+the write path. A second transaction on the same property waits for the first one,
+then sees its booking. This trigger was added after the project, when a re-examination
+showed that the original check could be bypassed.
+</p>
 </section>
 
 <!-- ===================== INTEGRITY ===================== -->
@@ -199,8 +210,8 @@ property that cannot be booked never appears as available in the first place.
 <h2>Integrity rules</h2>
 
 <p>
-Each of these triggers exists because of a specific way the data could be
-corrupted. They are listed with the error code they raise, since that is what the
+Each of these rules exists because of a specific way the data could be
+corrupted; most are enforced by triggers, the others by constraints and procedures. They are listed with the error code they raise, since that is what the
 Flask layer catches and translates for the user.
 </p>
 
@@ -213,9 +224,24 @@ Flask layer catches and translates for the user.
   <td><code>-20010</code></td>
 </tr>
 <tr>
-  <td>A successful payment cannot be modified</td>
-  <td><code>trg_no_update_paiement_if_reussi</code></td>
-  <td><code>-20011</code></td>
+  <td>No overlapping active reservations on a property</td>
+  <td><code>trg_resa_sans_chevauchement</code></td>
+  <td><code>-20001</code></td>
+</tr>
+<tr>
+  <td>A successful payment cannot be modified, only refunded once</td>
+  <td><code>trg_no_update_paiement_if_reussi</code> + <code>emettreRemboursement()</code></td>
+  <td><code>-20011</code>, <code>-20025</code></td>
+</tr>
+<tr>
+  <td>A rental is paid once</td>
+  <td><code>genererPaiement()</code>, <code>validerPaiement()</code></td>
+  <td><code>-20026</code></td>
+</tr>
+<tr>
+  <td>One rental per reservation; a reservation is confirmed once</td>
+  <td><code>uq_location_reservation</code> + <code>confirmerReservation()</code></td>
+  <td><code>-20020</code></td>
 </tr>
 <tr>
   <td>End date must follow start date</td>
@@ -234,17 +260,24 @@ Flask layer catches and translates for the user.
 <p>
 Once <code>statut_paiement = 'REUSSI'</code>, the row is frozen. Correcting a
 payment therefore requires an explicit refund through
-<code>emettreRemboursement()</code>, which leaves a trace, rather than an update
-that would erase the original state. This is the rule that most clearly belongs in
-the database rather than in application code.
+<code>emettreRemboursement()</code>, which leaves a trace (a negative payment row)
+rather than an update that would erase the original state. The trigger allows exactly
+one transition, from <code>REUSSI</code> to <code>REMBOURSE</code>, with every other
+column unchanged. The first version forbade every update, including that one, so a
+refund always failed; the tests added after the project found it. This is the rule
+that most clearly belongs in the database rather than in application code.
 </p>
 
 <h3>Rating updates</h3>
 <p>
-<code>majNoteMoyenne()</code> is declared <code>AUTONOMOUS_TRANSACTION</code>, so
-recomputing the average commits independently of the transaction that inserted the
-review. Without it, the procedure would be modifying a table already involved in
-the firing statement.
+The average is recomputed by a compound trigger on <code>AVIS_BIEN</code>: it collects
+the affected properties row by row and recomputes their rating once the statement is
+complete, inside the same transaction, for insertions, updates and deletions. The
+first version called a procedure declared <code>AUTONOMOUS_TRANSACTION</code> to avoid
+reading a table in the middle of its own modification. An autonomous transaction
+cannot see the uncommitted review that fired it, so the stored average always lagged
+one review behind, and any error was silently rolled back. Measuring it showed the
+problem: after a first review of 5, the stored rating stayed at 0.
 </p>
 </section>
 
@@ -270,7 +303,7 @@ BEGIN
     IF USER IN ('AIRBNB_V2', 'SYSTEM', 'SYS') THEN RETURN; END IF;
 
     SELECT id_utilisateur INTO v_user_id
-    FROM UTILISATEUR WHERE login_db = USER;
+    FROM UTILISATEUR WHERE UPPER(login_db) = USER;
 
     IF :NEW.id_locataire != v_user_id THEN
          :NEW.id_locataire := v_user_id;
@@ -281,7 +314,10 @@ END;</code></pre>
 <p>
 When each user connects with their own Oracle account, <code>USER</code> is a
 trustworthy identity, not a value the client can set. The same pattern protects
-messaging through <code>trg_secu_message_identity</code>. The Flask application
+messaging through <code>trg_secu_message_identity</code>. The same trigger also forces a
+directly inserted reservation to stay a pending request, and two further triggers limit
+direct reviews and payments to the tenant's own rentals, a payment being created as
+pending, for the rental's amount. The Flask application
 itself connects through a single application account, so in the web app the
 identity comes from the Flask session, and these triggers protect direct SQL
 clients rather than the web routes (see Known weaknesses).
@@ -369,7 +405,7 @@ makes accidental data leakage a schema question rather than a code review questi
 <figure class="shot shot--wide"><img src="reserv.png" alt="Reservations view" loading="lazy" /><figcaption>Reservations</figcaption></figure>
 
 <h3>Authentication</h3>
-<p>Registration through <code>sInscrire()</code>, login through <code>seConnecter()</code>.</p>
+<p>Registration through <code>sInscrire()</code>; passwords are checked in Flask against an Argon2id hash.</p>
 <figure class="shot shot--wide"><img src="insc.png" alt="Registration screen" loading="lazy" /><figcaption>Authentication</figcaption></figure>
 </section>
 
@@ -379,8 +415,10 @@ makes accidental data leakage a schema question rather than a code review questi
 
 <p>
 The full cycle works end to end: publish, search, reserve, confirm, pay, review.
-Thirty-nine PL/SQL objects (nineteen procedures and functions, ten triggers, ten
-views) carry the rules, backed by five database roles.
+Forty-three PL/SQL objects (nineteen procedures and functions, thirteen triggers, ten
+views and one package) carry the rules, backed by five database roles. A script of
+sixteen business-rule tests (<code>sql/tests_regles_metier.sql</code>) checks them on a
+fresh installation, and twenty-five automated tests cover the Flask layer.
 </p>
 
 <p>What the project taught me, and what I would defend:</p>
@@ -394,21 +432,22 @@ views) carry the rules, backed by five database roles.
 <h3 class="limits-head">Known weaknesses</h3>
 
 <div class="limits">
-<p>Three of these I would fix before deploying this anywhere real:</p>
+<p>The project was re-examined after the course with an AI coding assistant, which ran it against a real Oracle database, found the defects marked "fixed after the project" and drafted the corrections and tests; I reviewed, tested and committed every change. The open points are the ones I would address before deploying this anywhere real:</p>
 <ul>
-    <li><strong>The web app does not use the database identity model.</strong> Flask connects through a single Oracle account, so the identity triggers and the five roles protect direct SQL connections, not the web routes, where identity comes from the Flask session. Mapping each web session to its own database identity (or a proxy user with per-user context) would let the database enforce what it was designed to enforce.</li>
+    <li><strong>The web app does not use the database identity model.</strong> Flask connects through a single Oracle account, so the identity triggers and the five roles protect direct SQL connections, not the web routes, where identity comes from the Flask session. Mapping each web session to its own database identity (or a proxy user with per-user context) would let the database enforce what it was designed to enforce. Until then, every reservation route checks in Flask that the reservation belongs to the logged-in user; that check was missing in the original version and was added after the project.</li>
   <li><strong>Password hashing (fixed after the project).</strong> <code>sInscrire()</code> and <code>seConnecter()</code> originally hashed through <code>DBMS_CRYPTO.HASH_MD5</code>, without a salt. Passwords are now hashed with Argon2id in the Flask layer (per-password random salt, constant-time verification); Oracle stores only the hash and <code>sInscrire()</code> rejects anything that is not an Argon2id hash, and legacy MD5 hashes are upgraded at the next successful login.</li>
-  <li><strong>The availability check is not concurrency-safe.</strong> <code>verifierDisponibilite()</code> counts conflicts and <code>creerReservation()</code> then inserts. Two concurrent transactions can both pass the check before either commits, and both bookings are written. Closing this requires locking the property row or enforcing non-overlap as a constraint rather than a procedural check.</li>
+  <li><strong>Overlapping bookings (fixed after the project).</strong> <code>verifierDisponibilite()</code> counted conflicts and <code>creerReservation()</code> then inserted, so two concurrent transactions, or a direct insert, could write overlapping bookings. The compound trigger described above now locks the property row and enforces non-overlap for every write path.</li>
+  <li><strong>Cancelling a paid stay is not supported.</strong> A confirmed reservation can be cancelled only before any payment or review, and its rental is then removed. A paid stay must be refunded first, and the model has no cancellation-after-refund state yet.</li>
   <li><strong>Identity correction is silent.</strong> <code>trg_secu_resa_locataire</code> rewrites a mismatched tenant identifier rather than raising. It prevents the attack, but leaves no signal that one was attempted; raising an error would also make the rule visible during debugging.</li>
-  <li><strong>Few automated tests.</strong> The password layer and the registration and login routes have 17 automated tests; the PL/SQL procedures are still exercised manually. Edge cases around dates, status transitions and concurrency deserve a test suite.</li>
+  <li><strong>Tests are still limited.</strong> The Flask layer has 25 automated tests (passwords, registration, login, ownership of reservations), run against a simulated database. The sixteen business-rule tests run against Oracle, but by hand on a test installation, not automatically on every commit, and concurrency was checked manually.</li>
 </ul>
 </div>
 
 <h3>Next steps</h3>
 <ul>
-  <li>Make booking concurrency-safe through row locking or an exclusion constraint.</li>
   <li>Add an audit table for payment and status changes.</li>
-  <li>Build a PL/SQL test suite covering the eight integrity rules.</li>
+  <li>Run the business-rule tests automatically, against an Oracle container, on every commit.</li>
+  <li>Support cancelling a paid stay, with its refund, as an explicit state.</li>
 </ul>
 </section>
 
