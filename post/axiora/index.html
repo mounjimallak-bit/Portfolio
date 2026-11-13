@@ -66,6 +66,39 @@
     }
   }
 </style>
+<!-- MATH:BEGIN -->
+<!-- Mathematical notes: equations rendered with KaTeX 0.16.11 (pinned); styles apply to the notes only. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters: [{left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false}); window.dispatchEvent(new Event('mathrendered'));"></script>
+<style>
+.mathnote{ border:1px solid var(--rule); border-left:3px solid var(--signal); background:var(--paper-alt); margin:2rem 0 .6rem; }
+.mathnote > summary{ cursor:pointer; list-style:none; padding:.75rem 1.1rem; font-size:.93rem; line-height:1.5; }
+.mathnote > summary::-webkit-details-marker{ display:none; }
+.mathnote > summary::before{ content:"▸ "; color:var(--signal); }
+.mathnote[open] > summary::before{ content:"▾ "; }
+.mathnote[open] > summary{ border-bottom:1px solid var(--rule); }
+.mathnote .mn-tag{ font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--signal); margin-right:.5rem; }
+.mathnote .mn-dom{ font-family:var(--mono); font-size:.66rem; letter-spacing:.06em; color:var(--ink-soft); margin-left:.4rem; }
+.mathnote .mn-body{ padding:.4rem 1.1rem .6rem; background:#fff; }
+.mathnote .mn-body p, .mathnote .mn-body li{ font-size:.94rem; }
+.mathnote .mn-body h5{ font-family:var(--serif); font-weight:600; font-size:1rem; margin:1.3rem 0 .3rem; }
+.mathnote .mn-body table{ width:100%; border-collapse:collapse; font-size:.84rem; margin:.6rem 0 1rem; }
+.mathnote .mn-body th, .mathnote .mn-body td{ text-align:left; padding:.35rem .6rem .35rem 0; border-bottom:1px solid var(--rule); vertical-align:top; }
+.mathnote .mn-body thead th{ font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); border-bottom-color:var(--ink); }
+.mathnote .mn-body td.num{ font-family:var(--mono); text-align:right; white-space:nowrap; }
+.mathnote .mn-scroll{ overflow-x:auto; position:relative; }  /* contains KaTeX's absolutely positioned MathML copy */
+.mathnote .prov{ display:inline-block; font-family:var(--mono); font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; padding:.05rem .4rem; margin-right:.3rem; border:1px solid var(--rule); color:var(--ink-soft); white-space:nowrap; vertical-align:.1em; }
+.mathnote .prov-proj{ border-color:var(--signal); color:var(--signal); }
+.mathnote .prov-new{ border-color:var(--ink); color:var(--ink); }
+.mathnote .prov-theory{ background:var(--paper-alt); }
+.mathnote .prov-sim{ border-style:dashed; }
+.mathnote .prov-future{ border-style:dotted; }
+.mathnote .katex-display{ overflow-x:auto; overflow-y:hidden; padding:.2rem 0; position:relative; }
+.mathnote-intro{ font-size:.9rem; color:var(--ink-soft); }
+</style>
+<!-- MATH:END -->
 </head>
 
 <body>
@@ -139,6 +172,9 @@
     The main analysis examines changes in poverty rates between
     2004 and 2014 across communes and urban centre units.
   </p>
+<!-- MATH:BEGIN -->
+<p class="mathnote-intro">Boxes marked <em>Mathematical note</em> derive the statistics used in this analysis and test some of its assumptions on the data. Each number is labelled by origin: <strong>project result</strong> (<code>analyse_pauvrete.py</code>, <code>hcpdata.py</code>), <strong>new computation</strong> (<code>math_checks_axiora.py</code>), <strong>theory</strong> or <strong>future work</strong>.</p>
+<!-- MATH:END -->
 </section>
 
 
@@ -232,6 +268,36 @@
     The check reports no errors on the current dataset
     (see Data and validation below).
   </p>
+<!-- MATH:BEGIN -->
+<details class="mathnote">
+<summary><span class="mn-tag">Mathematical note</span>Weighted and unweighted levels, finite populations, and what the rates estimate<span class="mn-dom">· statistics · probability</span></summary>
+<div class="mn-body">
+<h5>Two means answer two questions <span class="prov prov-theory">Theory</span></h5>
+<p>For the units \(i\) of a territory, with populations \(N_i\) and poverty rates \(p_i\), the share of poor people is the population-weighted mean, while the unit-level summaries count each unit once:</p>
+\[ \bar p_w = \frac{\sum_i N_i\,p_i}{\sum_i N_i}, \qquad \tilde p = \operatorname{median}(p_1, \dots, p_n) . \]
+<p>They differ whenever poverty is correlated with population size. <span class="prov prov-proj">Project result</span> Agadir-Ida-Ou-Tanane in 2004: unit median 21.4 %, published (weighted) rate 8.9 %. The city of Agadir is a single unit with a rate of 3.7 %, in the urban part that holds 79 % of the prefecture's population (384,987 of 487,954 in the 2004 census).</p>
+<h5>A weighted mean identifies its weights <span class="prov prov-theory">Theory</span></h5>
+<p>If the territory rate is the population-weighted mean of its urban and rural rates, \(E = wU + (1 - w)R\), then the urban population share is identified by the three published rates:</p>
+\[ w = \frac{E - R}{U - R} . \]
+<p>Rounding of the published rates (to 0.05 points in 2004, 0.005 in 2014) propagates to an interval for \(w\), obtained by evaluating \(w\) at the corners of the rounding box (\(w\) is monotone in each rate).</p>
+<p><span class="prov prov-new">New computation</span> Implied urban share against the census urban share:</p>
+<div class="mn-scroll"><table>
+<thead><tr><th>Territory</th><th>2004 implied [rounding interval]</th><th>2004 census</th><th>2014 implied [interval]</th><th>2014 census</th></tr></thead>
+<tbody>
+<tr><td>Agadir-Ida-Ou-Tanane</td><td class="num">0.787 [0.782, 0.792]</td><td class="num">0.789</td><td class="num">0.846 [0.844, 0.847]</td><td class="num">0.846</td></tr>
+<tr><td>Inezgane-Aït Melloul</td><td class="num">0.917 [0.909, 0.926]</td><td class="num">0.919</td><td class="num">0.950 [0.947, 0.952]</td><td class="num">0.949</td></tr>
+<tr><td>Chtouka-Aït Baha</td><td class="num">0.135 [0.125, 0.144]</td><td class="num">0.134</td><td class="num">0.305 [0.301, 0.308]</td><td class="num">0.306</td></tr>
+<tr><td>Taroudant</td><td class="num">0.238 [0.232, 0.243]</td><td class="num">0.239</td><td class="num">0.295 [0.293, 0.297]</td><td class="num">0.296</td></tr>
+<tr><td>Tiznit</td><td class="num">0.245 [0.241, 0.250]</td><td class="num"><strong>0.270</strong></td><td class="num">0.392 [0.390, 0.393]</td><td class="num">0.391</td></tr>
+<tr><td>Tata</td><td class="num">0.324 [0.294, 0.353]</td><td class="num">0.321</td><td class="num">0.329 [0.328, 0.330]</td><td class="num"><strong>0.346</strong></td></tr>
+</tbody></table></div>
+<p>In 10 of 12 cases the census share lies inside the rounding interval: the published territory rates behave exactly as population-weighted means of their urban and rural parts, which is an independent check of the transcription and of the reading of the <em>Ensemble</em> row. The two exceptions (Tiznit 2004, Tata 2014) lie outside rounding error; a different population base or boundary for the poverty map is possible, but this has not been established.</p>
+<h5>Description of a finite population <span class="prov prov-theory">Theory</span></h5>
+<p>The 179 units are all units with published rates, not a sample: their median and quartiles are population quantities, not estimates with a sampling error, which is why no p-value or resampling interval is given. This does not make them exact. Communal poverty rates are small-area estimates that combine a household survey with census data (Elbers, Lanjouw and Lanjouw, 2003): each \(p_i\) is \(p_i^{\mathrm{true}} + e_i\) with an estimation error \(e_i\) whose variance the published sheets do not report, larger for small communes. The Results note shows one consequence of this error.</p>
+</div>
+</details>
+<!-- MATH:END -->
+
 </section>
 
 
@@ -501,6 +567,32 @@
     </figcaption>
   </figure>
 
+<!-- MATH:BEGIN -->
+<details class="mathnote">
+<summary><span class="mn-tag">Mathematical note</span>Robust summaries, change against initial level, and variation between territories<span class="mn-dom">· statistics</span></summary>
+<div class="mn-body">
+<h5>Why medians and quartiles <span class="prov prov-theory">Theory</span></h5>
+<p>The median and quartiles are order statistics. Their breakdown point is 50 % for the median and 25 % for the quartiles: that share of the units can be moved arbitrarily far before the summary does, against 0 % for the mean, which a single extreme unit can shift. For a normal distribution, IQR \(\approx 1.349\,\sigma\) and the median absolute deviation (MAD) \(\approx 0.674\,\sigma\), so comparing them with the standard deviation is a check of shape.</p>
+<p><span class="prov prov-new">New computation</span> Over the 179 units:</p>
+<div class="mn-scroll"><table>
+<thead><tr><th></th><th>Mean</th><th>Median</th><th>IQR</th><th>SD</th><th>MAD</th><th>Skewness</th></tr></thead>
+<tbody>
+<tr><td>2004 rate</td><td class="num">24.14</td><td class="num">23.00</td><td class="num">14.32</td><td class="num">10.35</td><td class="num">7.40</td><td class="num">+0.15</td></tr>
+<tr><td>2014 rate</td><td class="num">11.05</td><td class="num">10.23</td><td class="num">9.65</td><td class="num">6.88</td><td class="num">4.48</td><td class="num">+0.98</td></tr>
+<tr><td>Change 2004–2014</td><td class="num">−13.09</td><td class="num">−12.52</td><td class="num">10.04</td><td class="num">8.36</td><td class="num">5.20</td><td class="num">−0.40</td></tr>
+</tbody></table></div>
+<p>The 2004 distribution is nearly symmetric (IQR/SD = 1.38, close to the normal 1.35); by 2014 it is right-skewed, as expected for rates that fall towards a floor at zero, which compresses the lower tail. The mean exceeds the median in both years for the same reason.</p>
+<h5>Change against initial level: regression towards the mean <span class="prov prov-theory">Theory</span></h5>
+<p>With \(x_i\) the 2004 rate, \(z_i\) the 2014 rate and \(d_i = z_i - x_i\), the least-squares slope of \(d\) on \(x\) is</p>
+\[ b = \frac{\operatorname{cov}(z - x,\, x)}{\operatorname{var}(x)} = \frac{\operatorname{cov}(z, x)}{\operatorname{var}(x)} - 1 = r_{xz}\,\frac{s_z}{s_x} - 1 . \]
+<p>It is negative whenever \(r_{xz} s_z \lt s_x\), even if no unit converged. Suppose the true rates did not change and each published rate carried an independent estimation error of variance \(\sigma_e^2\): then \(b = -\sigma_e^2/\operatorname{var}(x) \lt 0\). Units that looked poorest in 2004 would appear to improve most, by measurement error alone (Galton's regression towards the mean).</p>
+<p><span class="prov prov-new">New computation</span> Here \(\operatorname{var}(x) = 107.1\), \(\operatorname{var}(z) = 47.3\), \(\operatorname{cov}(x, z) = 42.2\), so \(b = 42.2/107.1 - 1 = -0.61\) (Pearson \(r = -0.75\) between change and initial level). The <em>relative</em> change \(d_i/x_i\) is almost unrelated to the initial level (Spearman \(-0.07\); median \(-58\,\%\)). The data are therefore consistent with a roughly proportional decline across levels; the strong negative correlation in points is what proportional decline and regression towards the mean both produce, and must not be read as poorer communes progressing faster. The two explanations cannot be separated without the estimation errors of the poverty map.</p>
+<h5>How much of the variation lies between territories <span class="prov prov-theory">Theory</span></h5>
+<p>The total sum of squares splits into between-territory and within-territory parts, \(\sum_i (x_i - \bar x)^2 = \sum_g n_g(\bar x_g - \bar x)^2 + \sum_g\sum_{i \in g}(x_i - \bar x_g)^2\); the between share \(\eta^2\) is the analogue of an intraclass correlation. <span class="prov prov-new">New computation</span> \(\eta^2 = 0.16\) in 2004 and 0.25 in 2014: most of the variation is between communes of the same territory, and the territory explains a growing part of it.</p>
+</div>
+</details>
+<!-- MATH:END -->
+
 </section>
 
 
@@ -538,6 +630,29 @@
     the unit-level figures exclude three urban centre units for
     which no rate is published in two of the three years.
   </p>
+<!-- MATH:BEGIN -->
+<details class="mathnote">
+<summary><span class="mn-tag">Mathematical note</span>Spatial dependence: Moran's I on the commune map<span class="mn-dom">· probability · statistics</span></summary>
+<div class="mn-body">
+<h5>Definition <span class="prov prov-theory">Theory</span></h5>
+<p>With a spatial weight matrix \(W\) (\(w_{ij} = 1\) if communes \(i\) and \(j\) share a border or a corner, queen contiguity), \(S_0 = \sum_{ij}w_{ij}\) and \(z_i = x_i - \bar x\),</p>
+\[ I = \frac{n}{S_0}\,\frac{z^\top W z}{z^\top z}, \qquad \mathbb{E}[I] = -\frac{1}{n - 1}\ \text{ under no spatial association} \]
+<p>(Moran, 1950). \(I\) is a weighted correlation between each value and its neighbours' values. Its null distribution is obtained here by permutation: randomly reassigning the observed rates to the communes 9,999 times, which assumes exchangeability under the null and conditions on the map and on \(W\).</p>
+<h5>Results <span class="prov prov-new">New computation</span></h5>
+<p>The 175 communes joined to a polygon of the official boundary file (urban centre units have none) have between 1 and 11 neighbours (median 5).</p>
+<div class="mn-scroll"><table>
+<thead><tr><th>Variable</th><th>Moran's I</th><th>Permutation mean and SD</th><th>Two-sided p</th></tr></thead>
+<tbody>
+<tr><td>2004 rate</td><td class="num">0.348</td><td class="num">−0.006 · 0.046</td><td class="num">≤ 0.0001</td></tr>
+<tr><td>2014 rate</td><td class="num">0.425</td><td class="num">−0.006 · 0.046</td><td class="num">≤ 0.0001</td></tr>
+<tr><td>Change 2004–2014</td><td class="num">0.193</td><td class="num">−0.005 · 0.046</td><td class="num">≤ 0.0001</td></tr>
+</tbody></table></div>
+<p>(0.0001 is the smallest p-value attainable with 9,999 permutations.) Neighbouring communes have strongly similar rates, more so in 2014 than in 2004, and their changes are also spatially clustered. This quantifies the statement of the method that neighbouring units are not independent: the 179 units carry less independent information than their number suggests, and any model of the differences would have to include spatial correlation.</p>
+<p><strong>Limits.</strong> \(I\) depends on the choice of \(W\); it is a global summary and does not locate clusters; the measurement errors of the poverty map, themselves spatially correlated through shared survey strata, may contribute to it. <span class="prov prov-future">Future work</span> Local indicators of spatial association (local Moran) would locate the clusters, and a spatial regression would be needed before any explanatory model.</p>
+</div>
+</details>
+<!-- MATH:END -->
+
 </section>
 
 
@@ -581,6 +696,20 @@
     values could not be matched to a published table. None of these
     values is used for any result on this page.
   </p>
+<!-- MATH:BEGIN -->
+<details class="mathnote">
+<summary><span class="mn-tag">Mathematical note</span>Consistency checks as linear constraints, and what they can and cannot detect<span class="mn-dom">· linear algebra</span></summary>
+<div class="mn-body">
+<p><span class="prov prov-theory">Theory</span> Stack the cells of a table in a vector \(v\). Each published total gives a linear constraint: urban + rural = total, men + women = total, provinces = region. Together they read \(Av = b\), with one row of \(A\) per constraint. A transcription error \(\delta\) turns \(v\) into \(v + \delta\), and the validator detects it exactly when \(A\delta \ne 0\).</p>
+<ul>
+<li>An error in a single cell violates every constraint containing that cell; in a two-way table with row and column totals, it violates one row and one column constraint, which also locates it.</li>
+<li>Undetectable errors are the vectors of the null space of \(A\), of dimension (number of cells) − \(\operatorname{rank}(A)\): for instance two compensating errors in the same row of a table that has only row totals, or a whole table replaced by another consistent one. This is why the validator also compares every copy of a table with its source, value by value, matching copies by structure and year (one of its tests fills a 2018 table with the 2017 figures, which no total would reveal).</li>
+<li>Rates are not additive: a total rate is a weighted mean, \(E = wU + (1 - w)R\), so it can only be checked with weights. The Data and method note shows that this identity, with census weights, holds within rounding for 10 of the 12 territory–year rates.</li>
+</ul>
+</div>
+</details>
+<!-- MATH:END -->
+
 </section>
 
 
@@ -834,5 +963,17 @@
 </article>
 </main>
 
+<!-- MATH:BEGIN -->
+<script>
+(function(){
+  function f(){ document.querySelectorAll(".mathnote .katex-display, .mathnote .mn-scroll").forEach(function(e){
+    if (e.scrollWidth > e.clientWidth){ e.tabIndex = 0; e.setAttribute("role", "group"); e.setAttribute("aria-label", "Scrolls horizontally"); }
+    else { e.removeAttribute("tabindex"); e.removeAttribute("role"); e.removeAttribute("aria-label"); } }); }
+  window.addEventListener("mathrendered", f);
+  document.addEventListener("toggle", function(){ setTimeout(f, 50); }, true);
+  var t; window.addEventListener("resize", function(){ clearTimeout(t); t = setTimeout(f, 150); });
+})();
+</script>
+<!-- MATH:END -->
 </body>
 </html>
